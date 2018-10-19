@@ -1,0 +1,97 @@
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0; /* Set the fixed height of the footer here */
+    line-height: 60px; /* Vertically center the text there */
+    background-color: rgb(255, 100, 100);
+    text-align: center;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+html,
+body {
+    height: 100%;
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+body {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: rgba(255, 100, 100, 0.2);
+}
+
+.form-signin {
+    width: 100%;
+    max-width: 330px;
+    padding: 15px;
+    margin: auto;
+}
+.form-signin .checkbox {
+    font-weight: 400;
+}
+.form-signin .form-control {
+    position: relative;
+    box-sizing: border-box;
+    height: auto;
+    padding: 10px;
+    font-size: 16px;
+}
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* Home Page -- Not logged CSS starts */
+.auth-page{
+    height: 100%;
+}
+
+.auth-container {
+    padding-top: 5%;
+    width: 50%;
+    margin: auto;
+    text-align: center;
+}
+.auth{
+    background: #ffffff;
+
+    width: 400px;
+    margin: auto;
+    padding: 5%;
+    border-radius: 5px;
+    border: solid 1px #0000003d;
+}
+
+.auth-header-btn{
+    width: 49%;
+}
+
+.login,
+.register {
+    padding: 1.5%;
+}
+
+#login-tab, #register-tab {
+    background-color: rgb(255, 100, 100);
+    color: #fff;
+}
+/* Home Page -- Not logged CSS ends */
