@@ -23,50 +23,74 @@
                 <div class="auth-header">
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="btn auth-header-btn">
-                            <a class="nav-link active" id="register-tab" data-toggle="pill" href="#register" role="tab" aria-controls="register" aria-selected="true">Register</a>
+                            <a class="nav-link active" id="login-tab" data-toggle="pill" href="#login" role="tab" aria-controls="login" aria-selected="true">Se connecter</a>
                         </li>
                         <li class="btn auth-header-btn">
-                            <a class="nav-link" id="login-tab" data-toggle="pill" href="#login" role="tab" aria-controls="login" aria-selected="false">Login</a>
+                            <a class="nav-link" id="register-tab" data-toggle="pill" href="#register" role="tab" aria-controls="register" aria-selected="false">S'inscrire</a>
                         </li>
                     </ul>
                 </div>
                 <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active register" id="register" role="tabpanel" aria-labelledby="register-tab">
+
+                    <div class="tab-pane fade show active login" id="login" role="tabpanel" aria-labelledby="login-tab">
                         <div class="form-group">
-                            <label for="username">Username</label>
+                            <label for="username">Identifiant</label>
                             <input type="username"
                                    class="form-control"
                                    id="username"
                                    placeholder="Enter username">
                         </div>
                         <div class="form-group">
-                            <label for="password">Password</label>
+                            <label for="password">Mot de passe</label>
+                            <input type="password"
+                                   class="form-control"
+                                   id="login-password"
+                                   placeholder="Enter password">
+                        </div>
+                        <button class="btn login-btn">Login</button>
+                    </div>
+
+                    <div class="tab-pane fade register" id="register" role="tabpanel" aria-labelledby="register-tab">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label for="email">Nom</label>
+                                <input type="password"
+                                       class="form-control"
+                                       id="email"
+                                       placeholder="Enter email">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Prénom</label>
+                                <input type="password"
+                                       class="form-control"
+                                       id="email"
+                                       placeholder="Enter email">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="password"
+                                       class="form-control"
+                                       id="email"
+                                       placeholder="Enter email">
+                            </div>
+                            <label for="username">Identifiant</label>
+                            <input type="username"
+                                   class="form-control"
+                                   id="username"
+                                   placeholder="Enter username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Mot de passe</label>
                             <input type="password"
                                    class="form-control"
                                    id="password"
                                    placeholder="Enter password">
                         </div>
                         <div class="form-group">
-                            <label for="email">Email</label>
+                            <label for="password">Confirmation du Mot de Passe</label>
                             <input type="password"
                                    class="form-control"
-                                   id="email"
-                                   placeholder="Enter email">
-                        </div>
-                    </div>
-                    <div class="tab-pane fade login" id="login" role="tabpanel" aria-labelledby="login-tab">
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="username"
-                                   class="form-control"
-                                   id="username"
-                                   placeholder="Enter username">
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password"
-                                   class="form-control"
-                                   id="login-password"
+                                   id="password"
                                    placeholder="Enter password">
                         </div>
                     </div>
