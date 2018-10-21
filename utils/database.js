@@ -6,6 +6,6 @@ module.exports = {
         'user': 'root1',
         'password': 'root00'
     },
-    'database': 'matcha',
-    //'user_table': 'users'
+    'database': 'Matcha',
+    'user_table': 'users'
 };

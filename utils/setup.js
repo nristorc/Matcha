@@ -22,22 +22,21 @@ connection.query("USE " + configDatabase.database, (err) => {
     }
     console.log('connected to ' + configDatabase.database)
 });
-/*const sql = "CREATE TABLES IF NOT EXISTS " + configDatabase.user_table + '` ('
-    + 'id INT NOT NULL AUTO_INCREMENT,'
-    + 'PRIMARY KEY(id),'
-    + 'email VARCHAR(255) NOT NULL,'
-    + 'firstname VARCHAR(30) NOT NULL,'
-    + 'lastname VARCHAR(255) NOT NULL,'
-    + 'username VARCHAR(30) NOT NULL,'
-    + 'password VARCHAR(255) NOT NULL,'
-    + 'created_at DATETIME NOT NULL'
-    + ')';
+const sql = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
+    "(`id` INT(11) NOT NULL AUTO_INCREMENT," +
+    "`email` VARCHAR(255) NOT NULL," +
+    "`firstname` VARCHAR(30) NOT NULL," +
+    "`lastname` VARCHAR(50) NOT NULL," +
+    "`username` VARCHAR(50) NOT NULL," +
+    "`password` VARCHAR(255) NOT NULL," +
+    "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+
 connection.query(sql, (err, result) => {
     if (err) {
         console.error('error creating table: ' + err.stack);
         return
     }
     console.log("Table " + configDatabase.user_table + " created");
-});*/
+});
 
 connection.end();
