@@ -6,7 +6,6 @@ const path = require('path');
 
 const routes = require('./utils/routes');
 
-
 class Server{
 
     constructor(){
