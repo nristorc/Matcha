@@ -1,0 +1,19 @@
+{
+  "name": "matcha",
+  "version": "1.0.0",
+  "description": "42 pproject: Dating website using NodeJS MySQL and Bootstrap librairy",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "author": "nristorc - acoulomb",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "mysql": "^2.16.0",
+    "nodemon": "^1.18.4"
+  }
+}
