@@ -1,9 +1,16 @@
-const db = require('../utils/database');
+const mysql = require('mysql');
 
 class DatabaseRequest {
 
     constructor(){
-        this.db = db;
+            this.connection = mysql.createPool({
+                connectionLimit: 100,
+                host: 'localhost',
+                user: 'root1',
+                password: 'root00',
+                database: 'matcha',
+                debug: false
+            });
     }
 
     query(sql, args) {
@@ -18,8 +25,9 @@ class DatabaseRequest {
 
     async loginUser(params){
         try {
-            return await this.db.query(`SELECT id FROM matcha.users WHERE LOWER(username) = ? AND password = ?`, [params.username, params.password]);
+            return await this.query(`SELECT id FROM matcha.users WHERE LOWER(username) = ? AND password = ?`, [params.username, params.password]);
         } catch (error) {
+            console.log(error);
             return null;
         }
     }
