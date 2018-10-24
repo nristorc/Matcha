@@ -21,7 +21,7 @@
                 <div class="tab-content" id="pills-tabContent">
 
                     <div class="tab-pane fade show active login" id="login" role="tabpanel" aria-labelledby="login-tab">
-                        <form method="post" action="/">
+                        <form method="post" action="/login">
                             <div class="form-group">
                                 <label for="username">Identifiant</label>
                                 <input type="text" class="form-control" id="loginUsername" name="username" placeholder="Entrez votre identifiant">
@@ -36,39 +36,41 @@
                     </div>
 
                     <div class="tab-pane fade register" id="register" role="tabpanel" aria-labelledby="register-tab">
-                        <div class="form-group">
-                            <div class="display-register">
-                                <div class="form-group">
-                                    <label for="lastname">Nom</label>
-                                    <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Entrez votre nom de famille">
+                        <form method="post" action="/register">
+                            <div class="form-group">
+                                <div class="display-register">
+                                    <div class="form-group">
+                                        <label for="lastname">Nom</label>
+                                        <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Entrez votre nom de famille">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="firstname">Prénom</label>
+                                        <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Entrez votre prénom">
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="firstname">Prénom</label>
-                                    <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Entrez votre prénom">
+                                <div class="display-register">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="username">Identifiant</label>
+                                        <input type="text" class="form-control" id="register-username" name="username" placeholder="Entrez un identifiant">
+                                    </div>
+                                </div>
+                                <div class="display-register">
+                                    <div class="form-group">
+                                        <label for="password">Mot de passe</label>
+                                        <input type="password" class="form-control" id="register-password" name="password" placeholder="Entrez un mot de passe">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirm_password">Confirmation</label>
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirmez mot de passe">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="display-register">
-                                <div class="form-group">
-                                    <label for="email">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre email">
-                                </div>
-                                <div class="form-group">
-                                    <label for="username">Identifiant</label>
-                                    <input type="text" class="form-control" id="register-username" name="username" placeholder="Entrez un identifiant">
-                                </div>
-                            </div>
-                            <div class="display-register">
-                                <div class="form-group">
-                                    <label for="password">Mot de passe</label>
-                                    <input type="password" class="form-control" id="register-password" name="password" placeholder="Entrez un mot de passe">
-                                </div>
-                                <div class="form-group">
-                                    <label for="confirm_password">Confirmation</label>
-                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirmez mot de passe">
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn register-btn">S'inscrire</button>
+                            <button type="submit" id="submitRegister" class="btn register-btn">S'inscrire</button>
+                        </form>
                     </div>
                 </div>
             </div>

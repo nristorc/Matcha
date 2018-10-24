@@ -29,6 +29,7 @@ const sql = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`lastname` VARCHAR(50) NOT NULL," +
     "`username` VARCHAR(50) NOT NULL," +
     "`password` VARCHAR(255) NOT NULL," +
+    "`created_at` DATETIME NOT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql, (err, result) => {

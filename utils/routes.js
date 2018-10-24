@@ -16,7 +16,7 @@ class Routes{
             response.render('index');
         });
 
-        this.app.post('/', async (request, response)=> {
+        this.app.post('/login', async (request, response)=> {
             const loginResponse = {};
             const data = {
                 username: request.body.username,
@@ -48,7 +48,7 @@ class Routes{
             }
         });
 
-        this.app.post('/', async (request,response) => {
+        this.app.post('/register', async (request,response) => {
             const registrationResponse = {};
             const data = {
                 lastname: request.body.lastname,
@@ -65,9 +65,65 @@ class Routes{
                 registrationResponse.error = true;
                 registrationResponse.message = `One of the fields is empty -- ALL MANDATORY`;
                 response.status(412).json(registrationResponse);
-            }
-            else {
-                const result = await validation.isName(data.firstname, 'Wrong firstname')
+            } else {
+                await validation.isName(data.firstname, 'Wrong firstname');
+                await validation.isName(data.lastname, 'Wrong lastname');
+                await validation.isAlpha(data.username, 'Wrong username');
+                await validation.isEmail(data.email, "Wrong Email");
+                await validation.isConfirmed(data.password, data.confirmPassword, "Wrong matching password");
+                console.log(validation.errors);
+
+                if (validation.errors.length === 0) {
+                    console.log('on passe au check db !');
+                    const resultUsername  = await checkDb.checkUsername(data.username);
+                    const resultEmail = await checkDb.checkEmail(data.email);
+                    console.log('count db username: ', resultUsername[0].count);
+                    console.log('count db email: ', resultEmail[0].count);
+
+                    if (resultUsername[0].count !== 0 && resultEmail[0].count !== 0) {
+                        response.status(401).json({
+                            error:true,
+                            message: 'This username and email are already taken.'
+                        });
+                    } else if (resultUsername[0].count !== 0 && resultEmail[0].count === 0) {
+                        response.status(401).json({
+                            error:true,
+                            message: 'This username is already taken.'
+                        });
+                    } else if (resultUsername[0].count === 0 && resultEmail[0].count !== 0) {
+                        response.status(401).json({
+                            error:true,
+                            message: 'This email is already taken.'
+                        });
+                    }
+                    else {
+                        console.log("Je peux ajouter le nouvel utilisateur !! Youpiiii")
+                        const result = await checkDb.registerUser(data);
+                        console.log(result);
+                        if (result === false) {
+                            registrationResponse.error = true;
+                            registrationResponse.message = `User registration unsuccessful,try after some time.`;
+                            response.status(417).json(registrationResponse);
+                        } else {
+                            registrationResponse.error = false;
+                            registrationResponse.userId = result.insertId;
+                            registrationResponse.message = `User registration successful.`;
+                            response.status(200).render('pages/registered',
+                                { firstname: data.firstname, lastname: data.lastname,
+                                    username: data.username, password: data.password, email: data.email });
+                        }
+                    }
+                } else {
+                    registrationResponse.error = true;
+                    registrationResponse.message = `Error fields format... Check which is wrong please`;
+                    response.status(417).json(registrationResponse);
+                    validation.errors = [];
+                }
+
+
+                //console.log('result', result);
+
+
             }
             /*else{
                 const result = await checkDb.registerUser( data );
