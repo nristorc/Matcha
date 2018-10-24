@@ -43,6 +43,7 @@ class Routes{
                     loginResponse.userId = result[0].id;
                     console.log(data);
                     loginResponse.message = `User logged in.`;
+                    request.session.user = data;
                     response.status(200).render('pages/loggedIn', {username: data.username, password: data.password, message: loginResponse.message});
                 }
             }
@@ -97,7 +98,7 @@ class Routes{
                         });
                     }
                     else {
-                        console.log("Je peux ajouter le nouvel utilisateur !! Youpiiii")
+                        console.log("Je peux ajouter le nouvel utilisateur !! Youpiiii");
                         const result = await checkDb.registerUser(data);
                         console.log(result);
                         if (result === false) {
@@ -139,6 +140,16 @@ class Routes{
                 }
             }*/
         });
+
+        this.app.get('/dashboard', (request, response) => {
+            console.log(request.session);
+            if (!request.session.user) {
+                console.log('pas de session');
+                return response.status(401).send();
+            }
+            console.log('1 session');
+            return response.status(200).send('Welcome to your Dashboard !');
+        })
     }
 
     routesConfig(){
