@@ -6,6 +6,8 @@ const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
 
+var cookieParser = require('cookie-parser');
+
 class Routes{
     constructor(app){
         this.app = app;
@@ -34,21 +36,24 @@ class Routes{
                 loginResponse.message = `password cant be empty.`;
                 response.status(412).json(loginResponse);
             } else {
-                const result = await checkDb.loginUser(data);
-                console.log(result);
-                if (result === null ||result.length === 0) {
-                    loginResponse.error = true;
-                    loginResponse.message = `Invalid username and password combination.`;
-                    console.log('Invalid username or password');
-                    response.status(401).render('pages/error', {message: loginResponse.message});
-                } else {
+                checkDb.loginUser(data).then( (result) => {
                     loginResponse.error = false;
                     loginResponse.userId = result[0].id;
-                    console.log(data);
                     loginResponse.message = `User logged in.`;
                     request.session.user = data;
-                    response.status(200).render('pages/loggedIn', {username: data.username, password: data.password, message: loginResponse.message});
-                }
+                    response.status(200).render('pages/loggedIn', {
+                        username: data.username,
+                        password: data.password,
+                        message: loginResponse.message
+                    });
+                }).catch((result) => {
+                    if (result === undefined || result === false) {
+                        loginResponse.error = true;
+                        loginResponse.message = `Invalid username and password combination.`;
+                        console.log('Invalid username or password');
+                        response.status(401).render('pages/error', {message: loginResponse.message});
+                    }
+                });
             }
         });
 
@@ -135,6 +140,18 @@ class Routes{
             }
             console.log('1 session');
             return response.status(200).send('Welcome to your Dashboard !');
+        });
+
+        this.app.get('/logout', function(request, result){
+            let cookie = request.cookies;
+            for (var prop in cookie) {
+                if (!cookie.hasOwnProperty(prop)) {
+                    continue;
+                }
+                result.cookie(prop, '', {expires: new Date(0)});
+                request.session = null;
+            }
+            result.redirect('/');
         });
     }
 

@@ -2,8 +2,6 @@ const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const nodemailer = require('nodemailer');
-//const myPlaintextPassword = 's0/\/\P4$$w0rD';
-//const someOtherPlaintextPassword = 'not_bacon';
 
 class DatabaseRequest {
 
@@ -30,10 +28,24 @@ class DatabaseRequest {
 
     async loginUser(params){
         try {
-            return await this.query(`SELECT id FROM matcha.users WHERE LOWER(username) = ? AND password = ?`, [params.username, params.password]);
+            return new Promise((resolve, reject) => {
+                this.query("SELECT password FROM matcha.users WHERE username = ?", [params.username]).then((hash) => {
+                    if (hash && hash[0] && hash[0].password) {
+                        bcrypt.compare(params.password, hash[0].password, (err, res) => {
+                            if (res === true) {
+                                resolve(this.query(`SELECT id FROM matcha.users WHERE LOWER(username) = ? AND password = ?`, [params.username, hash[0].password]));
+                            } else {
+                                reject();
+                            }
+                        });
+                    } else {
+                        reject();
+                    }
+                });
+            });
         } catch (error) {
             console.log(error);
-            return null;
+            return false;
         }
     }
 

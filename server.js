@@ -31,7 +31,7 @@ class Server{
             key: 'user_sid',
             secret: 'somerandomstuffs',
             resave: false,
-            saveUninitialized: true,
+            saveUninitialized: false,
             cookie: { expires: 600000 }
         }));
 
