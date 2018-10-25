@@ -13,7 +13,10 @@ class Routes{
 
     appRoutes(){
         this.app.get('/', (request,response) => {
-            response.render('index');
+            if (!request.session.user) {
+                return response.render('index');
+            }
+            response.render('pages/dashboard');
         });
 
         this.app.post('/login', async (request, response)=> {
@@ -120,36 +123,19 @@ class Routes{
                     response.status(417).json(registrationResponse);
                     validation.errors = [];
                 }
-
-
-                //console.log('result', result);
-
-
             }
-            /*else{
-                const result = await checkDb.registerUser( data );
-                if (result === null) {
-                    registrationResponse.error = true;
-                    registrationResponse.message = `User registration unsuccessful,try after some time.`;
-                    response.status(417).json(registrationResponse);
-                } else {
-                    registrationResponse.error = false;
-                    registrationResponse.userId = result.insertId;
-                    registrationResponse.message = `User registration successful.`;
-                    response.status(200).json(registrationResponse);
-                }
-            }*/
         });
 
-        this.app.get('/dashboard', (request, response) => {
+        this.app.get('/loggedIn', (request, response) => {
             console.log(request.session);
+            console.log(request.session.user);
             if (!request.session.user) {
                 console.log('pas de session');
                 return response.status(401).send();
             }
             console.log('1 session');
             return response.status(200).send('Welcome to your Dashboard !');
-        })
+        });
     }
 
     routesConfig(){
