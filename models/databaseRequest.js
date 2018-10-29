@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const nodemailer = require('nodemailer');
 
+const str = require('../models/str');
+const random = new str();
+
 class DatabaseRequest {
 
     constructor(){
@@ -49,6 +52,27 @@ class DatabaseRequest {
         }
     }
 
+    async checkActive(params){
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT active FROM matcha.users WHERE username = ?", [params]).then((resultActive) => {
+                    if (resultActive && resultActive[0] !== undefined) {
+                        if (resultActive[0].active === 1) {
+                            resolve();
+                        } else {
+                            reject('non active user');
+                        }
+                    } else {
+                        reject('non existing user');
+                    }
+                });
+            });
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
     async checkUsername(params){
         console.log('username: ',params);
         return await this.query(`SELECT count(username) as count FROM matcha.users WHERE username = ?`, [params]);
@@ -59,12 +83,46 @@ class DatabaseRequest {
         return await this.query(`SELECT count(email) as count FROM matcha.users WHERE email = ?`, [params]);
     }
 
+    async checkSecretToken(param){
+        try {
+            return new Promise((resolve, reject) => {
+                console.log('param: ',param);
+                this.query(`SELECT * FROM matcha.users WHERE secretToken = ?`, [param]).then((result) => {
+                    console.log('select query: ', result);
+                    if (result && result[0] && result[0].secretToken === param && result[0].active === 0) {
+                        console.log('le token existe');
+                        this.query("UPDATE matcha.users SET `secretToken` = 'NULL', `active` = 1 WHERE users.secretToken = ?", [param]);
+                        resolve(
+                            this.query(`SELECT username, password FROM matcha.users WHERE id = ?`, [result[0].id])
+                        );
+                    } else {
+                        console.log("Le token n'existe pas");
+                        reject();
+                    }
+                });
+            });
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+
+
+        //console.log('token: ', param);
+        //return );
+    }
+
     async registerUser(params) {
         try {
             bcrypt.hash(params['password'], saltRounds, (err, hash) => {
-                this.query("INSERT INTO matcha.users (email, firstname, lastname, username, password, created_at)" +
-                    "VALUES (?, ?, ?, ?, ?, NOW())", [params['email'], params['firstname'], params['lastname'], params['username'], hash],
+
+                const secretToken = str.randomString(30);
+
+                this.query("INSERT INTO matcha.users (email, firstname, lastname, username, password, created_at, secretToken, active)" +
+                    "VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)",
+                    [params['email'], params['firstname'], params['lastname'], params['username'], hash, secretToken, params['active']],
                     function (error, results, fields) { if (error) throw error; });
+
+                //Sending emails
                 const output = `
                     <p>You have been registered to our Website</p>
                     <h3>Contact Details</h3>
@@ -75,7 +133,7 @@ class DatabaseRequest {
                     <li>Username: ${params['username']}</li>
                     </ul>
                     <h3>Link to confirm</h3>
-                    <p>TEST</p>
+                    <p><a href="http://localhost:3000/verify/${secretToken}">Verify your account</a></p>
                     `;
 
                 let transporter = nodemailer.createTransport({
@@ -106,7 +164,12 @@ class DatabaseRequest {
                     console.log('Message sent: %s', info.messageId);
                     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 });
+
+
             });
+
+
+
             return true;
         } catch (error){
             console.log(error);

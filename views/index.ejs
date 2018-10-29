@@ -32,7 +32,25 @@
                             </div>
                             <button type="submit" class="btn login-btn">Se connecter</button>
                         </form>
-                        <p><a  href="#" class="forgot-password">Mot de passe oublié ?</a></p>
+                        <div class="accordion" id="accordionExample">
+                            <button class="btn btn-link forgot-password collapsed" type="button" data-toggle="collapse" data-target="#collapse" aria-expanded="false" aria-controls="collapse">
+                                Mot de passe oublié ?
+                            </button>
+                        </div>
+                        <div id="collapse" class="collapse" data-parent="#accordionExample">
+                            <div class="card-body">
+                                <form method="post" action="/resetPassword">
+                                    <div class="form-group">
+                                        <div class="display-register">
+                                            <div class="form-group">
+                                                <label for="checkEmail">Renseignez l'email associé à votre compte</label>
+                                                <input type="text" class="form-control" id="checkEmail" name="checkEmail" placeholder="Entrez votre Email">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="tab-pane fade register" id="register" role="tabpanel" aria-labelledby="register-tab">

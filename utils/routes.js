@@ -25,9 +25,13 @@ class Routes{
             const loginResponse = {};
             const data = {
                 username: request.body.username,
-                password: request.body.password
+                password: request.body.password,
             };
-            if (data.username === '' || data.username === null) {
+            if ((data.username === '' || data.username === null) && (data.password === '' || data.password === null)) {
+                loginResponse.error = true;
+                loginResponse.message = `fields cannot be empty`;
+                response.status(412).json(loginResponse);
+            } else if (data.username === '' || data.username === null) {
                 loginResponse.error = true;
                 loginResponse.message = `username cant be empty.`;
                 response.status(412).json(loginResponse);
@@ -36,23 +40,29 @@ class Routes{
                 loginResponse.message = `password cant be empty.`;
                 response.status(412).json(loginResponse);
             } else {
-                checkDb.loginUser(data).then( (result) => {
-                    loginResponse.error = false;
-                    loginResponse.userId = result[0].id;
-                    loginResponse.message = `User logged in.`;
-                    request.session.user = data;
-                    response.status(200).render('pages/loggedIn', {
-                        username: data.username,
-                        password: data.password,
-                        message: loginResponse.message
+                checkDb.checkActive(data.username).then(() => {
+                    checkDb.loginUser(data).then( (result) => {
+                        loginResponse.error = false;
+                        loginResponse.userId = result[0].id;
+                        loginResponse.message = `User logged in.`;
+                        request.session.user = data;
+                        response.status(200).render('pages/loggedIn', {
+                            username: data.username,
+                            password: data.password,
+                            message: loginResponse.message
+                        });
+                    }).catch((result) => {
+                        if (result === undefined || result === false) {
+                            loginResponse.error = true;
+                            loginResponse.message = `Invalid username and password combination.`;
+                            console.log('Invalid username or password');
+                            response.status(401).render('pages/error', {message: loginResponse.message});
+                        }
                     });
-                }).catch((result) => {
-                    if (result === undefined || result === false) {
-                        loginResponse.error = true;
-                        loginResponse.message = `Invalid username and password combination.`;
-                        console.log('Invalid username or password');
-                        response.status(401).render('pages/error', {message: loginResponse.message});
-                    }
+                }).catch((val) => {
+                    loginResponse.error = true;
+                    loginResponse.message = val;
+                    response.status(420).json(loginResponse);
                 });
             }
         });
@@ -66,6 +76,7 @@ class Routes{
                 username : request.body.username,
                 password : request.body.password,
                 confirmPassword : request.body.confirmPassword,
+                active: false
             };
 
             if(data.lastname === '' || data.firstname === '' ||
@@ -129,6 +140,34 @@ class Routes{
                     validation.errors = [];
                 }
             }
+        });
+
+        this.app.post('/resetPassword', async (request, response) => {
+            console.log("J'ai oublie mon mdp");
+        });
+
+        this.app.get('/verify/:secretToken', async (request, response) => {
+            const loginResponse = {};
+            checkDb.checkSecretToken(request.params.secretToken).then((result) => {
+                const data = {
+                    username: result[0].username,
+                    password: result[0].password
+                };
+                loginResponse.error = false;
+                loginResponse.userId = result[0].id;
+                loginResponse.message = `User logged in.`;
+                request.session.user = data;
+                response.status(200).render('pages/loggedIn', {
+                    username: data.username,
+                    password: data.password,
+                    message: loginResponse.message
+                });
+            }).catch(() => {
+                loginResponse.error = true;
+                loginResponse.message = `Token not valid`;
+                console.log('Token not valid');
+                response.status(401).render('index');
+            });
         });
 
         this.app.get('/loggedIn', (request, response) => {
