@@ -83,15 +83,15 @@ class DatabaseRequest {
         return await this.query(`SELECT count(email) as count FROM matcha.users WHERE email = ?`, [params]);
     }
 
-    async checkSecretToken(param){
+    async checkRegisterToken(param){
         try {
             return new Promise((resolve, reject) => {
                 console.log('param: ',param);
-                this.query(`SELECT * FROM matcha.users WHERE secretToken = ?`, [param]).then((result) => {
+                this.query(`SELECT * FROM matcha.users WHERE registerToken = ?`, [param]).then((result) => {
                     console.log('select query: ', result);
-                    if (result && result[0] && result[0].secretToken === param && result[0].active === 0) {
+                    if (result && result[0] && result[0].registerToken === param && result[0].active === 0) {
                         console.log('le token existe');
-                        this.query("UPDATE matcha.users SET `secretToken` = 'NULL', `active` = 1 WHERE users.secretToken = ?", [param]);
+                        this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);
                         resolve(
                             this.query(`SELECT username, password FROM matcha.users WHERE id = ?`, [result[0].id])
                         );
@@ -105,21 +105,17 @@ class DatabaseRequest {
             console.log(error);
             return false;
         }
-
-
-        //console.log('token: ', param);
-        //return );
     }
 
     async registerUser(params) {
         try {
             bcrypt.hash(params['password'], saltRounds, (err, hash) => {
 
-                const secretToken = str.randomString(30);
+                const registerToken = str.randomString(30);
 
-                this.query("INSERT INTO matcha.users (email, firstname, lastname, username, password, created_at, secretToken, active)" +
+                this.query("INSERT INTO matcha.users (email, firstname, lastname, username, password, created_at, registerToken, active)" +
                     "VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)",
-                    [params['email'], params['firstname'], params['lastname'], params['username'], hash, secretToken, params['active']],
+                    [params['email'], params['firstname'], params['lastname'], params['username'], hash, registerToken, params['active']],
                     function (error, results, fields) { if (error) throw error; });
 
                 //Sending emails
@@ -133,7 +129,7 @@ class DatabaseRequest {
                     <li>Username: ${params['username']}</li>
                     </ul>
                     <h3>Link to confirm</h3>
-                    <p><a href="http://localhost:3000/verify/${secretToken}">Verify your account</a></p>
+                    <p><a href="http://localhost:3000/verify/${registerToken}">Verify your account</a></p>
                     `;
 
                 let transporter = nodemailer.createTransport({
@@ -162,20 +158,65 @@ class DatabaseRequest {
                         return console.log(error);
                     }
                     console.log('Message sent: %s', info.messageId);
-                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 });
-
-
             });
-
-
-
             return true;
         } catch (error){
             console.log(error);
             return false;
         }
     }
+
+    async resetToken (params) {
+        try {
+                const resetToken = str.randomString(30);
+                this.query("UPDATE matcha.users SET resetToken = ?, reset_at = NOW() WHERE email = ?",
+                    [resetToken, params],
+                    function (error, results, fields) { if (error) throw error; });
+
+                //Sending emails
+                const output = `
+                    <p>You ask for a reset of your Password :-)</p>
+                    
+                    <h3>Clink of this link to RESET</h3>
+                    <p><a href="http://localhost:3000/reset/${resetToken}">Reset</a></p>
+                    `;
+
+                let transporter = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false, // true for 465, false for other ports
+                    auth: {
+                        user: 'nina.ristorcelli@gmail.com', // generated ethereal user
+                        pass: 'wasfvdajlwqpgjfo'  // generated ethereal password
+                    },
+                    tls:{
+                        rejectUnauthorized:false
+                    }
+                });
+
+                let mailOptions = {
+                    from: '"RoooCool Team" <nina.ristorcelli@gmail.com>', // sender address
+                    to: params, // list of receivers
+                    subject: 'Reset your password of your Rooocool account', // Subject line
+                    text: 'Hello world?', // plain text body
+                    html: output // html body
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    console.log('Message sent: %s', info.messageId);
+                });
+            return true;
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+
 
 }
 

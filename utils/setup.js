@@ -30,8 +30,10 @@ const sql = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`username` VARCHAR(50) NOT NULL," +
     "`password` VARCHAR(255) NOT NULL," +
     "`created_at` DATETIME NOT NULL," +
-    "`secretToken` varchar(30) NOT NULL," +
+    "`registerToken` varchar(30) NOT NULL," +
     "`active` tinyint(1) NOT NULL," +
+    "`resetToken` varchar(30) NULL," +
+    "`reset_at` DATETIME NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql, (err, result) => {

@@ -6,7 +6,8 @@ const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
 
-var cookieParser = require('cookie-parser');
+//var cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 
 class Routes{
     constructor(app){
@@ -143,12 +144,36 @@ class Routes{
         });
 
         this.app.post('/resetPassword', async (request, response) => {
-            console.log("J'ai oublie mon mdp");
+            const checkingResponse = {};
+            const valid = await validation.isEmail(request.body.checkEmail, "Wrong Email");
+            console.log("Email du formulaire ",request.body.checkEmail);
+            console.log("Variable Valid: ",valid);
+            console.log("Tableau d'erreur: ",validation.errors);
+            if (valid && validation.errors !== []) {
+                console.log("Le format de l'email est incorrect");
+                checkingResponse.error = true;
+                checkingResponse.message = `Mauvais format d'email`;
+                response.status(417).json(checkingResponse);
+                validation.errors = [];
+            } else {
+                console.log("Format OK, je checke la DB");
+                const resultEmail = await checkDb.checkEmail(request.body.checkEmail);
+                if (resultEmail[0].count === 0) {
+                    console.log("DB: Email non trouvé");
+                    response.status(401).json({
+                        error:true,
+                        message: 'Aucun email correspondant dans la base de données'
+                    });
+                } else {
+                    console.log('All good, je peux envoyer mon mail de reset');
+                    checkDb.resetToken(request.body.checkEmail);
+                }
+            }
         });
 
-        this.app.get('/verify/:secretToken', async (request, response) => {
+        this.app.get('/verify/:registerToken', async (request, response) => {
             const loginResponse = {};
-            checkDb.checkSecretToken(request.params.secretToken).then((result) => {
+            checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
                 const data = {
                     username: result[0].username,
                     password: result[0].password
