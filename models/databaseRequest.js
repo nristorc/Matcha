@@ -55,7 +55,7 @@ class DatabaseRequest {
     async checkActive(params){
         try {
             return new Promise((resolve, reject) => {
-                this.query("SELECT active FROM matcha.users WHERE username = ?", [params]).then((resultActive) => {
+                this.query("SELECT active FROM matcha.users WHERE username = ? OR email = ?", [params, params]).then((resultActive) => {
                     if (resultActive && resultActive[0] !== undefined) {
                         if (resultActive[0].active === 1) {
                             resolve();
@@ -129,7 +129,7 @@ class DatabaseRequest {
                     <li>Username: ${params['username']}</li>
                     </ul>
                     <h3>Link to confirm</h3>
-                    <p><a href="http://localhost:3000/verify/${registerToken}">Verify your account</a></p>
+                    <p><a href="http://localhost:3000/verify/register/${registerToken}">Verify your account</a></p>
                     `;
 
                 let transporter = nodemailer.createTransport({
@@ -179,7 +179,7 @@ class DatabaseRequest {
                     <p>You ask for a reset of your Password :-)</p>
                     
                     <h3>Clink of this link to RESET</h3>
-                    <p><a href="http://localhost:3000/reset/${resetToken}">Reset</a></p>
+                    <p><a href="http://localhost:3000/verify/reset/${resetToken}">Reset</a></p>
                     `;
 
                 let transporter = nodemailer.createTransport({

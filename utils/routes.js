@@ -165,13 +165,21 @@ class Routes{
                         message: 'Aucun email correspondant dans la base de données'
                     });
                 } else {
-                    console.log('All good, je peux envoyer mon mail de reset');
-                    checkDb.resetToken(request.body.checkEmail);
+                    checkDb.checkActive(request.body.checkEmail).then(() => {
+                        console.log('All good, je peux envoyer mon mail de reset');
+                        checkDb.resetToken(request.body.checkEmail);
+                    }).catch(() => {
+                        console.log("DB: Compte pas actif");
+                        response.status(401).json({
+                            error:true,
+                            message: "Votre compte n'est pas encore actif..."
+                        });
+                    });
                 }
             }
         });
 
-        this.app.get('/verify/:registerToken', async (request, response) => {
+        this.app.get('/verify/register/:registerToken', async (request, response) => {
             const loginResponse = {};
             checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
                 const data = {
@@ -193,6 +201,32 @@ class Routes{
                 console.log('Token not valid');
                 response.status(401).render('index');
             });
+        });
+
+        this.app.get('/verify/reset/:resetToken', async (request, response) => {
+            /*const loginResponse = {};
+            checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
+                const data = {
+                    username: result[0].username,
+                    password: result[0].password
+                };
+                loginResponse.error = false;
+                loginResponse.userId = result[0].id;
+                loginResponse.message = `User logged in.`;
+                request.session.user = data;
+                response.status(200).render('pages/loggedIn', {
+                    username: data.username,
+                    password: data.password,
+                    message: loginResponse.message
+                });
+            }).catch(() => {
+                loginResponse.error = true;
+                loginResponse.message = `Token not valid`;
+                console.log('Token not valid');
+                response.status(401).render('index');
+            });*/
+
+            console.log("J'ai clique sur le lien de mon mail de ResetPassword");
         });
 
         this.app.get('/loggedIn', (request, response) => {
