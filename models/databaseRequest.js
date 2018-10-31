@@ -78,6 +78,10 @@ class DatabaseRequest {
         return await this.query(`SELECT count(username) as count FROM matcha.users WHERE username = ?`, [params]);
     }
 
+    async checkResetToken(params){
+        return await this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]);
+    }
+
     async checkEmail(params){
         console.log('email: ', params);
         return await this.query(`SELECT count(email) as count FROM matcha.users WHERE email = ?`, [params]);
@@ -209,6 +213,20 @@ class DatabaseRequest {
                     }
                     console.log('Message sent: %s', info.messageId);
                 });
+            return true;
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+    async resetPassword(params) {
+        try {
+            bcrypt.hash(params['newPassword'], saltRounds, (err, hash) => {
+                this.query("UPDATE matcha.users SET password = ?, resetToken = NULL, reset_at = NULL WHERE resetToken = ?",
+                    [hash, params['resetToken']],
+                    function (error, results, fields) { if (error) throw error; });
+            });
             return true;
         } catch (error){
             console.log(error);

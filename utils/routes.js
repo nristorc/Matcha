@@ -168,6 +168,7 @@ class Routes{
                     checkDb.checkActive(request.body.checkEmail).then(() => {
                         console.log('All good, je peux envoyer mon mail de reset');
                         checkDb.resetToken(request.body.checkEmail);
+                        response.redirect('/');
                     }).catch(() => {
                         console.log("DB: Compte pas actif");
                         response.status(401).json({
@@ -203,31 +204,93 @@ class Routes{
             });
         });
 
-        this.app.get('/verify/reset/:resetToken', async (request, response) => {
-            /*const loginResponse = {};
-            checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
-                const data = {
-                    username: result[0].username,
-                    password: result[0].password
-                };
-                loginResponse.error = false;
-                loginResponse.userId = result[0].id;
-                loginResponse.message = `User logged in.`;
-                request.session.user = data;
-                response.status(200).render('pages/loggedIn', {
-                    username: data.username,
-                    password: data.password,
-                    message: loginResponse.message
-                });
-            }).catch(() => {
-                loginResponse.error = true;
-                loginResponse.message = `Token not valid`;
-                console.log('Token not valid');
-                response.status(401).render('index');
-            });*/
+        /*this.app.get('/verify/reset/:resetToken', async (request, response) => {
+            console.log(request.params);
+        });*/
 
-            console.log("J'ai clique sur le lien de mon mail de ResetPassword");
+        this.app.route('/verify/reset/:resetToken')
+            .get((request, response) => {
+                checkDb.checkResetToken(request.params.resetToken).then((result) => {
+                    if (result[0].count === 0) {
+                        response.status(401).json({
+                            error:true,
+                            message: 'Token invalide...'
+                        });
+                    } else {
+                        response.render('pages/resetPassword', {resetToken: request.params.resetToken});
+                        console.log("Je rentre dans GET");
+                }
+            }).catch(() => {
+                response.status(417).json("Une erreur s'est produite, merci de bien vouloir reessayer");
+            });
+        }).post(async (request, response) => {
+            console.log("Je rentre dans POST");
+            const resetResponse = {};
+            const data = {
+                resetToken: request.body.resetToken,
+                newPassword: request.body.modifyPassword,
+                confirmPassword: request.body.modifyPasswordConfirm
+            };
+            await validation.isConfirmed(data.newPassword, data.confirmPassword, "Wrong matching password");
+            console.log(validation.errors);
+            if (validation.errors.length === 0) {
+                const result = await checkDb.resetPassword(data);
+                console.log(result);
+                if (result === false) {
+                    resetResponse.error = true;
+                    resetResponse.message = `Reset password unsuccessful,try after some time.`;
+                    response.status(417).json(resetResponse);
+                } else {
+                    resetResponse.error = false;
+                    //resetResponse.userId = result.insertId;
+                    resetResponse.message = `Votre mot de passe a bien été modifié`;
+                    response.status(200).redirect('/');
+                }
+
+            } else {
+                resetResponse.error = true;
+                resetResponse.message = `Error fields format...`;
+                response.status(417).json(resetResponse);
+                validation.errors = [];
+            }
         });
+
+        // this.app.route('/verify/reset/:resetToken')
+        //     .get((request, response) => {
+        //     response.render('pages/resetPassword', {resetToken: request.params.resetToken});
+        //     console.log("Je rentre dans GET");
+        // }).post(async (request, response) => {
+        //     console.log("Je rentre dans POST");
+        //     const resetResponse = {};
+        //     const data = {
+        //         resetToken: request.body.resetToken,
+        //         newPassword: request.body.modifyPassword,
+        //         confirmPassword: request.body.modifyPasswordConfirm
+        //     };
+        //         await validation.isConfirmed(data.newPassword, data.confirmPassword, "Wrong matching password");
+        //         console.log(validation.errors);
+        //
+        //         if (validation.errors.length === 0) {
+        //                 const result = await checkDb.resetPassword(data);
+        //                 console.log(result);
+        //                 if (result === false) {
+        //                     resetResponse.error = true;
+        //                     resetResponse.message = `Reset password unsuccessful,try after some time.`;
+        //                     response.status(417).json(resetResponse);
+        //                 } else {
+        //                     resetResponse.error = false;
+        //                     //resetResponse.userId = result.insertId;
+        //                     resetResponse.message = `Votre mot de passe a bien été modifié`;
+        //                     response.status(200).redirect('/');
+        //                 }
+        //
+        //         } else {
+        //             resetResponse.error = true;
+        //             resetResponse.message = `Error fields format...`;
+        //             response.status(417).json(resetResponse);
+        //             validation.errors = [];
+        //         }
+        // });
 
         this.app.get('/loggedIn', (request, response) => {
             console.log(request.session);
