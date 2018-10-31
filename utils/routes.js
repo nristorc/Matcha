@@ -7,7 +7,7 @@ const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
 
 //var cookieParser = require('cookie-parser');
-const nodemailer = require('nodemailer');
+//const nodemailer = require('nodemailer');
 
 class Routes{
     constructor(app){
@@ -21,6 +21,8 @@ class Routes{
             }
             response.render('pages/dashboard');
         });
+
+        /* Routes for Authentication */
 
         this.app.post('/login', async (request, response)=> {
             const loginResponse = {};
@@ -204,10 +206,6 @@ class Routes{
             });
         });
 
-        /*this.app.get('/verify/reset/:resetToken', async (request, response) => {
-            console.log(request.params);
-        });*/
-
         this.app.route('/verify/reset/:resetToken')
             .get((request, response) => {
                 checkDb.checkResetToken(request.params.resetToken).then((result) => {
@@ -255,43 +253,6 @@ class Routes{
             }
         });
 
-        // this.app.route('/verify/reset/:resetToken')
-        //     .get((request, response) => {
-        //     response.render('pages/resetPassword', {resetToken: request.params.resetToken});
-        //     console.log("Je rentre dans GET");
-        // }).post(async (request, response) => {
-        //     console.log("Je rentre dans POST");
-        //     const resetResponse = {};
-        //     const data = {
-        //         resetToken: request.body.resetToken,
-        //         newPassword: request.body.modifyPassword,
-        //         confirmPassword: request.body.modifyPasswordConfirm
-        //     };
-        //         await validation.isConfirmed(data.newPassword, data.confirmPassword, "Wrong matching password");
-        //         console.log(validation.errors);
-        //
-        //         if (validation.errors.length === 0) {
-        //                 const result = await checkDb.resetPassword(data);
-        //                 console.log(result);
-        //                 if (result === false) {
-        //                     resetResponse.error = true;
-        //                     resetResponse.message = `Reset password unsuccessful,try after some time.`;
-        //                     response.status(417).json(resetResponse);
-        //                 } else {
-        //                     resetResponse.error = false;
-        //                     //resetResponse.userId = result.insertId;
-        //                     resetResponse.message = `Votre mot de passe a bien été modifié`;
-        //                     response.status(200).redirect('/');
-        //                 }
-        //
-        //         } else {
-        //             resetResponse.error = true;
-        //             resetResponse.message = `Error fields format...`;
-        //             response.status(417).json(resetResponse);
-        //             validation.errors = [];
-        //         }
-        // });
-
         this.app.get('/loggedIn', (request, response) => {
             console.log(request.session);
             console.log(request.session.user);
@@ -314,6 +275,8 @@ class Routes{
             }
             result.redirect('/');
         });
+
+        /* Routes for .... */
     }
 
     routesConfig(){
