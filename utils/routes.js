@@ -12,13 +12,19 @@ class Routes{
     }
 
     appRoutes(){
-        this.app.get('/', (request,response) => {
+        this.app.get('/', async (request,response) => {
+            //console.log('avant de rentrer dans la boucle: ', request.session);
             if (!request.session.user) {
-                response.render('index', { message: request.flash('info') });
+                //console.log("Il n'y a pas de session");
+                //console.log('session KO: ', request.session);
+                response.status(200).render('index', {message: request.flash('info')});
                 //response.render('index');
+            } else {
+                //console.log("Il y a une session");
+                //console.log('session OK: ', request.session);
+                response.status(200).render('pages/dashboard', {message: request.flash('info')});
+                //response.redirect('pages/dashboard');
             }
-            //response.render('pages/dashboard', { message: request.flash('info') });
-            //response.render('pages/dashboard');
         });
 
         /* Routes for Authentication */
@@ -40,20 +46,22 @@ class Routes{
                 loginResponse.type = 'info';
                 loginResponse.message = `username cant be empty.`;
                 request.flash(loginResponse.type, loginResponse.message);
-                response.status(412).json(loginResponse).redirect('/');
-                //response.status(412).json(loginResponse);
+                response.status(412).redirect('/');
             } else if(data.password === '' || data.password === null){
                 loginResponse.error = true;
+                loginResponse.type = 'info';
                 loginResponse.message = `password cant be empty.`;
-                response.status(412).json(loginResponse);
                 request.flash(loginResponse.type, loginResponse.message);
+                response.status(412).redirect('/');
             } else {
                 checkDb.checkActive(data.username).then(() => {
                     checkDb.loginUser(data).then( (result) => {
                         loginResponse.error = false;
+                        loginResponse.type = 'info';
                         loginResponse.userId = result[0].id;
                         loginResponse.message = `User logged in.`;
                         request.session.user = data;
+                        request.flash(loginResponse.type, loginResponse.message);
                         response.status(200).render('pages/loggedIn', {
                             username: data.username,
                             password: data.password,
@@ -62,15 +70,18 @@ class Routes{
                     }).catch((result) => {
                         if (result === undefined || result === false) {
                             loginResponse.error = true;
+                            loginResponse.type = 'info';
                             loginResponse.message = `Invalid username and password combination.`;
-                            console.log('Invalid username or password');
-                            response.status(401).render('pages/error', {message: loginResponse.message});
+                            request.flash(loginResponse.type, loginResponse.message);
+                            response.status(401).redirect('/');
                         }
                     });
                 }).catch((val) => {
                     loginResponse.error = true;
+                    loginResponse.type = 'info';
                     loginResponse.message = val;
-                    response.status(420).json(loginResponse);
+                    request.flash(loginResponse.type, loginResponse.message);
+                    response.status(420).redirect('/');
                 });
             }
         });
@@ -92,7 +103,10 @@ class Routes{
                 data.password === '' || data.confirmPassword === '') {
                 registrationResponse.error = true;
                 registrationResponse.message = `One of the fields is empty -- ALL MANDATORY`;
-                response.status(412).json(registrationResponse);
+                registrationResponse.type = 'info';
+                request.flash(registrationResponse.type, registrationResponse.message);
+                //response.status(401).redirect('/');
+                response.status(412).redirect('/');
             } else {
                 await validation.isName(data.firstname, 'Wrong firstname');
                 await validation.isName(data.lastname, 'Wrong lastname');
@@ -222,11 +236,11 @@ class Routes{
                     } else {
                         response.render('pages/resetPassword', {resetToken: request.params.resetToken});
                         console.log("Je rentre dans GET");
-                }
-            }).catch(() => {
-                response.status(417).json("Une erreur s'est produite, merci de bien vouloir reessayer");
-            });
-        }).post(async (request, response) => {
+                    }
+                }).catch(() => {
+                    response.status(417).json("Une erreur s'est produite, merci de bien vouloir reessayer");
+                });
+            }).post(async (request, response) => {
             console.log("Je rentre dans POST");
             const resetResponse = {};
             const data = {
