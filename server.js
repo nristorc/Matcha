@@ -7,6 +7,7 @@ const path = require('path');
 const session = require('express-session');
 var cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
+const expressMessages = require('express-messages');
 
 const routes = require('./utils/routes');
 
@@ -36,6 +37,10 @@ class Server{
             cookie: { expires: 600000 }
         }));
         this.app.use(flash());
+        this.app.use(function (request, response, next) {
+            response.locals.messages = expressMessages(request, response);
+            next();
+        });
 
         this.app.set('views', './views');
         this.app.set('view engine', 'ejs');

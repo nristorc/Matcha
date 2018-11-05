@@ -1,0 +1,11 @@
+<p>You have been registered to our Website</p>
+<h3>Contact Details</h3>
+<ul>
+    <li>FirstName: ${username}</li>
+    <li>LastName: <%username%></li>
+    <li>Email: <%=username%></li>
+    <li>Username: <%-username%></li>
+    <li>Username: ${params['email]}</li>
+</ul>
+<h3>Link to confirm</h3>
+<p><a href="http://localhost:3000/verify/register/${registerToken}">Verify your account</a></p>

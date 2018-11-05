@@ -4,6 +4,7 @@ const saltRounds = 10;
 const nodemailer = require('nodemailer');
 
 const str = require('../models/str');
+const fs = require('fs');
 const random = new str();
 
 class DatabaseRequest {
@@ -123,18 +124,9 @@ class DatabaseRequest {
                     function (error, results, fields) { if (error) throw error; });
 
                 //Sending emails
-                const output = `
-                    <p>You have been registered to our Website</p>
-                    <h3>Contact Details</h3>
-                    <ul>
-                    <li>FirstName: ${params['firstname']}</li>
-                    <li>LastName: ${params['lastname']}</li>
-                    <li>Email: ${params['email']}</li>
-                    <li>Username: ${params['username']}</li>
-                    </ul>
-                    <h3>Link to confirm</h3>
-                    <p><a href="http://localhost:3000/verify/register/${registerToken}">Verify your account</a></p>
-                    `;
+                const output = fs.readFile('views/pages/registrationEmail.ejs', 'utf-8', (err, data) => {
+                    console.log(data);
+                });
 
                 let transporter = nodemailer.createTransport({
                     host: 'smtp.gmail.com',
