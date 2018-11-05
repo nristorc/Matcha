@@ -6,9 +6,6 @@ const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
 
-//var cookieParser = require('cookie-parser');
-//const nodemailer = require('nodemailer');
-
 class Routes{
     constructor(app){
         this.app = app;
@@ -17,9 +14,11 @@ class Routes{
     appRoutes(){
         this.app.get('/', (request,response) => {
             if (!request.session.user) {
-                return response.render('index');
+                response.render('index', { message: request.flash('info') });
+                //response.render('index');
             }
-            response.render('pages/dashboard');
+            //response.render('pages/dashboard', { message: request.flash('info') });
+            //response.render('pages/dashboard');
         });
 
         /* Routes for Authentication */
@@ -32,16 +31,22 @@ class Routes{
             };
             if ((data.username === '' || data.username === null) && (data.password === '' || data.password === null)) {
                 loginResponse.error = true;
+                loginResponse.type = 'info';
                 loginResponse.message = `fields cannot be empty`;
-                response.status(412).json(loginResponse);
+                request.flash(loginResponse.type, loginResponse.message);
+                response.status(412).redirect('/');
             } else if (data.username === '' || data.username === null) {
                 loginResponse.error = true;
+                loginResponse.type = 'info';
                 loginResponse.message = `username cant be empty.`;
-                response.status(412).json(loginResponse);
+                request.flash(loginResponse.type, loginResponse.message);
+                response.status(412).json(loginResponse).redirect('/');
+                //response.status(412).json(loginResponse);
             } else if(data.password === '' || data.password === null){
                 loginResponse.error = true;
                 loginResponse.message = `password cant be empty.`;
                 response.status(412).json(loginResponse);
+                request.flash(loginResponse.type, loginResponse.message);
             } else {
                 checkDb.checkActive(data.username).then(() => {
                     checkDb.loginUser(data).then( (result) => {
@@ -266,7 +271,7 @@ class Routes{
 
         this.app.get('/logout', function(request, result){
             let cookie = request.cookies;
-            for (var prop in cookie) {
+            for (let prop in cookie) {
                 if (!cookie.hasOwnProperty(prop)) {
                     continue;
                 }
