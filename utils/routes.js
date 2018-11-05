@@ -16,13 +16,13 @@ class Routes{
             //console.log('avant de rentrer dans la boucle: ', request.session);
             if (!request.session.user) {
                 //console.log("Il n'y a pas de session");
-                //console.log('session KO: ', request.session);
-                response.status(200).render('index', {message: request.flash('info')});
+                console.log('session KO: ', request.session);
+                response.status(200).render('index', {message: request.flash('danger')});
                 //response.render('index');
             } else {
                 //console.log("Il y a une session");
-                //console.log('session OK: ', request.session);
-                response.status(200).render('pages/dashboard', {message: request.flash('info')});
+                console.log('session OK: ', request.session);
+                response.status(200).render('pages/dashboard', {message: request.flash('danger')});
                 //response.redirect('pages/dashboard');
             }
         });
@@ -37,19 +37,19 @@ class Routes{
             };
             if ((data.username === '' || data.username === null) && (data.password === '' || data.password === null)) {
                 loginResponse.error = true;
-                loginResponse.type = 'info';
+                loginResponse.type = 'danger';
                 loginResponse.message = `fields cannot be empty`;
                 request.flash(loginResponse.type, loginResponse.message);
                 response.status(412).redirect('/');
             } else if (data.username === '' || data.username === null) {
                 loginResponse.error = true;
-                loginResponse.type = 'info';
+                loginResponse.type = 'danger';
                 loginResponse.message = `username cant be empty.`;
                 request.flash(loginResponse.type, loginResponse.message);
                 response.status(412).redirect('/');
             } else if(data.password === '' || data.password === null){
                 loginResponse.error = true;
-                loginResponse.type = 'info';
+                loginResponse.type = 'danger';
                 loginResponse.message = `password cant be empty.`;
                 request.flash(loginResponse.type, loginResponse.message);
                 response.status(412).redirect('/');
@@ -57,7 +57,7 @@ class Routes{
                 checkDb.checkActive(data.username).then(() => {
                     checkDb.loginUser(data).then( (result) => {
                         loginResponse.error = false;
-                        loginResponse.type = 'info';
+                        loginResponse.type = 'success';
                         loginResponse.userId = result[0].id;
                         loginResponse.message = `User logged in.`;
                         request.session.user = data;
@@ -70,7 +70,7 @@ class Routes{
                     }).catch((result) => {
                         if (result === undefined || result === false) {
                             loginResponse.error = true;
-                            loginResponse.type = 'info';
+                            loginResponse.type = 'danger';
                             loginResponse.message = `Invalid username and password combination.`;
                             request.flash(loginResponse.type, loginResponse.message);
                             response.status(401).redirect('/');
@@ -78,7 +78,7 @@ class Routes{
                     });
                 }).catch((val) => {
                     loginResponse.error = true;
-                    loginResponse.type = 'info';
+                    loginResponse.type = 'danger';
                     loginResponse.message = val;
                     request.flash(loginResponse.type, loginResponse.message);
                     response.status(420).redirect('/');
