@@ -12,12 +12,16 @@ body {
 
 body {
     display: -ms-flexbox;
-    display: flex;
+    /* display: flex; */
     -ms-flex-align: center;
     align-items: center;
-    padding-top: 40px;
+    /* padding-top: 40px; */
     padding-bottom: 40px;
     background-color: rgba(255, 100, 100, 0.2);
+}
+
+.container {
+    padding-top: 40px;
 }
 
 .nav {
@@ -125,3 +129,54 @@ p {
 }
 
 /* Home Page -- Not logged CSS ends */
+
+/* Profile Page */
+
+.hashtag{
+    /* box-shadow:inset 0 0 0 3px rgb(255, 0, 100); */
+    background-color: rgb(238, 162, 162);
+    color: #fff;
+    /* cursor: pointer; */
+    border: rgb(255, 100, 100);
+    margin-bottom: 20px;
+}
+
+.hashtag:hover{
+    background-color: rgb(238, 162, 162);
+    cursor: pointer;
+    border-color: rgb(255, 0, 100);
+    margin-bottom: 20px;
+}
+
+.profile-pic {
+    padding: 0 20px 20px 0;
+}
+
+.description{
+    padding: 20px 0 20px 0;
+}
+
+.carroussel{
+    padding: 0px;
+    border: none;
+    /* max-height: 200px; */
+    /* max-width: 200px; */
+}
+
+.btn:not(:disabled):not(.disabled) .popularity {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: default;
+}
+
+.popularity {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: default;
+}
+
+.popularity:hover {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: auto;
+}

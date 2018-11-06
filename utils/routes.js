@@ -296,7 +296,24 @@ class Routes{
             result.redirect('/');
         });
 
-        /* Routes for .... */
+        /* Routes for Profil */
+
+        this.app.get('/profil', (request, response) => {
+            if (!request.session.user) {
+                return response.render('index');
+                }
+            const sql = "SELECT * FROM matcha.users WHERE username = ?";
+            checkDb.query(sql, [request.session.user.username]).then((result) => {
+                console.log(result);
+                // response.render('pages/profile2');
+                response.render('pages/profil', {user: result});
+                }).catch(() => {
+                console.log('ko');
+            });
+        });
+
+		/* Routes for ... */
+
     }
 
     routesConfig(){
