@@ -7,15 +7,28 @@
 		<button type="button" class="btn btn-primary popularity">
 			Popularité <span class="badge badge-light">93%</span>
 	  </button>
-		<h2 class="mt-0">Stephanie De Monaco</h2>
+		<h2 class="mt-0"><%=user[0]['username']%></h2>
         <div class="row">
             <div class="col-sm">
-                Femme, Bisexuelle
+				<% if (user[0]['gender'] == null) { %>
+					Genre non renseigne,
+				<%} else { %>
+					<%=user[0]['gender']%>,
+				<% } %>
+				<% if (user[0]['orientation'] == null) { %>
+					orientation non renseigne
+				<%} else { %>
+					<%=user[0]['orientation']%>
+				<% } %>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-sm">
-				18 ans
+				<% if (user[0]['birth'] == null) { %>
+					Date de naissance manquante
+				<%} else { %>
+					<%= userage %> ans
+				<% } %>
 			</div>
 		</div>
 		<div class="row">
@@ -24,7 +37,11 @@
 			</div>
 		</div>
 		<div class="description">
-				Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+			<% if (user[0]['description'] == null) { %>
+				Description manquante
+			<%} else { %>
+				<%=user[0]['description']%>
+			<% } %>
 		</div>
 
 		<a class="btn btn-primary hashtag" href="#" role="button">#chatons</a>

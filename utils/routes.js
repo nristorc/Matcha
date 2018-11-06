@@ -304,9 +304,26 @@ class Routes{
                 }
             const sql = "SELECT * FROM matcha.users WHERE username = ?";
             checkDb.query(sql, [request.session.user.username]).then((result) => {
-                console.log(result);
-                // response.render('pages/profile2');
-                response.render('pages/profil', {user: result});
+				console.log(result);
+				var dob = result[0]['birth'];
+				if (dob != null) {
+					var year = dob.getFullYear();
+					var month = dob.getMonth();
+					var day = dob.getDate();
+					var today = new Date();
+					var age = today.getFullYear() - year;
+						if (today.getMonth() < month || (today.getMonth() == month && today.getDate() < day)) {
+						age--;
+						}
+					response.render('pages/profil', {
+						user: result,
+						userage: age
+					});
+				} else {
+					response.render('pages/profil', {
+						user: result
+					});
+				}
                 }).catch(() => {
                 console.log('ko');
             });
