@@ -34,6 +34,10 @@ const sql = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`active` tinyint(1) NOT NULL," +
     "`resetToken` varchar(30) NULL," +
     "`reset_at` DATETIME NULL," +
+    "`birth` DATE DEFAULT NULL," +
+    "`gender` VARCHAR (20) DEFAULT NULL," +
+    "`orientation` VARCHAR (20) DEFAULT NULL," +
+    "`description` VARCHAR (255) DEFAULT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql, (err, result) => {

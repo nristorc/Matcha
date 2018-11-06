@@ -13,12 +13,14 @@ class Routes{
 
     appRoutes(){
         this.app.get('/', async (request,response) => {
+            console.log("Je suis dans INDEX");
             if (!request.session.user) {
                 //console.log('session KO: ', request.session);
                 response.status(200).render('index');
             } else {
                 //console.log('session OK: ', request.session);
-                response.status(200).render('pages/dashboard');
+                console.log(request.session.user);
+                response.status(200).render('pages/profil');
             }
         });
 
@@ -56,12 +58,14 @@ class Routes{
                         loginResponse.userId = result[0].id;
                         loginResponse.message = `User logged in.`;
                         request.session.user = data;
+                        request.session.user.id = result[0].id;
+                        console.log(request.session.user);
                         request.flash(loginResponse.type, loginResponse.message);
-                        response.status(200).render('pages/loggedIn', {
-                            username: data.username,
-                            password: data.password,
-                            message: loginResponse.message
-                        });
+                        response.status(200).redirect('/profil');//.render('pages/profil', {
+                            //username: data.username,
+                            //password: data.password,
+                            //message: loginResponse.message
+                        //});
                     }).catch((result) => {
                         if (result === undefined || result === false) {
                             loginResponse.error = true;
@@ -82,6 +86,7 @@ class Routes{
         });
 
         this.app.post('/register', async (request,response) => {
+            console.log("Je suis dans REGISTER");
             const registrationResponse = {};
             const data = {
                 lastname: request.body.lastname,
@@ -203,26 +208,34 @@ class Routes{
         });
 
         this.app.get('/verify/register/:registerToken', async (request, response) => {
+            console.log("Jesuis dans VERIFY REGISTER");
             const loginResponse = {};
             checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
-                const data = {
-                    username: result[0].username,
-                    password: result[0].password
-                };
-                loginResponse.error = false;
-                loginResponse.userId = result[0].id;
-                loginResponse.message = `User logged in.`;
-                request.session.user = data;
-                response.status(200).render('pages/loggedIn', {
-                    username: data.username,
-                    password: data.password,
-                    message: loginResponse.message
-                });
-            }).catch(() => {
+                if (result && result !== undefined) {
+                    console.log("Then: ", result);
+                    const data = {
+                        username: result[0].username,
+                        password: result[0].password,
+                    };
+                    loginResponse.error = false;
+                    loginResponse.userId = result[0].id;
+                    loginResponse.type = 'dark';
+                    loginResponse.message = `User logged in.`;
+                    request.session.user = data;
+                    request.session.user.id = result[0].id;
+                    console.log('session : ', request.session.user);
+                    request.flash(loginResponse.type, loginResponse.message);
+                    response.status(200).redirect('/profil');
+                    console.log('response then: ', response.status);
+                }
+            }).catch((result) => {
+                console.log("Catch: ", result);
                 loginResponse.error = true;
+                loginResponse.type = 'warning';
                 loginResponse.message = `Token not valid`;
-                console.log('Token not valid');
-                response.status(401).render('index');
+                request.flash(loginResponse.type, loginResponse.message);
+                response.status(401).redirect('/');
+                console.log('response catch: ', response.status);
             });
         });
 
@@ -274,17 +287,19 @@ class Routes{
         });
 
         this.app.get('/loggedIn', (request, response) => {
-            console.log(request.session);
-            console.log(request.session.user);
+            console.log('Je suis dans LOGGEDIN');
+            //console.log(request.session);
+            //console.log(request.session.user);
             if (!request.session.user) {
-                console.log('pas de session');
+                //console.log('pas de session');
                 return response.status(401).send();
             }
-            console.log('1 session');
+            //console.log('1 session');
             return response.status(200).send('Welcome to your Dashboard !');
         });
 
         this.app.get('/logout', function(request, result){
+            console.log("Je suis dans LOGOUT");
             let cookie = request.cookies;
             for (let prop in cookie) {
                 if (!cookie.hasOwnProperty(prop)) {
@@ -299,16 +314,14 @@ class Routes{
         /* Routes for Profil */
 
         this.app.get('/profil', (request, response) => {
+            //console.log("Je suis sur la page de PROFIL !!!!")
             if (!request.session.user) {
                 return response.render('index');
                 }
             const sql = "SELECT * FROM matcha.users WHERE username = ?";
             checkDb.query(sql, [request.session.user.username]).then((result) => {
-                console.log(result);
-                // response.render('pages/profile2');
                 response.render('pages/profil', {user: result});
                 }).catch(() => {
-                console.log('ko');
             });
         });
 

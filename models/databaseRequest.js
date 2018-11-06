@@ -92,23 +92,23 @@ class DatabaseRequest {
     async checkRegisterToken(param){
         try {
             return new Promise((resolve, reject) => {
-                console.log('param: ',param);
+                //console.log('param: ',param);
                 this.query(`SELECT * FROM matcha.users WHERE registerToken = ?`, [param]).then((result) => {
-                    console.log('select query: ', result);
+                    //console.log('select query: ', result);
                     if (result && result[0] && result[0].registerToken === param && result[0].active === 0) {
-                        console.log('le token existe');
+                        //console.log('le token existe');
                         this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);
                         resolve(
-                            this.query(`SELECT username, password FROM matcha.users WHERE id = ?`, [result[0].id])
+                            this.query(`SELECT username, password, id FROM matcha.users WHERE id = ?`, [result[0].id])
                         );
                     } else {
-                        console.log("Le token n'existe pas");
+                        //console.log("Le token n'existe pas");
                         reject();
                     }
                 });
             });
         } catch (error) {
-            console.log(error);
+            //console.log(error);
             return false;
         }
     }
