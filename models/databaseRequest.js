@@ -143,11 +143,11 @@ class DatabaseRequest {
                 });
 
                 let mailOptions = {
-                    from: '"Nodemailer Contact" <nina.ristorcelli@gmail.com>', // sender address
+                    from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>', // sender address
                     to: params['email'], // list of receivers
                     subject: 'Confirm your Registration to Matcha website', // Subject line
                     text: 'Hello world?', // plain text body
-                    html: compiledTemplate.render({firstname: params['email']}) // render template
+                    html: compiledTemplate.render({username: params['username'], registerToken: registerToken}) // render template
                 };
 
                 transporter.sendMail(mailOptions, (error, info) => {
