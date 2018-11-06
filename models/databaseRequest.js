@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 
 const str = require('../models/str');
 const fs = require('fs');
+const hogan = require('hogan.js');
 const random = new str();
 
 class DatabaseRequest {
@@ -124,9 +125,9 @@ class DatabaseRequest {
                     function (error, results, fields) { if (error) throw error; });
 
                 //Sending emails
-                const output = fs.readFile('views/pages/registrationEmail.ejs', 'utf-8', (err, data) => {
-                    console.log(data);
-                });
+
+                const template = fs.readFileSync('views/pages/registrationEmail.ejs', 'utf-8');
+                const compiledTemplate = hogan.compile(template);
 
                 let transporter = nodemailer.createTransport({
                     host: 'smtp.gmail.com',
@@ -146,7 +147,7 @@ class DatabaseRequest {
                     to: params['email'], // list of receivers
                     subject: 'Confirm your Registration to Matcha website', // Subject line
                     text: 'Hello world?', // plain text body
-                    html: output // html body
+                    html: compiledTemplate.render({firstname: params['email']}) // render template
                 };
 
                 transporter.sendMail(mailOptions, (error, info) => {
