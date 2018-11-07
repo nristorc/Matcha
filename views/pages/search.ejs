@@ -3,14 +3,13 @@
 
 <div class="container">
 
-<% if (users != "") {
-	var i=0; %>
+<% if (users != "") { %>
 
-	<% for (var x=0; x<users.length/3; x++){ %>
+	<% for (var offset=0; offset<users.length; offset+=3){ %>
 
 	<div class="row">
 	<% 
-	for (i; i<3; i++){ %>
+	for (i=0; i<3; i++){ %>
 			<div class="col-sm">
 				<%=users[i]['username']%>
 			</div>
