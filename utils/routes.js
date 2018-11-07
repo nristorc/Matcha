@@ -286,7 +286,7 @@ class Routes{
             }
         });
 
-        this.app.get('/loggedIn', (request, response) => {
+        /*this.app.get('/loggedIn', (request, response) => {
             console.log('Je suis dans LOGGEDIN');
             //console.log(request.session);
             //console.log(request.session.user);
@@ -296,7 +296,7 @@ class Routes{
             }
             //console.log('1 session');
             return response.status(200).send('Welcome to your Dashboard !');
-        });
+        });*/
 
         this.app.get('/logout', function(request, result){
             console.log("Je suis dans LOGOUT");
@@ -313,16 +313,39 @@ class Routes{
 
         /* Routes for Profil */
 
-        this.app.get('/profil', (request, response) => {
+        this.app.route('/profil').get((request, response) => {
             //console.log("Je suis sur la page de PROFIL !!!!")
             if (!request.session.user) {
                 return response.render('index');
                 }
-            const sql = "SELECT * FROM matcha.users WHERE username = ?";
+            const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE username = ?";
             checkDb.query(sql, [request.session.user.username]).then((result) => {
-                response.render('pages/profil', {user: result});
+                console.log(result[0].birth);
+                response.render('pages/profil', {user: result[0]});
                 }).catch(() => {
+
             });
+        }).post(async (request, response) => {
+            console.log(request.body);
+            const data = {
+                gender: request.body.gender,
+                birthdate: request.body.birthdate,
+                orientation: request.body.orientation,
+                description: request.body.description,
+            };
+            console.log('response: ', response.body);
+            console.log('request: ', request.body);
+            const sql = "UPDATE matcha.users SET `birth` = STR_TO_DATE(?, '%d/%m/%Y'), `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
+            checkDb.query(sql, [data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
+                checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                    response.json({user: result[0]});
+                }).catch((result) => {
+                    console.log('result CATCH:',result);
+                });
+            }).catch((result) => {
+                console.log('result CATCH:',result);
+            });
+            //response.send();
         });
 
 		/* Routes for ... */
