@@ -245,6 +245,24 @@ class DatabaseRequest {
         }
     }
 
+    async getAllUsers(){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'";
+                this.query(sql).then((users) => {
+                    if (users){
+                        resolve(users);
+                    } else {
+                        reject('no user found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async getTags(params){
         try {
             return new Promise((resolve, reject) => {

@@ -327,6 +327,25 @@ class Routes{
 			});
 		});
 			
+
+		/* Routes for Search */
+
+        this.app.get('/search', (request, response) => {
+            if (!request.session.user) {
+                return response.render('index');
+			}
+			checkDb.getAllUsers().then((users) => {
+				console.log(users);
+				response.render('pages/search', {
+				users: users,
+				});
+			}).catch((users) => {
+				console.log(users);
+				response.render('pages/search', {
+				users: users,
+				});
+			});
+		});
 		/* Routes for ... */
 
     }
