@@ -44,11 +44,10 @@
 			<% } %>
 		</div>
 
-		<a class="btn btn-primary hashtag" href="#" role="button">#chatons</a>
-		<a class="btn btn-primary hashtag" href="#" role="button">#42</a>
-		<a class="btn btn-primary hashtag" href="#" role="button">#footballamericain</a>
-		<a class="btn btn-primary hashtag" href="#" role="button">#dalida</a>		
-
+		<% if (usertags != "") { 
+			for (var i=0; i<usertags.length; i++){ %>
+				<a class="btn btn-primary hashtag" href="#" role="button">#<%=usertags[i]['tag']%></a>
+		<% }} %>
 	</div>
 </div>	
 

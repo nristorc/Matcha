@@ -227,7 +227,7 @@ class DatabaseRequest {
         }
     }
 
-    async userData(params){
+    async getUser(params){
         try {
             return new Promise((resolve, reject) => {
                 const sql = "SELECT * FROM matcha.users WHERE username = ?";
@@ -236,6 +236,26 @@ class DatabaseRequest {
                         resolve(user);
                     } else {
                         reject('no user found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+    async getTags(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.tags WHERE user_id = ?";
+                this.query(sql, params).then((tags) => {
+                    if (tags){
+                        // console.log(tags);
+                        resolve(tags);
+                    } else {
+                        // console.log(tags);
+                        reject(tags);
                     }
                 });
             });

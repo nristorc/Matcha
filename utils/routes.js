@@ -59,12 +59,14 @@ class Routes{
                         loginResponse.userId = result[0].id;
                         loginResponse.message = `User logged in.`;
                         request.session.user = data;
+                        request.session.user.id = result[0].id;
+                        console.log(request.session.user);
                         request.flash(loginResponse.type, loginResponse.message);
-                        response.status(200).render('pages/loggedIn', {
-                            username: data.username,
-                            password: data.password,
-                            message: loginResponse.message
-                        });
+                        response.status(200).redirect('/profil');//.render('pages/profil', {
+                            //username: data.username,
+                            //password: data.password,
+                            //message: loginResponse.message
+                        //});
                     }).catch((result) => {
                         if (result === undefined || result === false) {
                             loginResponse.error = true;
@@ -304,17 +306,22 @@ class Routes{
         this.app.get('/profil', (request, response) => {
             if (!request.session.user) {
                 return response.render('index');
-                }
-            checkDb.userData(request.session.user.username).then((user) => {
-				userData.userAge(user[0]['birth']).then((age) => {
-					response.render('pages/profil', {
-					user: user,
-					userage: age
-					});
-			}).catch((age) => {
-				response.render('pages/profil', {
-					user: user,
-					userage: null
+			}
+			checkDb.getUser(request.session.user.username).then((user) => {
+				checkDb.getTags(request.session.user.id).then((tags) => {
+					console.log(tags);
+					userData.userAge(user[0]['birth']).then((age) => {
+						response.render('pages/profil', {
+						user: user,
+						userage: age,
+						usertags: tags
+						});
+					}).catch((age) => {
+						response.render('pages/profil', {
+						user: user,
+						usertags: tags,
+						userage: null
+						});
 					});
 				});
 			});
