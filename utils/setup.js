@@ -42,8 +42,8 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
 
 const sql_tags = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.tags_table +
 	"(`id` INT(11) NOT NULL AUTO_INCREMENT," +
-	"`user_id` VARCHAR(255) NOT NULL," +
-    "`tag` INT(11) NOT NULL," +
+	"`user_id` INT(11) NOT NULL," +
+    "`tag` VARCHAR(255) NOT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql_user, (err, result) => {
