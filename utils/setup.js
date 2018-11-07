@@ -38,6 +38,7 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`gender` VARCHAR (20) DEFAULT NULL," +
     "`orientation` VARCHAR (20) DEFAULT NULL," +
     "`description` VARCHAR (255) DEFAULT NULL," +
+    "`popularity` INT(11) DEFAULT `0`," +
 	"PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 const sql_tags = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.tags_table +
