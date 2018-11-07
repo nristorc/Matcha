@@ -6,8 +6,8 @@ const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
 
-const profilRequest =require('../models/profilRequest');
-const profil = new profilRequest();
+const userDatabase =require('../models/userData');
+const userData = new userDatabase();
 
 class Routes{
     constructor(app){
@@ -305,35 +305,21 @@ class Routes{
             if (!request.session.user) {
                 return response.render('index');
                 }
-                console.log(checkDb.userData(request.session.user.username));
-                const user = null;
-            // const sql_user = "SELECT * FROM matcha.users WHERE username = ?";
-            // checkDb.query(sql_user, [request.session.user.username]).then((result) => {
-			// console.log(user);
-				// var dob = user[0]['birth'];
-				// if (dob != null) {
-				// 	var year = dob.getFullYear();
-				// 	var month = dob.getMonth();
-				// 	var day = dob.getDate();
-				// 	var today = new Date();
-				// 	var age = today.getFullYear() - year;
-				// 		if (today.getMonth() < month || (today.getMonth() == month && today.getDate() < day)) {
-				// 		age--;
-				// 		}
-				// 	response.render('pages/profil', {
-				// 		user: user,
-				// 		userage: age
-				// 	});
-				// } else {
-					response.render('index', {
-						user: user
+            checkDb.userData(request.session.user.username).then((user) => {
+				userData.userAge(user[0]['birth']).then((age) => {
+					response.render('pages/profil', {
+					user: user,
+					userage: age
 					});
-				// }
-            //     }).catch(() => {
-            //     console.log('ko');
-            // });
-        });
-
+			}).catch((age) => {
+				response.render('pages/profil', {
+					user: user,
+					userage: null
+					});
+				});
+			});
+		});
+			
 		/* Routes for ... */
 
     }

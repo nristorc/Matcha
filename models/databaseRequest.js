@@ -231,8 +231,14 @@ class DatabaseRequest {
         try {
             return new Promise((resolve, reject) => {
                 const sql = "SELECT * FROM matcha.users WHERE username = ?";
-                this.query(sql, params);
-            })
+                this.query(sql, params).then((user) => {
+                    if (user){
+                        resolve(user);
+                    } else {
+                        reject('no user found');
+                    }
+                });
+            });
         } catch (error){
             console.log(error);
             return false;
