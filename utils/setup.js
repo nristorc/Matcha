@@ -22,7 +22,7 @@ connection.query("USE " + configDatabase.database, (err) => {
     }
     console.log('connected to ' + configDatabase.database)
 });
-const sql = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
+const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "(`id` INT(11) NOT NULL AUTO_INCREMENT," +
     "`email` VARCHAR(255) NOT NULL," +
     "`firstname` VARCHAR(30) NOT NULL," +
@@ -38,14 +38,28 @@ const sql = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`gender` VARCHAR (20) DEFAULT NULL," +
     "`orientation` VARCHAR (20) DEFAULT NULL," +
     "`description` VARCHAR (255) DEFAULT NULL," +
+	"PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+
+const sql_tags = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.tags_table +
+	"(`id` INT(11) NOT NULL AUTO_INCREMENT," +
+	"`user_id` VARCHAR(255) NOT NULL," +
+    "`tag` INT(11) NOT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
-connection.query(sql, (err, result) => {
+connection.query(sql_user, (err, result) => {
     if (err) {
         console.error('error creating table: ' + err.stack);
         return
     }
     console.log("Table " + configDatabase.user_table + " created");
+});
+
+connection.query(sql_tags, (err, result) => {
+    if (err) {
+        console.error('error creating table: ' + err.stack);
+        return
+    }
+    console.log("Table " + configDatabase.tags_table + " created");
 });
 
 connection.end();

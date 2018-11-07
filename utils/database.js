@@ -7,5 +7,6 @@ module.exports = {
         'password': 'root00'
     },
     'database': 'Matcha',
-    'user_table': 'users'
+    'user_table': 'users',
+    'tags_table': 'tags'
 };

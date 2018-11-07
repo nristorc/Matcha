@@ -6,6 +6,9 @@ const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
 
+const profilRequest =require('../models/profilRequest');
+const profil = new profilRequest();
+
 class Routes{
     constructor(app){
         this.app = app;
@@ -302,31 +305,33 @@ class Routes{
             if (!request.session.user) {
                 return response.render('index');
                 }
-            const sql = "SELECT * FROM matcha.users WHERE username = ?";
-            checkDb.query(sql, [request.session.user.username]).then((result) => {
-				console.log(result);
-				var dob = result[0]['birth'];
-				if (dob != null) {
-					var year = dob.getFullYear();
-					var month = dob.getMonth();
-					var day = dob.getDate();
-					var today = new Date();
-					var age = today.getFullYear() - year;
-						if (today.getMonth() < month || (today.getMonth() == month && today.getDate() < day)) {
-						age--;
-						}
-					response.render('pages/profil', {
-						user: result,
-						userage: age
+                console.log(checkDb.userData(request.session.user.username));
+                const user = null;
+            // const sql_user = "SELECT * FROM matcha.users WHERE username = ?";
+            // checkDb.query(sql_user, [request.session.user.username]).then((result) => {
+			// console.log(user);
+				// var dob = user[0]['birth'];
+				// if (dob != null) {
+				// 	var year = dob.getFullYear();
+				// 	var month = dob.getMonth();
+				// 	var day = dob.getDate();
+				// 	var today = new Date();
+				// 	var age = today.getFullYear() - year;
+				// 		if (today.getMonth() < month || (today.getMonth() == month && today.getDate() < day)) {
+				// 		age--;
+				// 		}
+				// 	response.render('pages/profil', {
+				// 		user: user,
+				// 		userage: age
+				// 	});
+				// } else {
+					response.render('index', {
+						user: user
 					});
-				} else {
-					response.render('pages/profil', {
-						user: result
-					});
-				}
-                }).catch(() => {
-                console.log('ko');
-            });
+				// }
+            //     }).catch(() => {
+            //     console.log('ko');
+            // });
         });
 
 		/* Routes for ... */
