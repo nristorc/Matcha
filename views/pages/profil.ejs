@@ -4,7 +4,7 @@
 <%- messages('partial/message', locals) %>
 
 <!-- Modal -->
-<% if (user && (user.birth === null || user.gender === null || user.orientation === null || user.description === null)) { %>
+<% if (user && (user.birth === null || user.birth === '' || user.gender == null || user.gender === '' || user.orientation == null || user.orientation === '' || user.description == null || user.description === '')) { %>
 	<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
@@ -15,7 +15,7 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<p style="text-align: center"><%=user.firstname%>, fin de finaliser votre profil</p>
+					<p style="text-align: center"><%=user.firstname%>, Afin de finaliser votre profil</p>
 					<input name="displayUser" type="hidden" id="displayUser" value="<%=user.username%>">
 					<p style="text-align: center">Merci de renseigner les champs restés vides</p>
 					<form>
@@ -39,7 +39,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-					<button id="saveProfil" type="button" class="btn btn-primary" data-dismiss="modal">Confirmer</button>
+					<button id="saveProfil" type="button" class="btn btn-primary">Confirmer</button>
 				</div>
 			</div>
 		</div>
@@ -52,23 +52,23 @@
 		<button type="button" class="btn btn-primary popularity">
 			Popularité <span class="badge badge-light">93%</span>
 	  </button>
-		<h2 class="mt-0"><%=user.firstname%></h2>
+		<h2 class="mt-0" id="firstname"><%=user.firstname%></h2>
         <div class="row">
-            <div class="col-sm">
+            <div class="col-sm" id="genderOrientation">
 				<%=user.gender%>, <%=user.orientation%>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row" id="age">
 			<div class="col-sm">
 				18 ans
 			</div>
 		</div>
-		<div class="row">
+		<div class="row" id="location">
 			<div class="col-sm">
 				À 7km
 			</div>
 		</div>
-		<div class="description">
+		<div class="description" id="desc">
 			<%=user.description%>
 		</div>
 
@@ -116,25 +116,57 @@
 				orientation: $sexOrientation.val(),
 				description: $description.val()
 			}
-
-            /*$.post( "profil", function( data ) {
-               alert( "Data Loaded: " + data );
-            })*/
-
-
-
 			$.ajax({
 				type: 'POST',
 				url: '/profil',
 				data: profile,
 				success: function (response) {
-                    console.log(response);
-                    //cons
-				    //const sql = "UPDATE matcha.users SET `birth` = ?, `gender` = ?, orientation = ?, description = ? WHERE users.username = ?";
-				    //checkDb.query(sql, [fields.birthdate, fields.gender, fields.orientation, fields.description, $('#displayUser').val()]);
+                    if (response.user) {
+                        $('#exampleModalCenter').modal('hide');
+                        const genderOrientation = document.getElementById('genderOrientation');
+                        const description = document.getElementById('desc');
+                        genderOrientation.innerHTML = response.user.gender + ', ' + response.user.orientation;
+                        description.innerHTML = response.user.description;
+					} else {
+                        const parent = document.getElementById('exampleModalCenterTitle');
+                        //console.log(parent.getElementsByTagName('p'));
+                        /*if (parent.getElementsByTagName('p')) {
+                            //console.log('des p sont presents');
+                            //parent.removeChild.getElementsByTagName('p');
+                            console.log(parent.getElementsByTagName('p').length)
+							for (var j = 0; j < parent.getElementsByTagName('p').length; j++) {
+                                console.log("je supprime " + parent.removeChild(parent.getElementsByTagName('p')[j]));
+							    //parent.removeChild(parent.getElementsByTagName('p')[j]);
+							}
+						}*/
+
+						$('document').ready(() => {
+                            if (document.getElementsByClassName('modal-body errors')) {
+                                const errorsClass = document.getElementsByClassName('modal-body errors');
+                                //errorsClass.parentNode.removeChild(errorsClass);
+                                //console.log(errorsClass[0]);
+                                for (var j = 0; j < errorsClass.length; j++) {
+                                    console.log(errorsClass[j++]);
+                                    parent.removeChild(errorsClass[j++]);
+                                    //parent.removeChild(parent.getElementsByTagName('p')[j]);
+                                }
+                            }
+						})
+                            //errorsClass.parentNode.removeChild(errorsClass);
+
+						for (var i = 0; i < response.errors.length; i++) {
+                            const errorDiv = document.createElement("p");
+                            //errorDiv.setAttribute("id", "errors" + i);
+                            errorDiv.setAttribute("class", "modal-body errors");
+                            errorDiv.setAttribute("style", "color: red;");
+                            const msg = document.createTextNode(response.errors[i].msg);
+                            errorDiv.appendChild(msg);
+                            parent.appendChild(errorDiv);
+						}
+					}
 				},
 				error: function () {
-                    alert('erreur');
+                    alert('une erreur est survenue, merci de réitérer votre demande ultérieurement');
 				}
 			});
 		})

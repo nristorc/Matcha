@@ -314,38 +314,45 @@ class Routes{
         /* Routes for Profil */
 
         this.app.route('/profil').get((request, response) => {
-            //console.log("Je suis sur la page de PROFIL !!!!")
             if (!request.session.user) {
                 return response.render('index');
                 }
             const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE username = ?";
             checkDb.query(sql, [request.session.user.username]).then((result) => {
-                console.log(result[0].birth);
                 response.render('pages/profil', {user: result[0]});
                 }).catch(() => {
 
             });
         }).post(async (request, response) => {
-            console.log(request.body);
             const data = {
                 gender: request.body.gender,
                 birthdate: request.body.birthdate,
                 orientation: request.body.orientation,
                 description: request.body.description,
             };
-            console.log('response: ', response.body);
-            console.log('request: ', request.body);
-            const sql = "UPDATE matcha.users SET `birth` = STR_TO_DATE(?, '%d/%m/%Y'), `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
-            checkDb.query(sql, [data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
-                checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                    response.json({user: result[0]});
+            await validation.matchingRegex(data.gender, /^[a-zA-Z]+$/, "Mauvais format de genre");
+            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de de date de naissance");
+            await validation.matchingRegex(data.orientation, /^[a-zA-Z]+$/, "Mauvais format d'orientation");
+            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
+
+            if (validation.errors.length === 0) {
+                console.log("pas d'erreur");
+                const sql = "UPDATE matcha.users SET `birth` = CASE WHEN ? = '' THEN NULL ELSE str_to_date(?, '%d/%m/%Y') END, `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
+
+                checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
+                    checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                        response.json({user: result[0]});
+                    }).catch((result) => {
+                        console.log('result CATCH:',result);
+                    });
                 }).catch((result) => {
                     console.log('result CATCH:',result);
                 });
-            }).catch((result) => {
-                console.log('result CATCH:',result);
-            });
-            //response.send();
+            } else {
+                console.log('erreurs: ', validation.errors);
+                response.json({errors: validation.errors});
+                validation.errors = [];
+            }
         });
 
 		/* Routes for ... */
