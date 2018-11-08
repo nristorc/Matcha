@@ -2,27 +2,31 @@
 <%- include('../partial/header')%>
 
 <div class="container2">
-
+		<%=users[0]['username']%>
+		<%
+		for (var i=0; i<10; i++){%>
+	<%=i%>
+		<%} %>
 
 </div>
 
 
-<p id="loading">
+<p id="loading" style="display:none">
 		<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
-	</p>
+</p>
 
 
 
 
 
 <script>
-	var i =0;
+	var i =1;
 
 	$(document).ready(function() {
 		var win = $(window);
 		win.scroll(function() {
 			if ($(document).height() - win.height() == win.scrollTop()) {
-				$('#loading').show();
+				$('#loading').show();	
 				$.ajax({
 					method: "GET",
 					data: {
@@ -31,6 +35,9 @@
 					url: 'search-infinite',
 					success: function(html) {
 						$('.container2').append(html);
+						$('#loading').hide();
+					},
+					error: function() {
 						$('#loading').hide();
 					}
 				});
