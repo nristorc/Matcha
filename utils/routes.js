@@ -334,12 +334,12 @@ class Routes{
                 return response.render('index');
 			}
 			checkDb.getAllUsers().then((users) => {
-				console.log(users);
+				// console.log(users);
 				response.render('pages/search', {
 				users: users,
 				});
 			}).catch((users) => {
-				console.log(users);
+				// console.log(users);
 				response.render('pages/search', {
 				users: users,
 				});
@@ -347,15 +347,65 @@ class Routes{
         });
         
 
-		/* Routes for test */
+		/* Routes for infinite */
 
-        this.app.get('/get-post.php', (request, response) => {
-            return response.render('pages/test2');
-        });
+        this.app.get('/search-infinite', (request, response) => {
+			if (!request.session.user) {
+                return response.render('index');
+			} else {
+                console.log(request.query.index);
+				checkDb.getAllUsers().then((users) => {
+					response.render('pages/search-infinite', {
+                    users: users,
+                    index: request.query.index
+					});
+				}).catch((users) => {
+					// console.log(users);
+					response.render('index',{
+					users: users,
+					});
+				});
+			}
+		});
+		
+				/* Routes for Test */
 
-        this.app.get('/test', (request, response) => {
-            return response.render('pages/test');
-        });
+				this.app.get('/test', (request, response) => {
+					if (!request.session.user) {
+						return response.render('index');
+					}
+					checkDb.getAllUsers().then((users) => {
+						console.log(users);
+						response.render('pages/test', {
+						users: users,
+						});
+					}).catch((users) => {
+						console.log(users);
+						response.render('pages/test', {
+						users: users,
+						});
+					});
+				});
+				
+		
+				/* Routes for infinite-test */
+		
+				this.app.get('/test2', (request, response) => {
+					if (!request.session.user) {
+						return response.render('index');
+					} else {
+						checkDb.getAllUsers().then((users) => {
+							response.render('pages/test2', {
+							users: users,
+							});
+						}).catch((users) => {
+							console.log(users);
+							response.render('index',{
+							users: users,
+							});
+						});
+					}
+				});
 
 		/* Routes for ... */
 
