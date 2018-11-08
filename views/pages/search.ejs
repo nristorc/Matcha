@@ -9,7 +9,7 @@
 
 	<div class="row">
 	<% 
-	for (i=0; i<3; i++){ %>
+	for (i=0; i+offset<offset+3; i++){ %>
 			<div class="col-sm">
 				<%=users[i]['username']%>
 			</div>
@@ -21,5 +21,76 @@
 <% }} %>
 
 </div>
+
+
+
+
+
+<nav>
+	<div class="text-center">
+		<ul class="pagination pagination-sm">
+			<li
+					<% if(0 <= 0) { %>
+					class="disabled"
+					<% } %>
+			><a href="#">&laquo;</a></li>
+			<% for(var i = 0; i < 5; i++) { %>
+			<li
+					<% if(i == i) { %>
+					class="active"
+					<% } %>
+			><a href="#"><%= i + 1 %></a></li>
+			<% } %>
+			<li <% if(1 > 1 - 1) { %>class="disabled"
+					<% } %>
+			><a href="#">&raquo;</a></li>
+		</ul>
+	</div>
+
+
+
+	<div class="grid">
+		<div class="grid-item grid-item-2">
+			<p>content</p>
+		</div>
+		…
+	</div>
+
+	<!-- The next page which content will be loaded when scrolled -->
+	<nav id="pagination">
+		<p><a href="page-2.html">Page 2</a></p>
+	</nav>
+
+<script>$(document).ready(function() {
+	var grid = $('.grid');
+
+	grid.masonry({
+		itemSelector: '.grid-item',
+		columnWidth: 200
+	});
+
+	grid.infinitescroll({
+		// Pagination element that will be hidden
+		navSelector: '#pagination',
+
+		// Next page link
+		nextSelector: '#pagination p a',
+
+		// Selector of items to retrieve
+		itemSelector: '.grid-item',
+
+		// Loading message
+		loadingText: 'Loading new items…'
+	},
+
+	// Function called once the elements are retrieved
+	function(new_elts) {
+		var elts = $(new_elts).css('opacity', 0);
+
+		elts.animate({opacity: 1});
+		grid.masonry('appended', elts);
+	});
+});</script>
+
 
 <% include ../partial/footer.ejs%>

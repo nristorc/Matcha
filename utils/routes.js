@@ -325,8 +325,7 @@ class Routes{
 					});
 				});
 			});
-		});
-			
+		});	
 
 		/* Routes for Search */
 
@@ -345,7 +344,19 @@ class Routes{
 				users: users,
 				});
 			});
-		});
+        });
+        
+
+		/* Routes for test */
+
+        this.app.get('/get-post.php', (request, response) => {
+            return response.render('pages/test2');
+        });
+
+        this.app.get('/test', (request, response) => {
+            return response.render('pages/test');
+        });
+
 		/* Routes for ... */
 
     }
