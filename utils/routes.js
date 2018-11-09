@@ -411,45 +411,6 @@ class Routes{
 			}
 		});
 		
-				/* Routes for Test */
-
-				this.app.get('/test', (request, response) => {
-					if (!request.session.user) {
-						return response.render('index');
-					}
-					checkDb.getAllUsers().then((users) => {
-						console.log(users);
-						response.render('pages/test', {
-						users: users,
-						});
-					}).catch((users) => {
-						console.log(users);
-						response.render('pages/test', {
-						users: users,
-						});
-					});
-				});
-				
-		
-				/* Routes for infinite-test */
-		
-				this.app.get('/test2', (request, response) => {
-					if (!request.session.user) {
-						return response.render('index');
-					} else {
-						checkDb.getAllUsers().then((users) => {
-							response.render('pages/test2', {
-							users: users,
-							});
-						}).catch((users) => {
-							console.log(users);
-							response.render('index',{
-							users: users,
-							});
-						});
-					}
-				});
-
 		/* Routes for ... */
 
     }
