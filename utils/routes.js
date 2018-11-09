@@ -322,14 +322,16 @@ class Routes{
 			}
 			checkDb.getUser(request.session.user.username).then((user) => {
 				checkDb.getTags(request.session.user.id).then((tags) => {
-					console.log(tags);
+					//console.log(tags);
 					userData.userAge(user[0]['birth']).then((age) => {
+					    //console.log('thne', age);
 						response.render('pages/profil', {
 						user: user,
 						userage: age,
 						usertags: tags
 						});
 					}).catch((age) => {
+                        //console.log('catch', age);
 						response.render('pages/profil', {
 						user: user,
 						usertags: tags,
@@ -345,9 +347,9 @@ class Routes{
                 orientation: request.body.orientation,
                 description: request.body.description,
             };
-            await validation.matchingRegex(data.gender, /^[a-zA-Z]+$/, "Mauvais format de genre");
+            await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
             await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
-            await validation.matchingRegex(data.orientation, /^[a-zA-Z]+$/, "Mauvais format d'orientation");
+            await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
             await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
 
             if (validation.errors.length === 0) {
@@ -369,6 +371,7 @@ class Routes{
                 validation.errors = [];
             }
         });
+
 		/* Routes for Search */
 
         this.app.get('/search', (request, response) => {
@@ -387,8 +390,6 @@ class Routes{
 				});
 			});
         });
-        
-        
 
 		/* Routes for infinite */
 
