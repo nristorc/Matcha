@@ -37,7 +37,7 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-							<button id="saveProfil" type="submit" class="btn btn-primary">Confirmer</button>
+							<button id="saveProfil" type="submit" class="btn login-btn">Confirmer</button>
 						</div>
 					</form>
 				</div>
@@ -104,7 +104,6 @@
         $(document).ready(function() {
 
             $('#exampleModalCenter').modal('show');
-            // process the form
             $('form').submit(function(event) {
 
                 $('.form-group').removeClass('has-error'); // remove the error class
@@ -135,15 +134,12 @@
 
                         // here we will handle errors and validation messages
                         if (data.errors) {
-
                             console.log(data.errors.length);
                             for (var i = 0; i < data.errors.length; i++) {
                                 $('#modal-body').addClass('has-error'); // add the error class to show red input
-                                $('#modal-body').append('<div class="help-block">' + data.errors[i].msg + '</div>'); // add the actual error message under our input
+                                $('#modal-body').append('<div class="help-block alert alert-warning">' + data.errors[i].msg + '</div>'); // add the actual error message under our input
 							}
-
                         } else {
-
                             if (data.user) {
                                 $('#exampleModalCenter').modal('hide');
                                 const genderOrientation = document.getElementById('genderOrientation');
@@ -153,92 +149,12 @@
 
                                 const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
                                 flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
-
-
-                                // ALL GOOD! just show the success message!
-                                //$('form').append('<div class="alert alert-success">' + data.message + '</div>');
-
-                                // usually after form submission, you'll want to redirect
-                                // window.location = '/thank-you'; // redirect a user to another page
-                                // alert('success'); // for now we'll just alert the user
                             }
-
                         }
                     });
-
                 // stop the form from submitting the normal way and refreshing the page
                 event.preventDefault();
             });
-
         });
-
-
-        // $gender = $('#gender');
-        // $birthdate = $('#birthdate');
-        // $sexOrientation = $('#sexOrientation');
-        // $description = $('#description');
-		//
-        // $('#saveProfil').on('click', (e) => {
-        //     e.preventDefault();
-        //     const profile = {
-        //         gender: $gender.val(),
-		// 		birthdate: $birthdate.val(),
-		// 		orientation: $sexOrientation.val(),
-		// 		description: $description.val()
-		// 	}
-		// 	$.ajax({
-		// 		type: 'POST',
-		// 		url: '/profil',
-		// 		data: profile,
-		// 		success: function (response) {
-        //             if (response.user) {
-        //                 $('#exampleModalCenter').modal('hide');
-        //                 const genderOrientation = document.getElementById('genderOrientation');
-        //                 const description = document.getElementById('desc');
-        //                 genderOrientation.innerHTML = response.user.gender + ', ' + response.user.orientation;
-        //                 description.innerHTML = response.user.description;
-		// 			} else {
-        //                 const parent = document.getElementById('exampleModalCenterTitle');
-        //                 //console.log(parent.getElementsByTagName('p'));
-        //                 /*if (parent.getElementsByTagName('p')) {
-        //                     //console.log('des p sont presents');
-        //                     //parent.removeChild.getElementsByTagName('p');
-        //                     console.log(parent.getElementsByTagName('p').length)
-		// 					for (var j = 0; j < parent.getElementsByTagName('p').length; j++) {
-        //                         console.log("je supprime " + parent.removeChild(parent.getElementsByTagName('p')[j]));
-		// 					    //parent.removeChild(parent.getElementsByTagName('p')[j]);
-		// 					}
-		// 				}*/
-		//
-		// 				$('document').ready(() => {
-        //                     if (document.getElementsByClassName('modal-body errors')) {
-        //                         const errorsClass = document.getElementsByClassName('modal-body errors');
-        //                         //errorsClass.parentNode.removeChild(errorsClass);
-        //                         //console.log(errorsClass[0]);
-        //                         for (var j = 0; j < errorsClass.length; j++) {
-        //                             console.log(errorsClass[j++]);
-        //                             parent.removeChild(errorsClass[j++]);
-        //                             //parent.removeChild(parent.getElementsByTagName('p')[j]);
-        //                         }
-        //                     }
-		// 				})
-        //                     //errorsClass.parentNode.removeChild(errorsClass);
-		//
-		// 				for (var i = 0; i < response.errors.length; i++) {
-        //                     const errorDiv = document.createElement("p");
-        //                     //errorDiv.setAttribute("id", "errors" + i);
-        //                     errorDiv.setAttribute("class", "modal-body errors");
-        //                     errorDiv.setAttribute("style", "color: red;");
-        //                     const msg = document.createTextNode(response.errors[i].msg);
-        //                     errorDiv.appendChild(msg);
-        //                     parent.appendChild(errorDiv);
-		// 				}
-		// 			}
-		// 		},
-		// 		error: function () {
-        //             alert('une erreur est survenue, merci de réitérer votre demande ultérieurement');
-		// 		}
-		// 	});
-		// })
 	});
 </script>

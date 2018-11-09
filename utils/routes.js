@@ -331,7 +331,7 @@ class Routes{
                 description: request.body.description,
             };
             await validation.matchingRegex(data.gender, /^[a-zA-Z]+$/, "Mauvais format de genre");
-            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de de date de naissance");
+            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
             await validation.matchingRegex(data.orientation, /^[a-zA-Z]+$/, "Mauvais format d'orientation");
             await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
 
