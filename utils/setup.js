@@ -37,10 +37,10 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
 	"`birth` DATE DEFAULT NULL," +
     "`gender` VARCHAR (20) DEFAULT NULL," +
     "`orientation` VARCHAR (20) DEFAULT NULL," +
-    "`description` VARCHAR (255) DEFAULT NULL," +
+    "`description` LONGTEXT DEFAULT NULL," +
     "`popularity` INT(11) DEFAULT 0," +
-	"PRIMARY KEY (`id`)) ENGINE = InnoDB;";
-
+    "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+    
 const sql_tags = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.tags_table +
 	"(`id` INT(11) NOT NULL AUTO_INCREMENT," +
 	"`user_id` INT(11) NOT NULL," +
