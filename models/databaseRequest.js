@@ -266,7 +266,7 @@ class DatabaseRequest {
     async getTags(params){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE user_id = ?";
+                const sql = "SELECT * FROM matcha.tags WHERE user_id = ?";
                 this.query(sql, params).then((tags) => {
                     if (tags){
                         // console.log(tags);

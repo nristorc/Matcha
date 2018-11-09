@@ -4,7 +4,7 @@
 <%- messages('partial/message', locals) %>
 
 <!-- Modal -->
-<% if (user && (user[0].birth === null || user[0].birth === '' ||user[0].gender == null || user[0].gender === '' || user[0].orientation == null || user[0].orientation === '' || user[0].description === null || user[0].description ==== '')) { %>
+<% if (user && user[0] && (user[0].birth === null || user[0].birth === '' ||user[0].gender == null || user[0].gender === '' || user[0].orientation == null || user[0].orientation === '' || user[0].description === null || user[0].description === '')) { %>
 	<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
@@ -16,7 +16,7 @@
 				</div>
 				<div class="modal-body" id="modal-body">
 					<p style="text-align: center"><%=user[0].firstname%>, Afin de finaliser votre profil</p>
-					<input name="displayUser" type="hidden" id="displayUser" value="<%=user.username%>">
+					<input name="displayUser" type="hidden" id="displayUser" value="<%=user[0].username%>">
 					<p style="text-align: center">Merci de renseigner les champs restés vides</p>
 					<form>
 						<div class="form-group">
@@ -81,8 +81,6 @@
 				À 7km
 			</div>
 		</div>
-		<div class="description" id="desc">
-				Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
 		<div class="description" id="desc">
 			<% if (user[0]['description'] == null) { %>
 				Description manquante
