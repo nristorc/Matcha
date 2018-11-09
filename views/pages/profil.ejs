@@ -21,7 +21,12 @@
 					<form>
 						<div class="form-group">
 							<label for="gender" class="col-form-label">Votre Genre</label>
-							<input name="gender" type="text" class="form-control" id="gender" value="<%=user[0].gender%>">
+							<select name="gender" class="form-control" id="gender">
+								<option value=""></option>
+								<option value="Autre">Autre</option>
+								<option value="Femme">Femme</option>
+								<option value="Homme">Homme</option>
+							</select>
 						</div>
 						<div class="form-group">
 							<label for="birthdate" class="col-form-label">Votre Date de Naissance</label>
@@ -29,7 +34,12 @@
 						</div>
 						<div class="form-group">
 							<label for="sexOrientation" class="col-form-label">Votre Orientation Sexuelle</label>
-							<input name="orientation" type="text" class="form-control" id="sexOrientation" value="<%=user[0].orientation%>">
+							<select name="orientation" class="form-control" id="sexOrientation">
+								<option value=""></option>
+								<option value="Hétérosexuel">Hétérosexuel</option>
+								<option value="Homosexuel">Homosexuel</option>
+								<option value="Autre">Autre</option>
+							</select>
 						</div>
 						<div class="form-group">
 							<label for="description" class="col-form-label">Description</label>
@@ -140,9 +150,9 @@
                 // get the form data
                 // there are many ways to get this data using jQuery (you can use the class or id also)
                 var formData = {
-                    'gender'              : $('input[name=gender]').val(),
+                    'gender'              : $('select[name=gender]').val(),
                     'birthdate'             : $('input[name=birthdate]').val(),
-                    'orientation'    : $('input[name=orientation]').val(),
+                    'orientation'    : $('select[name=orientation]').val(),
                     'description'    : $('textarea[name=description]').val()
                 };
 
