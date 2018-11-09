@@ -52,7 +52,7 @@
 		<button type="button" class="btn btn-primary popularity">
 			Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
 	  </button>
-		<h2 class="mt-0" id="username"><%=user[0]['username']%></h2>
+		<h2 class="mt-0" id="username"><%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>
         <div class="row">
             <div class="col-sm" id=genderOrientation>
 				<% if (user[0]['gender'] === null) { %>
@@ -61,14 +61,14 @@
 					<%=user[0]['gender']%>,
 				<% } %>
 				<% if (user[0]['orientation'] === null) { %>
-					orientation non renseignee
+					Orientation non renseignee
 				<%} else { %>
 					<%=user[0]['orientation']%>
 				<% } %>
 			</div>
 		</div>
 		<div class="row" id="age">
-			<div class="col-sm">
+			<div class="col-sm" id="birth">
 				<% if (user[0]['birth'] == null) { %>
 					Date de naissance manquante
 				<%} else { %>
@@ -117,9 +117,21 @@
 <script>
 	$(function () {
 
+
         $(document).ready(function() {
 
             $('#exampleModalCenter').modal('show');
+
+			if ($('#birthdate').val()) {
+                let now = new Date($('#birthdate').val());
+                let options = {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                };
+                $("#birthdate").attr("value", now.toLocaleString('en-GB', options));
+			}
+
             $('form').submit(function(event) {
 
                 $('.form-group').removeClass('has-error'); // remove the error class
@@ -145,23 +157,34 @@
                 // using the done promise callback
                     .done(function(data) {
 
-                        // log data to the console so we can see
-                        console.log(data);
-
                         // here we will handle errors and validation messages
                         if (data.errors) {
-                            console.log(data.errors.length);
                             for (var i = 0; i < data.errors.length; i++) {
                                 $('#modal-body').addClass('has-error'); // add the error class to show red input
                                 $('#modal-body').append('<div class="help-block alert alert-warning">' + data.errors[i].msg + '</div>'); // add the actual error message under our input
 							}
                         } else {
                             if (data.user) {
+
                                 $('#exampleModalCenter').modal('hide');
                                 const genderOrientation = document.getElementById('genderOrientation');
                                 const description = document.getElementById('desc');
+                                const birthdate = document.getElementById('birth');
                                 genderOrientation.innerHTML = data.user.gender + ', ' + data.user.orientation;
                                 description.innerHTML = data.user.description;
+
+                                var date = new Date(data.user.birth);
+								var year = date.getFullYear();
+								var month = date.getMonth();
+								var day = date.getDate();
+								var today = new Date();
+
+								var age = today.getFullYear() - year;
+								if (today.getMonth() < month || (today.getMonth() === month && today.getDate() < day)) {
+									age--;
+								}
+
+                                birthdate.innerHTML = age + ' ans';
 
                                 const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
                                 flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
