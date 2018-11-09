@@ -151,6 +151,10 @@
                                 genderOrientation.innerHTML = data.user.gender + ', ' + data.user.orientation;
                                 description.innerHTML = data.user.description;
 
+                                const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
+
+
                                 // ALL GOOD! just show the success message!
                                 //$('form').append('<div class="alert alert-success">' + data.message + '</div>');
 
