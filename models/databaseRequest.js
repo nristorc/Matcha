@@ -227,7 +227,61 @@ class DatabaseRequest {
         }
     }
 
+    async getUser(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE username = ?";
+                this.query(sql, params).then((user) => {
+                    if (user){
+                        resolve(user);
+                    } else {
+                        reject('no user found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
 
+    async getAllUsers(){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'";
+                this.query(sql).then((users) => {
+                    if (users){
+                        resolve(users);
+                    } else {
+                        reject('no user found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+    async getTags(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE user_id = ?";
+                this.query(sql, params).then((tags) => {
+                    if (tags){
+                        // console.log(tags);
+                        resolve(tags);
+                    } else {
+                        // console.log(tags);
+                        reject(tags);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
 
 }
 

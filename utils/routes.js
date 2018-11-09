@@ -6,6 +6,9 @@ const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
 
+const userDatabase =require('../models/userData');
+const userData = new userDatabase();
+
 class Routes{
     constructor(app){
         this.app = app;
@@ -316,13 +319,25 @@ class Routes{
         this.app.route('/profil').get((request, response) => {
             if (!request.session.user) {
                 return response.render('index');
-                }
-            const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE username = ?";
-            checkDb.query(sql, [request.session.user.username]).then((result) => {
-                response.render('pages/profil', {user: result[0]});
-                }).catch(() => {
-
-            });
+			}
+			checkDb.getUser(request.session.user.username).then((user) => {
+				checkDb.getTags(request.session.user.id).then((tags) => {
+					console.log(tags);
+					userData.userAge(user[0]['birth']).then((age) => {
+						response.render('pages/profil', {
+						user: user,
+						userage: age,
+						usertags: tags
+						});
+					}).catch((age) => {
+						response.render('pages/profil', {
+						user: user,
+						usertags: tags,
+						userage: null
+						});
+					});
+				});
+			});
         }).post(async (request, response) => {
             const data = {
                 gender: request.body.gender,
@@ -354,6 +369,86 @@ class Routes{
                 validation.errors = [];
             }
         });
+		/* Routes for Search */
+
+        this.app.get('/search', (request, response) => {
+            if (!request.session.user) {
+                return response.render('index');
+			}
+			checkDb.getAllUsers().then((users) => {
+				// console.log(users);
+				response.render('pages/search', {
+				users: users,
+				});
+			}).catch((users) => {
+				// console.log(users);
+				response.render('pages/search', {
+				users: users,
+				});
+			});
+        });
+        
+        
+
+		/* Routes for infinite */
+
+        this.app.get('/search-infinite', (request, response) => {
+			if (!request.session.user) {
+                return response.render('index');
+			} else {
+                console.log(request.query.index);
+				checkDb.getAllUsers().then((users) => {
+					response.render('pages/search-infinite', {
+                    users: users,
+                    index: request.query.index
+					});
+				}).catch((users) => {
+					// console.log(users);
+					response.render('index',{
+					users: users,
+					});
+				});
+			}
+		});
+		
+				/* Routes for Test */
+
+				this.app.get('/test', (request, response) => {
+					if (!request.session.user) {
+						return response.render('index');
+					}
+					checkDb.getAllUsers().then((users) => {
+						console.log(users);
+						response.render('pages/test', {
+						users: users,
+						});
+					}).catch((users) => {
+						console.log(users);
+						response.render('pages/test', {
+						users: users,
+						});
+					});
+				});
+				
+		
+				/* Routes for infinite-test */
+		
+				this.app.get('/test2', (request, response) => {
+					if (!request.session.user) {
+						return response.render('index');
+					} else {
+						checkDb.getAllUsers().then((users) => {
+							response.render('pages/test2', {
+							users: users,
+							});
+						}).catch((users) => {
+							console.log(users);
+							response.render('index',{
+							users: users,
+							});
+						});
+					}
+				});
 
 		/* Routes for ... */
 

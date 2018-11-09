@@ -4,7 +4,7 @@
 <%- messages('partial/message', locals) %>
 
 <!-- Modal -->
-<% if (user && (user.birth === null || user.birth === '' || user.gender == null || user.gender === '' || user.orientation == null || user.orientation === '' || user.description == null || user.description === '')) { %>
+<% if (user && (user[0].birth === null || user[0].birth === '' ||user[0].gender == null || user[0].gender === '' || user[0].orientation == null || user[0].orientation === '' || user[0].description === null || user[0].description ==== '')) { %>
 	<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
@@ -15,25 +15,25 @@
 					</button>
 				</div>
 				<div class="modal-body" id="modal-body">
-					<p style="text-align: center"><%=user.firstname%>, Afin de finaliser votre profil</p>
+					<p style="text-align: center"><%=user[0].firstname%>, Afin de finaliser votre profil</p>
 					<input name="displayUser" type="hidden" id="displayUser" value="<%=user.username%>">
 					<p style="text-align: center">Merci de renseigner les champs restés vides</p>
 					<form>
 						<div class="form-group">
 							<label for="gender" class="col-form-label">Votre Genre</label>
-							<input name="gender" type="text" class="form-control" id="gender" value="<%=user.gender%>">
+							<input name="gender" type="text" class="form-control" id="gender" value="<%=user[0].gender%>">
 						</div>
 						<div class="form-group">
 							<label for="birthdate" class="col-form-label">Votre Date de Naissance</label>
-							<input name="birthdate" type="text" class="form-control" id="birthdate" value="<%=user.birth%>">
+							<input name="birthdate" type="text" class="form-control" id="birthdate" value="<%=user[0].birth%>">
 						</div>
 						<div class="form-group">
 							<label for="sexOrientation" class="col-form-label">Votre Orientation Sexuelle</label>
-							<input name="orientation" type="text" class="form-control" id="sexOrientation" value="<%=user.orientation%>">
+							<input name="orientation" type="text" class="form-control" id="sexOrientation" value="<%=user[0].orientation%>">
 						</div>
 						<div class="form-group">
 							<label for="description" class="col-form-label">Description</label>
-							<textarea name="description" class="form-control" id="description"><%=user.description%></textarea>
+							<textarea name="description" class="form-control" id="description"><%=user[0].description%></textarea>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -50,17 +50,30 @@
     <img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded float-left profile-pic">
     <div class="media-body">
 		<button type="button" class="btn btn-primary popularity">
-			Popularité <span class="badge badge-light">93%</span>
+			Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
 	  </button>
-		<h2 class="mt-0" id="firstname"><%=user.firstname%></h2>
+		<h2 class="mt-0" id="username"><%=user[0]['username']%></h2>
         <div class="row">
-            <div class="col-sm" id="genderOrientation">
-				<%=user.gender%>, <%=user.orientation%>
+            <div class="col-sm" id=genderOrientation>
+				<% if (user[0]['gender'] === null) { %>
+					Genre non renseigne,
+				<%} else { %>
+					<%=user[0]['gender']%>,
+				<% } %>
+				<% if (user[0]['orientation'] === null) { %>
+					orientation non renseignee
+				<%} else { %>
+					<%=user[0]['orientation']%>
+				<% } %>
 			</div>
 		</div>
 		<div class="row" id="age">
 			<div class="col-sm">
-				18 ans
+				<% if (user[0]['birth'] == null) { %>
+					Date de naissance manquante
+				<%} else { %>
+					<%= userage %> ans
+				<% } %>
 			</div>
 		</div>
 		<div class="row" id="location">
@@ -69,14 +82,19 @@
 			</div>
 		</div>
 		<div class="description" id="desc">
-			<%=user.description%>
+				Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+		<div class="description" id="desc">
+			<% if (user[0]['description'] == null) { %>
+				Description manquante
+			<%} else { %>
+				<%=user[0]['description']%>
+			<% } %>
 		</div>
 
-		<a class="btn btn-primary hashtag" href="#" role="button">#chatons</a>
-		<a class="btn btn-primary hashtag" href="#" role="button">#42</a>
-		<a class="btn btn-primary hashtag" href="#" role="button">#footballamericain</a>
-		<a class="btn btn-primary hashtag" href="#" role="button">#dalida</a>		
-
+		<% if (usertags != "") { 
+			for (var i=0; i<usertags.length; i++){ %>
+				<a class="btn btn-primary hashtag" href="#" role="button">#<%=usertags[i]['tag']%></a>
+		<% }} %>
 	</div>
 </div>	
 
