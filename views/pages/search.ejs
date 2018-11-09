@@ -1,0 +1,54 @@
+<%- include('../partial/head')%>
+<%- include('../partial/header')%>
+
+<div class="container2">
+		<%=users[0]['username']%>
+		<%
+		for (var i=0; i<10; i++){%>
+	<%=i%>
+		<%} %>
+
+</div>
+
+
+<p id="loading" style="display:none">
+		<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
+</p>
+
+
+
+
+
+<script>
+	var i =1;
+
+	$(document).ready(function() {
+		var win = $(window);
+		win.scroll(function() {
+			if ($(document).height() - win.height() == win.scrollTop()) {
+				$('#loading').show();	
+				$.ajax({
+					method: "GET",
+					data: {
+						index:i
+					},
+					url: 'search-infinite',
+					success: function(html) {
+						$('.container2').append(html);
+						$('#loading').hide();
+					},
+					error: function() {
+						$('#loading').hide();
+					}
+				});
+				i++;
+			}
+		});
+	});
+</script>
+		
+
+
+
+
+<% include ../partial/footer.ejs%>

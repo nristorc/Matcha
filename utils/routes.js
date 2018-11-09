@@ -6,6 +6,9 @@ const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
 
+const userDatabase =require('../models/userData');
+const userData = new userDatabase();
+
 class Routes{
     constructor(app){
         this.app = app;
@@ -13,12 +16,14 @@ class Routes{
 
     appRoutes(){
         this.app.get('/', async (request,response) => {
+            console.log("Je suis dans INDEX");
             if (!request.session.user) {
                 //console.log('session KO: ', request.session);
                 response.status(200).render('index');
             } else {
                 //console.log('session OK: ', request.session);
-                response.status(200).render('pages/dashboard');
+                console.log(request.session.user);
+                response.status(200).render('pages/profil');
             }
         });
 
@@ -56,12 +61,14 @@ class Routes{
                         loginResponse.userId = result[0].id;
                         loginResponse.message = `User logged in.`;
                         request.session.user = data;
+                        request.session.user.id = result[0].id;
+                        console.log(request.session.user);
                         request.flash(loginResponse.type, loginResponse.message);
-                        response.status(200).render('pages/loggedIn', {
-                            username: data.username,
-                            password: data.password,
-                            message: loginResponse.message
-                        });
+                        response.status(200).redirect('/profil');//.render('pages/profil', {
+                            //username: data.username,
+                            //password: data.password,
+                            //message: loginResponse.message
+                        //});
                     }).catch((result) => {
                         if (result === undefined || result === false) {
                             loginResponse.error = true;
@@ -82,6 +89,7 @@ class Routes{
         });
 
         this.app.post('/register', async (request,response) => {
+            console.log("Je suis dans REGISTER");
             const registrationResponse = {};
             const data = {
                 lastname: request.body.lastname,
@@ -203,26 +211,34 @@ class Routes{
         });
 
         this.app.get('/verify/register/:registerToken', async (request, response) => {
+            console.log("Jesuis dans VERIFY REGISTER");
             const loginResponse = {};
             checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
-                const data = {
-                    username: result[0].username,
-                    password: result[0].password
-                };
-                loginResponse.error = false;
-                loginResponse.userId = result[0].id;
-                loginResponse.message = `User logged in.`;
-                request.session.user = data;
-                response.status(200).render('pages/loggedIn', {
-                    username: data.username,
-                    password: data.password,
-                    message: loginResponse.message
-                });
-            }).catch(() => {
+                if (result && result !== undefined) {
+                    console.log("Then: ", result);
+                    const data = {
+                        username: result[0].username,
+                        password: result[0].password,
+                    };
+                    loginResponse.error = false;
+                    loginResponse.userId = result[0].id;
+                    loginResponse.type = 'dark';
+                    loginResponse.message = `User logged in.`;
+                    request.session.user = data;
+                    request.session.user.id = result[0].id;
+                    console.log('session : ', request.session.user);
+                    request.flash(loginResponse.type, loginResponse.message);
+                    response.status(200).redirect('/profil');
+                    console.log('response then: ', response.status);
+                }
+            }).catch((result) => {
+                console.log("Catch: ", result);
                 loginResponse.error = true;
+                loginResponse.type = 'warning';
                 loginResponse.message = `Token not valid`;
-                console.log('Token not valid');
-                response.status(401).render('index');
+                request.flash(loginResponse.type, loginResponse.message);
+                response.status(401).redirect('/');
+                console.log('response catch: ', response.status);
             });
         });
 
@@ -273,18 +289,20 @@ class Routes{
             }
         });
 
-        this.app.get('/loggedIn', (request, response) => {
-            console.log(request.session);
-            console.log(request.session.user);
+        /*this.app.get('/loggedIn', (request, response) => {
+            console.log('Je suis dans LOGGEDIN');
+            //console.log(request.session);
+            //console.log(request.session.user);
             if (!request.session.user) {
-                console.log('pas de session');
+                //console.log('pas de session');
                 return response.status(401).send();
             }
-            console.log('1 session');
+            //console.log('1 session');
             return response.status(200).send('Welcome to your Dashboard !');
-        });
+        });*/
 
         this.app.get('/logout', function(request, result){
+            console.log("Je suis dans LOGOUT");
             let cookie = request.cookies;
             for (let prop in cookie) {
                 if (!cookie.hasOwnProperty(prop)) {
@@ -298,19 +316,139 @@ class Routes{
 
         /* Routes for Profil */
 
-        this.app.get('/profil', (request, response) => {
+        this.app.route('/profil').get((request, response) => {
             if (!request.session.user) {
                 return response.render('index');
-                }
-            const sql = "SELECT * FROM matcha.users WHERE username = ?";
-            checkDb.query(sql, [request.session.user.username]).then((result) => {
-                console.log(result);
-                // response.render('pages/profile2');
-                response.render('pages/profil', {user: result});
-                }).catch(() => {
-                console.log('ko');
-            });
+			}
+			checkDb.getUser(request.session.user.username).then((user) => {
+				checkDb.getTags(request.session.user.id).then((tags) => {
+					console.log(tags);
+					userData.userAge(user[0]['birth']).then((age) => {
+						response.render('pages/profil', {
+						user: user,
+						userage: age,
+						usertags: tags
+						});
+					}).catch((age) => {
+						response.render('pages/profil', {
+						user: user,
+						usertags: tags,
+						userage: null
+						});
+					});
+				});
+			});
+        }).post(async (request, response) => {
+            const data = {
+                gender: request.body.gender,
+                birthdate: request.body.birthdate,
+                orientation: request.body.orientation,
+                description: request.body.description,
+            };
+            await validation.matchingRegex(data.gender, /^[a-zA-Z]+$/, "Mauvais format de genre");
+            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
+            await validation.matchingRegex(data.orientation, /^[a-zA-Z]+$/, "Mauvais format d'orientation");
+            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
+
+            if (validation.errors.length === 0) {
+                console.log("pas d'erreur");
+                const sql = "UPDATE matcha.users SET `birth` = CASE WHEN ? = '' THEN NULL ELSE str_to_date(?, '%d/%m/%Y') END, `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
+
+                checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
+                    checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                        response.json({user: result[0]});
+                    }).catch((result) => {
+                        console.log('result CATCH:',result);
+                    });
+                }).catch((result) => {
+                    console.log('result CATCH:',result);
+                });
+            } else {
+                console.log('erreurs: ', validation.errors);
+                response.json({errors: validation.errors});
+                validation.errors = [];
+            }
         });
+		/* Routes for Search */
+
+        this.app.get('/search', (request, response) => {
+            if (!request.session.user) {
+                return response.render('index');
+			}
+			checkDb.getAllUsers().then((users) => {
+				// console.log(users);
+				response.render('pages/search', {
+				users: users,
+				});
+			}).catch((users) => {
+				// console.log(users);
+				response.render('pages/search', {
+				users: users,
+				});
+			});
+        });
+        
+        
+
+		/* Routes for infinite */
+
+        this.app.get('/search-infinite', (request, response) => {
+			if (!request.session.user) {
+                return response.render('index');
+			} else {
+                console.log(request.query.index);
+				checkDb.getAllUsers().then((users) => {
+					response.render('pages/search-infinite', {
+                    users: users,
+                    index: request.query.index
+					});
+				}).catch((users) => {
+					// console.log(users);
+					response.render('index',{
+					users: users,
+					});
+				});
+			}
+		});
+		
+				/* Routes for Test */
+
+				this.app.get('/test', (request, response) => {
+					if (!request.session.user) {
+						return response.render('index');
+					}
+					checkDb.getAllUsers().then((users) => {
+						console.log(users);
+						response.render('pages/test', {
+						users: users,
+						});
+					}).catch((users) => {
+						console.log(users);
+						response.render('pages/test', {
+						users: users,
+						});
+					});
+				});
+				
+		
+				/* Routes for infinite-test */
+		
+				this.app.get('/test2', (request, response) => {
+					if (!request.session.user) {
+						return response.render('index');
+					} else {
+						checkDb.getAllUsers().then((users) => {
+							response.render('pages/test2', {
+							users: users,
+							});
+						}).catch((users) => {
+							console.log(users);
+							response.render('index',{
+							users: users,
+							});
+						});
+					}
+				});
 
 		/* Routes for ... */
 
