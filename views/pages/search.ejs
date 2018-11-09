@@ -1,12 +1,17 @@
 <%- include('../partial/head')%>
 <%- include('../partial/header')%>
 
-<div class="container2">
-		<%=users[0]['username']%>
-		<%
-		for (var i=0; i<10; i++){%>
-	<%=i%>
-		<%} %>
+<div class="scroll">
+
+<div class="row">
+	<% for (var x=0; x<3; x++){
+		if (users[x]){%>
+		<div class="col-sm">
+			<%=users[x]['username']%>
+		</div>
+	<%}} %>
+</div>
+
 
 </div>
 
@@ -20,7 +25,7 @@
 
 
 <script>
-	var i =1;
+	var i=3;
 
 	$(document).ready(function() {
 		var win = $(window);
@@ -34,14 +39,14 @@
 					},
 					url: 'search-infinite',
 					success: function(html) {
-						$('.container2').append(html);
+						$('.scroll').append(html);
 						$('#loading').hide();
 					},
 					error: function() {
 						$('#loading').hide();
 					}
 				});
-				i++;
+				i=i+3;
 			}
 		});
 	});

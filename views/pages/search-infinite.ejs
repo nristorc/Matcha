@@ -1,8 +1,11 @@
 <div class="row">
-    <%=users[index]['username']%>
-    <%
-    for (var i=0; i<10; i++){%>
-<%=i%>
-    <%} %>
+	<% for (var i=index; i<index+2; i++){
+			if (users[i]){%>
+				<div class="col-sm">
+				<%=users[i]['username']%>
+			</div>
+			<%}} %>
+	
+
 
 </div>
