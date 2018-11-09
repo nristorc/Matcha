@@ -92,23 +92,23 @@ class DatabaseRequest {
     async checkRegisterToken(param){
         try {
             return new Promise((resolve, reject) => {
-                console.log('param: ',param);
+                //console.log('param: ',param);
                 this.query(`SELECT * FROM matcha.users WHERE registerToken = ?`, [param]).then((result) => {
-                    console.log('select query: ', result);
+                    //console.log('select query: ', result);
                     if (result && result[0] && result[0].registerToken === param && result[0].active === 0) {
-                        console.log('le token existe');
+                        //console.log('le token existe');
                         this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);
                         resolve(
-                            this.query(`SELECT username, password FROM matcha.users WHERE id = ?`, [result[0].id])
+                            this.query(`SELECT username, password, id FROM matcha.users WHERE id = ?`, [result[0].id])
                         );
                     } else {
-                        console.log("Le token n'existe pas");
+                        //console.log("Le token n'existe pas");
                         reject();
                     }
                 });
             });
         } catch (error) {
-            console.log(error);
+            //console.log(error);
             return false;
         }
     }
@@ -143,11 +143,11 @@ class DatabaseRequest {
                 });
 
                 let mailOptions = {
-                    from: '"Nodemailer Contact" <nina.ristorcelli@gmail.com>', // sender address
+                    from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>', // sender address
                     to: params['email'], // list of receivers
                     subject: 'Confirm your Registration to Matcha website', // Subject line
                     text: 'Hello world?', // plain text body
-                    html: compiledTemplate.render({firstname: params['email']}) // render template
+                    html: compiledTemplate.render({username: params['username'], registerToken: registerToken}) // render template
                 };
 
                 transporter.sendMail(mailOptions, (error, info) => {
@@ -227,7 +227,61 @@ class DatabaseRequest {
         }
     }
 
+    async getUser(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE username = ?";
+                this.query(sql, params).then((user) => {
+                    if (user){
+                        resolve(user);
+                    } else {
+                        reject('no user found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
 
+    async getAllUsers(){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'";
+                this.query(sql).then((users) => {
+                    if (users){
+                        resolve(users);
+                    } else {
+                        reject('no user found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+    async getTags(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.tags WHERE user_id = ?";
+                this.query(sql, params).then((tags) => {
+                    if (tags){
+                        // console.log(tags);
+                        resolve(tags);
+                    } else {
+                        // console.log(tags);
+                        reject(tags);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
 
 }
 

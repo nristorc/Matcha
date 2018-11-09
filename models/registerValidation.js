@@ -39,6 +39,15 @@ class RegisterValidation{
             return null;
         }
     }
+
+    async matchingRegex(param, regex, msg) {
+        try {
+            if (!param.match(regex))
+                return await this.errors.push({msg});
+        } catch (error) {
+            return null;
+        }
+    }
 }
 
 module.exports = RegisterValidation;
