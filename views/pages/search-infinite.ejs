@@ -1,11 +1,23 @@
 <div class="row">
-	<% for (var i=index; i<index+2; i++){
+		<div class="col-sm">
+		<% var i = index;
 			if (users[i]){%>
-				<div class="col-sm">
 				<%=users[i]['username']%>
-			</div>
-			<%}} %>
-	
-
-
+				Voici i : <%= i%>
+				<%} %>
+		</div>
+		<div class="col-sm">
+		<% i++;
+		if (users[i]){%>
+				<%=users[i]['username']%>
+				Voici i : <%= i%>
+		</div>
+		<%} %> 
+		<div class="col-sm">
+		<% i++;
+		if (users[i]){%>
+				<%=users[i]['username']%>
+				Voici i : <%= i%>
+		<%}  %>
+		</div>
 </div>
