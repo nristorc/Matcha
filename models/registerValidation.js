@@ -6,7 +6,7 @@ class RegisterValidation{
 
     async isName(name, errorMsg){
         try {
-            if (typeof name === 'undefined' || !name || !(name.match(/^[a-zA-Z]+ ?[a-zA-Z]*$/)))
+            if (typeof name === 'undefined' || !name || !(name.match(/^[a-zA-Z]+ ?[\-a-zA-Z]*$/)))
                 return await this.errors.push({name, errorMsg});
         } catch (error) {
             return null;
