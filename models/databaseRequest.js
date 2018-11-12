@@ -79,6 +79,19 @@ class DatabaseRequest {
         return await this.query(`SELECT count(username) as count FROM matcha.users WHERE username = ?`, [params]);
     }
 
+    async checkPassword(params){
+        try {
+            bcrypt.hash(params.currentPassword, saltRounds, (err, hash) => {
+                this.query(`SELECT count(password) as count FROM matcha.users WHERE username = ?`, [hash, params.username],
+                    function (error, results, fields) { if (error) throw error; })
+            });
+            return true;
+        } catch (e) {
+            console.log(error);
+            return false;
+        }
+    }
+
     async checkResetToken(params){
         return await this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]);
     }

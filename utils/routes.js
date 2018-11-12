@@ -343,7 +343,10 @@ class Routes{
                     lastname: request.body.lastname,
                     email: request.body.email,
                     username: request.body.username,
-                    birthdate: request.body.birthdate
+                    birthdate: request.body.birthdate,
+                    currentPassword: request.body.currentPassword,
+                    newPassword: request.body.newPassword,
+                    confirmPassword: request.body.confirmNewPass
                 };
 
                 await validation.isName(data.firstname, "Mauvais format de prénom");
@@ -351,6 +354,13 @@ class Routes{
                 await validation.isEmail(data.email, "Mauvais format d'email");
                 await validation.isAlpha(data.username, "Mauvais format d'identifiant");
                 await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
+
+                await checkDb.checkPassword(data).then((result) => { // => Mdp vrai ou faux ca rentre !!!!!!!
+                    console.log('result THEN pass :', result);
+                }).catch((result) => {
+                    console.log('result CATCH', result);
+                });
+
 
                 if (data.username !== request.session.user.username) {
                     const resultUsername  = await checkDb.checkUsername(data.username);

@@ -74,7 +74,7 @@
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="accountParametersModification">Modifier les paramètre de votre Compte</h5>
+						<h5 class="modal-title" id="accountParametersModification">Modifier les paramètres de votre Compte</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -101,6 +101,23 @@
 								<label for="birth" class="col-form-label">Votre Date de Naissance</label>
 								<input name="birth" type="text" class="form-control" id="birth" value="<%=user[0].birth%>">
 							</div>
+
+							<div class="accordion" id="modifyPass">
+								<button class="btn btn-dark collapsed" type="button" data-toggle="collapse" data-target="#open" aria-expanded="false" aria-controls="collapse">
+									Modifier son Mot de Passe
+								</button>
+							</div>
+							<div id="open" class="collapse" data-parent="#modifyPass">
+								<div class="card-body">
+									<div class="form-group">
+										<label for="currentPass">Mot de Passe actuel</label>
+										<input type="password" class="form-control" id="currentPassword" name="currentPassword" placeholder="Entrez votre mot de passe actuel">
+										<input type="password" class="form-control" id="newPass" name="newPass" placeholder="Nouveau Mot de Passe">
+										<input type="password" class="form-control" id="confirmNewPass" name="confirmNewPass" placeholder="Confirmer le nouveau mot de passe">
+									</div>
+								</div>
+							</div>
+
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 								<button type="submit" class="btn login-btn">Modifier</button>
@@ -285,6 +302,9 @@
                     'email'              : $('input[name=email]').val(),
                     'username'              : $('input[name=username]').val(),
                     'birthdate'             : $('input[name=birth]').val(),
+					'currentPassword': $('input[name=currentPassword]').val(),
+					'newPassword': $('input[name=newPass]').val(),
+					'confirmNewPass': $('input[name=confirmNewPass]').val(),
                     'submit': 'modifyProfile'
                 };
 
