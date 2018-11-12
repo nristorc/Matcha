@@ -23,7 +23,7 @@ class Routes{
             } else {
                 //console.log('session OK: ', request.session);
                 console.log(request.session.user);
-                response.status(200).render('pages/profil');
+                response.status(200).redirect('/profil');
             }
         });
 
@@ -62,13 +62,10 @@ class Routes{
                         loginResponse.message = `User logged in.`;
                         request.session.user = data;
                         request.session.user.id = result[0].id;
+                        request.session.user.email = result[0].email;
                         console.log(request.session.user);
                         request.flash(loginResponse.type, loginResponse.message);
-                        response.status(200).redirect('/profil');//.render('pages/profil', {
-                            //username: data.username,
-                            //password: data.password,
-                            //message: loginResponse.message
-                        //});
+                        response.status(200).redirect('/profil');
                     }).catch((result) => {
                         if (result === undefined || result === false) {
                             loginResponse.error = true;
@@ -118,11 +115,9 @@ class Routes{
                 console.log(validation.errors);
 
                 if (validation.errors.length === 0) {
-                    //console.log('on passe au check db !');
+
                     const resultUsername  = await checkDb.checkUsername(data.username);
                     const resultEmail = await checkDb.checkEmail(data.email);
-                    //console.log('count db username: ', resultUsername[0].count);
-                    //console.log('count db email: ', resultEmail[0].count);
 
                     if (resultUsername[0].count !== 0 && resultEmail[0].count !== 0) {
                         registrationResponse.error = true;
@@ -226,6 +221,7 @@ class Routes{
                     loginResponse.message = `User logged in.`;
                     request.session.user = data;
                     request.session.user.id = result[0].id;
+                    request.session.user.email = result[0].email;
                     console.log('session : ', request.session.user);
                     request.flash(loginResponse.type, loginResponse.message);
                     response.status(200).redirect('/profil');
@@ -341,34 +337,87 @@ class Routes{
 				});
 			});
         }).post(async (request, response) => {
-            const data = {
-                gender: request.body.gender,
-                birthdate: request.body.birthdate,
-                orientation: request.body.orientation,
-                description: request.body.description,
-            };
-            await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
-            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
-            await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
-            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
+            if (request.body.submit === 'modifyProfile') {
+                const data = {
+                    firstname: request.body.firstname,
+                    lastname: request.body.lastname,
+                    email: request.body.email,
+                    username: request.body.username,
+                    birthdate: request.body.birthdate
+                };
 
-            if (validation.errors.length === 0) {
-                console.log("pas d'erreur");
-                const sql = "UPDATE matcha.users SET `birth` = CASE WHEN ? = '' THEN NULL ELSE str_to_date(?, '%d/%m/%Y') END, `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
+                await validation.isName(data.firstname, "Mauvais format de prénom");
+                await validation.isName(data.lastname, "Mauvais format de nom de Famille");
+                await validation.isEmail(data.email, "Mauvais format d'email");
+                await validation.isAlpha(data.username, "Mauvais format d'identifiant");
+                await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
 
-                checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
-                    checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                        response.json({user: result[0]});
+                if (data.username !== request.session.user.username) {
+                    const resultUsername  = await checkDb.checkUsername(data.username);
+                    if (resultUsername[0].count !== 0) {
+                        validation.errors.push({errorMsg:'Identifiant deja pris'});
+                    }
+                }
+                if (data.email !== request.session.user.email) {
+                    const resultEmail = await checkDb.checkEmail(data.email);
+                    if (resultEmail[0].count !== 0) {
+                        validation.errors.push({errorMsg:'Email deja pris'});
+                    }
+                }
+
+                if (validation.errors.length === 0) {
+                    const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y') WHERE users.id = ?";
+                    checkDb.query(sql, [data.firstname, data.lastname, data.email, data.username, data.birthdate, request.session.user.id]).then(() => {
+                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                            console.log('result THEN: ', result);
+                            response.json({user: result[0]});
+                            request.session.user.username = data.username;
+                            request.session.user.username = data.email;
+
+                        }).catch((result) => {
+                            console.log('result CATCH:',result);
+                        });
                     }).catch((result) => {
                         console.log('result CATCH:',result);
                     });
-                }).catch((result) => {
-                    console.log('result CATCH:',result);
-                });
-            } else {
-                console.log('erreurs: ', validation.errors);
-                response.json({errors: validation.errors});
-                validation.errors = [];
+                } else {
+                    //console.log('errors: ', validation.errors);
+                    response.json({errors: validation.errors});
+                    validation.errors = [];
+                }
+
+            } else if (request.body.submit === 'createProfile') {
+
+                const data = {
+                    gender: request.body.gender,
+                    birthdate: request.body.birthdate,
+                    orientation: request.body.orientation,
+                    description: request.body.description,
+                };
+                await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
+                await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
+                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
+                await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
+
+                if (validation.errors.length === 0) {
+                    const sql = "UPDATE matcha.users SET `birth` = CASE WHEN ? = '' THEN NULL ELSE str_to_date(?, '%d/%m/%Y') END, `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
+
+                    checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
+                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                            response.json({user: result[0]});
+                            request.session.user.profil = data;
+
+                        }).catch((result) => {
+                            console.log('result CATCH:',result);
+                        });
+                    }).catch((result) => {
+                        console.log('result CATCH:',result);
+                    });
+                } else {
+                    //console.log('erreurs: ', validation.errors);
+                    response.json({errors: validation.errors});
+                    validation.errors = [];
+                }
             }
         });
 
