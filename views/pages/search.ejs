@@ -53,14 +53,12 @@
 </p>
 
 	<script>
-		console.log("lol");
-
 		$(document).ready(function() {
 			var i=6;
 			var win = $(window);
-			var ended = 0;
+			var end = 0;
 			win.scroll(function() {
-				if ($(document).height() - win.height() == win.scrollTop() && ended == 0) {
+				if ($(document).height() - win.height() == win.scrollTop() && end == 0) {
 					$('#loading').show();
 					$.ajax({
 						method: "GET",
@@ -72,16 +70,14 @@
 							$('.scroll').append(html);
 							$('#loading').hide();
 							if (html == ""){
-								ended = 1;
+								end = 1;
 							}
 						},
 						error: function() {
-							console.log(i);
 							$('#loading').hide();
 						},
 						complete: function(jqXHR, status){
 							$('#loading').hide();
-							console.log(status);
 						}
 					});
 					i=i+6;

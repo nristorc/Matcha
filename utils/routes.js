@@ -421,33 +421,15 @@ class Routes{
             }
         });
 
-		/* Routes for Search */
-
-                checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
-                    checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                        response.json({user: result[0]});
-                    }).catch((result) => {
-                        console.log('result CATCH:',result);
-                    });
-                }).catch((result) => {
-                    console.log('result CATCH:',result);
-                });
-            } else {
-                console.log('erreurs: ', validation.errors);
-                response.json({errors: validation.errors});
-                validation.errors = [];
-            }
-        });
-
 		/* Routes for search */
 
         this.app.get('/search', (request, response) => {
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-				checkDb.getAllUsers().then((users) => {
+				console.log(checkDb.getPref(3));
+				checkDb.getAllUsers("username DESC").then((users) => {
 					if (!request.query.index) {
-						console.log("oups");
 						response.render('pages/search', {
 							users: users,
 							index: 0

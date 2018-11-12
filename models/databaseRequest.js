@@ -243,10 +243,10 @@ class DatabaseRequest {
         }
     }
 
-    async getAllUsers(){
+    async getAllUsers(params){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'";
+                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL' ORDER BY "+params;
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);
@@ -260,6 +260,25 @@ class DatabaseRequest {
             return false;
         }
     }
+
+    async getPref(params){
+		try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT orientation, popularity FROM matcha.users WHERE id = ?";
+                this.query(sql, params).then((pref) => {
+                    if (pref){
+                        console.log(pref);
+                        resolve(pref);
+                    } else {
+                        reject('no preferences found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+	}
 
     async getTags(params){
         try {
