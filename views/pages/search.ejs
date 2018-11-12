@@ -2,38 +2,39 @@
 <%- include('../partial/header')%>
 
 <div class="scroll">
-
-<div class="row">
-	<% for (var x=0; x<3; x++){ %>
+	<% for (var x=0; x<6; x++){ 
+		if (x===0 || x===3){ %>
+			<div class="row">
+		<%}%>
 		<div class="col-sm">
 			<%if (users[x]){%>
-		    <img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded float-left profile-pic"><br/>
-			<h5><%=users[x]['username']%></h5>
-			<h6>
-				<% if (users[x]['gender'] === null) { %>
-					Genre non renseigne,
-				<%} else { %>
-					<%=users[x]['gender']%>,
-				<% } %>
-				<% if (users[x]['orientation'] === null) { %>
-					orientation non renseignee
-				<%} else { %>
-					<%=users[x]['orientation']%>
-				<% } %>
-			</h6>
-			<h6>
-				<% if (users[x]['description'] == null) { %>
-					Description manquante
-				<%} else { %>
-					<%=users[x]['description']%>
-				<% } %>
-			</h6>
+				<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic"><br/>
+				<h5><%=users[x]['username']%></h5>
+				<h6>
+					<% if (users[x]['gender'] === null) { %>
+						Genre non renseigne,
+					<%} else { %>
+						<%=users[x]['gender']%>,
+					<% } %>
+					<% if (users[x]['orientation'] === null) { %>
+						orientation non renseignee
+					<%} else { %>
+						<%=users[x]['orientation']%>
+					<% } %>
+				</h6>
+				<h6>
+					<% if (users[x]['description'] == null) { %>
+						Description manquante
+					<%} else { %>
+						<%=users[x]['description']%>
+					<% } %>
+				</h6>
+			<%}%>
+		</div>
+		<% if (x===2 || x===5){ %>
+		</div>
 		<%}%>
-	</div>
 	<%} %>
-</div>
-
-
 </div>
 
 
@@ -46,7 +47,7 @@
 
 
 <script>
-	var i=3;
+	var i=6;
 
 	$(document).ready(function() {
 		var win = $(window);
@@ -67,7 +68,7 @@
 						$('#loading').hide();
 					}
 				});
-				i=i+3;
+				i=i+6;
 			}
 		});
 	});
