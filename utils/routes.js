@@ -369,9 +369,10 @@ class Routes{
                 validation.errors = [];
             }
         });
+
 		/* Routes for Search */
 
-        this.app.get('/search', (request, response) => {
+        this.app.get('/search-infinite', (request, response) => {
             if (!request.session.user) {
                 return response.render('index');
 			}
@@ -386,27 +387,34 @@ class Routes{
 				users: users,
 				});
 			});
-        });
-        
-        
+        });      
 
 		/* Routes for infinite */
 
-        this.app.get('/search-infinite', (request, response) => {
+        this.app.get('/search', (request, response) => {
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-                console.log(request.query.index);
 				checkDb.getAllUsers().then((users) => {
-					response.render('pages/search-infinite', {
-                    users: users,
-                    index: request.query.index
-					});
+					if (!request.query.index) {
+						console.log("oups");
+						response.render('pages/search', {
+							users: users,
+							index: 0
+						});
+					} else {
+						console.log(request.query.index);
+						if (request.query.index < users.length){
+							response.render('pages/search', {
+								users: users,
+								index: request.query.index
+							});
+						} else {
+							response.end();
+						}
+					}
 				}).catch((users) => {
-					// console.log(users);
-					response.render('index',{
-					users: users,
-					});
+					return response.render('index');
 				});
 			}
 		});

@@ -1,14 +1,18 @@
-<%- include('../partial/head')%>
-<%- include('../partial/header')%>
+<% if(!index) {%>
+	<%- include('../partial/head')%>
+	<%- include('../partial/header')%>
+<%}%>
 
 <div class="scroll">
-	<% for (var x=0; x<6; x++){ 
-		if (x===0 || x===3){ %>
+	<% var x = index;
+	var i = 0;
+	while (i < 6){ 
+		if (i===0 || i===3){ %>
 			<div class="row">
 		<%}%>
 		<div class="col-sm">
-			<%if (users[x]){%>
-				<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic"><br/>
+			<% if (users[x]){%>
+				<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic">
 				<h5><%=users[x]['username']%></h5>
 				<h6>
 					<% if (users[x]['gender'] === null) { %>
@@ -29,53 +33,62 @@
 						<%=users[x]['description']%>
 					<% } %>
 				</h6>
-			<%}%>
+			<%} %>
 		</div>
 		<% if (x===2 || x===5){ %>
-		</div>
-		<%}%>
-	<%} %>
+			</div>
+		<%}
+		x++;
+		i++;	
+	}
+%>
+
 </div>
 
+
+<% if (index == 0){ %>
 
 <p id="loading" style="display:none">
 		<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
 </p>
 
+	<script>
+		console.log("lol");
 
-
-
-
-<script>
-	var i=6;
-
-	$(document).ready(function() {
-		var win = $(window);
-		win.scroll(function() {
-			if ($(document).height() - win.height() == win.scrollTop()) {
-				$('#loading').show();	
-				$.ajax({
-					method: "GET",
-					data: {
-						index:i
-					},
-					url: 'search-infinite',
-					success: function(html) {
-						$('.scroll').append(html);
-						$('#loading').hide();
-					},
-					error: function() {
-						$('#loading').hide();
-					}
-				});
-				i=i+6;
-			}
+		$(document).ready(function() {
+			var i=6;
+			var win = $(window);
+			var ended = 0;
+			win.scroll(function() {
+				if ($(document).height() - win.height() == win.scrollTop() && ended == 0) {
+					$('#loading').show();
+					$.ajax({
+						method: "GET",
+						data: {
+							index:i
+						},
+						url: 'search',
+						success: function(html) {
+							$('.scroll').append(html);
+							$('#loading').hide();
+							if (html == ""){
+								ended = 1;
+							}
+						},
+						error: function() {
+							console.log(i);
+							$('#loading').hide();
+						},
+						complete: function(jqXHR, status){
+							$('#loading').hide();
+							console.log(status);
+						}
+					});
+					i=i+6;
+				}
+			});
 		});
-	});
-</script>
-		
-
-
-
+	</script>
+<% } %>
 
 <% include ../partial/footer.ejs%>
