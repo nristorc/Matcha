@@ -38,7 +38,7 @@ class DatabaseRequest {
                     if (hash && hash[0] && hash[0].password) {
                         bcrypt.compare(params.password, hash[0].password, (err, res) => {
                             if (res === true) {
-                                resolve(this.query(`SELECT id FROM matcha.users WHERE LOWER(username) = ? AND password = ?`, [params.username, hash[0].password]));
+                                resolve(this.query(`SELECT id, email FROM matcha.users WHERE LOWER(username) = ? AND password = ?`, [params.username, hash[0].password]));
                             } else {
                                 reject();
                             }
@@ -76,7 +76,6 @@ class DatabaseRequest {
     }
 
     async checkUsername(params){
-        console.log('username: ',params);
         return await this.query(`SELECT count(username) as count FROM matcha.users WHERE username = ?`, [params]);
     }
 
@@ -85,7 +84,6 @@ class DatabaseRequest {
     }
 
     async checkEmail(params){
-        console.log('email: ', params);
         return await this.query(`SELECT count(email) as count FROM matcha.users WHERE email = ?`, [params]);
     }
 
@@ -99,7 +97,7 @@ class DatabaseRequest {
                         //console.log('le token existe');
                         this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);
                         resolve(
-                            this.query(`SELECT username, password, id FROM matcha.users WHERE id = ?`, [result[0].id])
+                            this.query(`SELECT username, password, id, email FROM matcha.users WHERE id = ?`, [result[0].id])
                         );
                     } else {
                         //console.log("Le token n'existe pas");
