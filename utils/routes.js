@@ -427,27 +427,31 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-				console.log(checkDb.getPref(3));
-				checkDb.getAllUsers("username DESC").then((users) => {
-					if (!request.query.index) {
-						response.render('pages/search', {
-							users: users,
-							index: 0
-						});
-					} else {
-						console.log(request.query.index);
-						if (request.query.index < users.length){
-							response.render('pages/search', {
-								users: users,
-								index: request.query.index
-							});
-						} else {
-							response.end();
-						}
-					}
-				}).catch((users) => {
-					return response.render('index');
-				});
+                checkDb.setOrientation(request.session.user.id).then((filter) => {
+                    console.log(filter);
+                    checkDb.getAllUsers(filter).then((users) => {
+                        if (!request.query.index) {
+                            response.render('pages/search', {
+                                users: users,
+                                index: 0
+                            });
+                        } else {
+                            console.log(request.query.index);
+                            if (request.query.index < users.length){
+                                response.render('pages/search', {
+                                    users: users,
+                                    index: request.query.index
+                                });
+                            } else {
+                                response.end();
+                            }
+                        }
+                    }).catch((users) => {
+                        return response.render('index');
+                    });
+                }).catch((filter) => {
+                    return response.render('index');
+                });
 			}
 		});
 		

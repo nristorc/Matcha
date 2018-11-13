@@ -246,7 +246,7 @@ class DatabaseRequest {
     async getAllUsers(params){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL' ORDER BY "+params;
+                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'"+params;
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);
@@ -261,16 +261,28 @@ class DatabaseRequest {
         }
     }
 
-    async getPref(params){
+    async setOrientation(params){
 		try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT orientation, popularity FROM matcha.users WHERE id = ?";
+                const sql = "SELECT orientation, gender FROM matcha.users WHERE id = ?";
                 this.query(sql, params).then((pref) => {
-                    if (pref){
-                        console.log(pref);
-                        resolve(pref);
-                    } else {
-                        reject('no preferences found');
+                    if (pref[0]['orientation'] == "Hétérosexuel"){
+						if (pref[0]['gender'] == "Femme"){
+							resolve("AND `gender` = \"homme\" AND `orientation` != \"Homosexuel\" AND id !="+params);
+						} else {
+							resolve("AND `gender` = \"femme\" AND `orientation` != \"Homosexuel\" AND id !="+params);
+						}
+                    } else if (pref[0]['orientation'] == "Homosexuel"){
+						if (pref[0]['gender'] == "Femme"){
+							resolve("AND `gender` = \"femme\" AND `orientation` != \"Hétérosexuel\" AND id !="+params);
+						} else {
+							resolve("AND `gender` = \"homme\" AND `orientation` != \"Hétérosexuel\" AND id !="+params);
+						}                       
+                    } else if (pref[0]['orientation'] == "Bi"){
+						console.log(pref);
+                        resolve("AND `gender` = \"homme\" OR `gender` = \"femme\" AND id !="+params);
+					} else {
+                        reject('no orientation found');
                     }
                 });
             });
