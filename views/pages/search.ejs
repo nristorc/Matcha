@@ -1,7 +1,21 @@
 <% if(!index) {%>
 	<%- include('../partial/head')%>
 	<%- include('../partial/header')%>
+
+	<ul class="nav nav-pills">
+		<li class="nav-item dropdown">
+		  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+		  <div class="dropdown-menu">
+			<a class="dropdown-item" href="#">Age</a>
+			<a class="dropdown-item" href="#">Localisation</a>
+			<a class="dropdown-item" href="#">Popularite</a>
+		</li>
+	  </ul>
+
 <%}%>
+
+
+
 
 <div class="scroll">
 	<% var x = index;
@@ -47,10 +61,9 @@
 
 
 <% if (index == 0){ %>
-
-<p id="loading" style="display:none">
-		<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
-</p>
+	<p id="loading" style="display:none">
+			<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
+	</p>
 
 	<script>
 		$(document).ready(function() {

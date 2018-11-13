@@ -180,3 +180,22 @@ p {
     border:none;
     cursor: auto;
 }
+
+/* Search Page */
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	background-color: rgb(238, 162, 162);
+	margin-bottom: 20px;	
+}
+
+.nav-pills .nav-link {
+	margin-bottom: 20px;
+}
+
+a {
+	color: rgba(0,0,0,.5);
+}
+
+a:hover {
+	color: rgba(0,0,0,.8);
+}
