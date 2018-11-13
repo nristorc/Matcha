@@ -132,7 +132,7 @@ class DatabaseRequest {
         }
     }
 
-    async updateInfo(param, id){
+    async updateInfoWithPass(param, id){
         try {
             bcrypt.hash(param.newPassword, saltRounds, (err, hash) => {
                 const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y'), password = ? WHERE id = ?";
@@ -144,6 +144,11 @@ class DatabaseRequest {
             console.log(error);
             return false;
         }
+    }
+
+    async updateInfoWithoutPass(param, id){
+        const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y') WHERE id = ?";
+            return await this.query(sql, [param.firstname, param.lastname, param.email, param.username, param.birthdate, id]);
     }
 
     async registerUser(params) {

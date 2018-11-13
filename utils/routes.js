@@ -380,20 +380,40 @@ class Routes{
                 }
 
                 if (validation.errors.length === 0) {
-                    checkDb.updateInfo(data, request.session.user.id).then(() => {
-                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                            console.log('result THEN :', result);
-                            response.json({user: result[0]});
-                            request.session.user.username = data.username;
-                            request.session.user.email = data.email;
-                            request.session.user.password = data.newPassword;
+                    if (data.newPassword !== '') {
+                        console.log("Pass");
+                        checkDb.updateInfoWithPass(data, request.session.user.id).then(() => {
+                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                                console.log('result THEN :', result);
+                                response.json({user: result[0]});
+                                request.session.user.username = data.username;
+                                request.session.user.email = data.email;
+                                request.session.user.password = data.newPassword;
 
+                            }).catch((result) => {
+                                console.log('result CATCH:',result);
+                            });
                         }).catch((result) => {
                             console.log('result CATCH:',result);
                         });
-                    }).catch((result) => {
-                        console.log('result CATCH:',result);
-                    });
+                    } else if (data.newPassword === '') {
+                        console.log("No Pass");
+                        checkDb.updateInfoWithoutPass(data, request.session.user.id).then(() => {
+                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                                console.log('result THEN :', result);
+                                response.json({user: result[0]});
+                                request.session.user.username = data.username;
+                                request.session.user.email = data.email;
+                                request.session.user.password = data.newPassword;
+
+                            }).catch((result) => {
+                                console.log('result CATCH:',result);
+                            });
+                        }).catch((result) => {
+                            console.log('result CATCH:',result);
+                        });
+                    }
+
                 } else {
                     response.json({errors: validation.errors});
                     validation.errors = [];
@@ -430,6 +450,37 @@ class Routes{
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
+            } else if (request.body.submit === 'modifyProfile') {
+
+                // const data = {
+                //     gender: request.body.gender,
+                //     birthdate: request.body.birthdate,
+                //     orientation: request.body.orientation,
+                //     description: request.body.description,
+                // };
+                // await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
+                // await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
+                // await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
+                // await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
+                //
+                // if (validation.errors.length === 0) {
+                //     const sql = "UPDATE matcha.users SET `birth` = CASE WHEN ? = '' THEN NULL ELSE str_to_date(?, '%d/%m/%Y') END, `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
+                //
+                //     checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
+                //         checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                //             response.json({user: result[0]});
+                //             request.session.user.profil = data;
+                //
+                //         }).catch((result) => {
+                //             console.log('result CATCH:',result);
+                //         });
+                //     }).catch((result) => {
+                //         console.log('result CATCH:',result);
+                //     });
+                // } else {
+                //     response.json({errors: validation.errors});
+                //     validation.errors = [];
+                // }
             }
         });
 
