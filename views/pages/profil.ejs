@@ -272,8 +272,13 @@
 
                                 birthdate.innerHTML = age + ' ans';
 
-                                const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
-                                flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
+                                if (document.getElementById('messages')) {
+                                    const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                    flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
+                                } else {
+                                    $('#container').prepend('<div id="messages"></div>');
+                                    $('#messages').append('<div class="alert alert-dark alert-dismissible">Votre profil RoooCool a été créé avec succès</div>')
+                                }
 
                                 let options = {
                                     year: 'numeric',
@@ -305,7 +310,7 @@
 					'currentPassword': $('input[name=currentPassword]').val(),
 					'newPassword': $('input[name=newPass]').val(),
 					'confirmNewPass': $('input[name=confirmNewPass]').val(),
-                    'submit': 'modifyProfile'
+                    'submit': 'modifyParams'
                 };
 
                 // process the form
@@ -326,9 +331,9 @@
                             for (var i = 0; i < data.errors.length; i++) {
                                 $('#modal-body').addClass('has-error');
                                 if (data.errors[i].msg) {
-                                    $('#modal-body').append('<div class="help-block alert alert-warning">' + data.errors[i].msg + '</div>');
+                                    $('#modal-body').prepend('<div class="help-block alert alert-warning">' + data.errors[i].msg + '</div>');
 								} else if (data.errors[i].errorMsg) {
-                                    $('#modal-body').append('<div class="help-block alert alert-warning">' + data.errors[i].errorMsg + '</div>');
+                                    $('#modal-body').prepend('<div class="help-block alert alert-warning">' + data.errors[i].errorMsg + '</div>');
 								}
                             }
                         } else {
@@ -352,10 +357,17 @@
                                 }
 
                                 birthdate.innerHTML = age + ' ans';
+
+                                if (document.getElementById('messages')) {
+                                    const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                    flash[0].innerHTML = 'Vos paramètres ont bien été mis à jour';
+                                } else {
+                                    $('#container').prepend('<div id="messages"></div>');
+                                    $('#messages').append('<div class="alert alert-dark alert-dismissible">Vos paramètres ont bien été mis à jour</div>')
+                                }
                             }
                         }
                     });
-                // stop the form from submitting the normal way and refreshing the page
                 event.preventDefault();
             });
         });

@@ -337,7 +337,7 @@ class Routes{
 				});
 			});
         }).post(async (request, response) => {
-            if (request.body.submit === 'modifyProfile') {
+            if (request.body.submit === 'modifyParams') {
                 const data = {
                     firstname: request.body.firstname,
                     lastname: request.body.lastname,
@@ -355,12 +355,16 @@ class Routes{
                 await validation.isAlpha(data.username, "Mauvais format d'identifiant");
                 await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
 
-                await checkDb.checkPassword(data).then((result) => { // => Mdp vrai ou faux ca rentre !!!!!!!
-                    console.log('result THEN pass :', result);
-                }).catch((result) => {
-                    console.log('result CATCH', result);
-                });
 
+                if (data.currentPassword !== '' || data.newPassword !== '' || data.confirmPassword !== '') {
+                    await checkDb.checkPassword(data, request.session.user.id).then((result) => {
+                        if (result === true) {
+                            validation.isConfirmed(data.newPassword, data.confirmPassword, "Nouveau mot de passe incorrect");
+                        }
+                    }).catch((result) => {
+                        validation.errors.push(result);
+                    });
+                }
 
                 if (data.username !== request.session.user.username) {
                     const resultUsername  = await checkDb.checkUsername(data.username);
@@ -376,13 +380,13 @@ class Routes{
                 }
 
                 if (validation.errors.length === 0) {
-                    const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y') WHERE users.id = ?";
-                    checkDb.query(sql, [data.firstname, data.lastname, data.email, data.username, data.birthdate, request.session.user.id]).then(() => {
+                    checkDb.updateInfo(data, request.session.user.id).then(() => {
                         checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                            console.log('result THEN: ', result);
+                            console.log('result THEN :', result);
                             response.json({user: result[0]});
                             request.session.user.username = data.username;
-                            request.session.user.username = data.email;
+                            request.session.user.email = data.email;
+                            request.session.user.password = data.newPassword;
 
                         }).catch((result) => {
                             console.log('result CATCH:',result);
@@ -391,7 +395,6 @@ class Routes{
                         console.log('result CATCH:',result);
                     });
                 } else {
-                    //console.log('errors: ', validation.errors);
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
@@ -424,7 +427,6 @@ class Routes{
                         console.log('result CATCH:',result);
                     });
                 } else {
-                    //console.log('erreurs: ', validation.errors);
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
@@ -438,12 +440,10 @@ class Routes{
                 return response.render('index');
 			}
 			checkDb.getAllUsers().then((users) => {
-				// console.log(users);
 				response.render('pages/search', {
 				users: users,
 				});
 			}).catch((users) => {
-				// console.log(users);
 				response.render('pages/search', {
 				users: users,
 				});
