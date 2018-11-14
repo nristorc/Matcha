@@ -243,10 +243,14 @@ class DatabaseRequest {
         }
     }
 
-    async getAllUsers(params){
+    async getAllUsers(filter, sort){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'"+params;
+                if (sort){
+                    var sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
+                } else {
+                    var sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'"+filter;
+                }
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);
@@ -279,7 +283,6 @@ class DatabaseRequest {
 							resolve("AND `gender` = \"homme\" AND `orientation` != \"Hétérosexuel\" AND id !="+params);
 						}                       
                     } else if (pref[0]['orientation'] == "Bi"){
-						console.log(pref);
                         resolve("AND `gender` = \"homme\" OR `gender` = \"femme\" AND id !="+params);
 					} else {
                         reject('no orientation found');
@@ -298,10 +301,8 @@ class DatabaseRequest {
                 const sql = "SELECT * FROM matcha.tags WHERE user_id = ?";
                 this.query(sql, params).then((tags) => {
                     if (tags){
-                        // console.log(tags);
                         resolve(tags);
                     } else {
-                        // console.log(tags);
                         reject(tags);
                     }
                 });

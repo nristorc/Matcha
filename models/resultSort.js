@@ -7,7 +7,6 @@ class Sort{
         try {
             return new Promise((resolve, reject) => {
 				var dob = params;
-				console.log('dob',dob);
 				if (dob != null) {
 				    var year = dob.getFullYear();
 					var month = dob.getMonth();

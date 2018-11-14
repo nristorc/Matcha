@@ -201,7 +201,7 @@ a:hover {
 }
 
 .popularity-search-1 {
-    background-color: rgb(255, 0, 100);
+    background-color:  rgb(238, 162, 162);
     border:none;
     cursor: default;
     display: flex;
@@ -211,12 +211,50 @@ a:hover {
 }
 
 .popularity-search-1:hover {
+    background-color:  rgb(238, 162, 162);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.popularity-search-2 {
+    background-color: rgb(250, 94, 154);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+    margin: 210px 0 0 85px;
+    position : right;
+}
+
+.popularity-search-2:hover {
+    background-color: rgb(250, 94, 154);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.popularity-search-3 {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+    margin: 210px 0 0 85px;
+    position : right;
+}
+
+.popularity-search-3:hover {
     background-color: rgb(255, 0, 100);
     border:none;
     cursor: auto;
     display: flex;
     position : right;
 }
+
+
 
 .search-pic {
     display: flex;

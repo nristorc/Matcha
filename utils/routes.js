@@ -428,15 +428,13 @@ class Routes{
                 return response.render('index');
 			} else {
                 checkDb.setOrientation(request.session.user.id).then((filter) => {
-                    console.log(filter);
-                    checkDb.getAllUsers(filter).then((users) => {
+                    checkDb.getAllUsers(filter, request.query.sort).then((users) => {
                         if (!request.query.index) {
                             response.render('pages/search', {
                                 users: users,
                                 index: 0
                             });
                         } else {
-                            console.log(request.query.index);
                             if (request.query.index < users.length){
                                 response.render('pages/search', {
                                     users: users,

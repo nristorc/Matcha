@@ -6,9 +6,9 @@
 		<li class="nav-item dropdown">
 		  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
 		  <div class="dropdown-menu">
-			<a class="dropdown-item" href="#">Age</a>
-			<a class="dropdown-item" href="#">Localisation</a>
-			<a class="dropdown-item" href="#">Popularite</a>
+			<a class="dropdown-item" id="sort-age">Age</a>
+			<a class="dropdown-item" id="sort-loc">Localisation</a>
+			<a class="dropdown-item" id="sort-pop">Popularite</a>
 		</li>
 	  </ul>
 
@@ -25,7 +25,13 @@
 			<% if (users[x]){%>
 				<div class="img-pop">
 					<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic search-pic">
-					<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
+					<%if (users[x]['popularity'] < 50){ %>
+						<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
+					<% } else if (users[x]['popularity'] < 85) { %>
+						<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
+					<% } else { %>
+						<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
+					<%}%>
 				</div>
 				<h5><%=users[x]['username']%></h5>
 				<h6>
@@ -65,39 +71,10 @@
 			<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
 	</p>
 
-	<script>
-		$(document).ready(function() {
-			var i=6;
-			var win = $(window);
-			var end = 0;
-			win.scroll(function() {
-				if ($(document).height() - win.height() == win.scrollTop() && end == 0) {
-					$('#loading').show();
-					$.ajax({
-						method: "GET",
-						data: {
-							index:i
-						},
-						url: 'search',
-						success: function(html) {
-							$('.scroll').append(html);
-							$('#loading').hide();
-							if (html == ""){
-								end = 1;
-							}
-						},
-						error: function() {
-							$('#loading').hide();
-						},
-						complete: function(jqXHR, status){
-							$('#loading').hide();
-						}
-					});
-					i=i+6;
-				}
-			});
-		});
-	</script>
+<script src="./public/js/scroll.js"></script>
+<script src="./public/js/sort.js"></script>
+
 <% } %>
+
 
 <% include ../partial/footer.ejs%>
