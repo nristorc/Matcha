@@ -9,6 +9,35 @@ let validation = new registerValidation();
 const userDatabase =require('../models/userData');
 const userData = new userDatabase();
 
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+    destination: './public/uploads/',
+    filename: function (request, file, callback) {
+        callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {fileSize: 1000000},
+    fileFilter: function(request, file, callback) {
+        checkFileType(file, callback);
+    }
+}).single('inputFile');
+
+function checkFileType(file, callback) {
+    const filetypes = /jpeg|jpg|png|gif/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+    if (mimetype && extname) {
+        return callback(null, true);
+    } else {
+        callback({message: "Image corrompue !"});
+    }
+}
+
 class Routes{
     constructor(app){
         this.app = app;
@@ -478,6 +507,22 @@ class Routes{
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
+            } else {
+
+                //pour avoir une info spp sur le POST de files : request.body.submit a l'interieur d'upload() // En ajax, formData.append('submit', valeur)
+                upload(request, response, (error) => {
+                    if (error) {
+                        response.json({errors: error.message});
+                    } else {
+                        if (request.file === undefined) {
+                            response.json({errors: 'No file selected !'});
+                        } else {
+                            console.log('file :',request.file.filename);
+                            response.json({file: `uploads/${request.file.filename}`});
+                        }
+                    }
+                });
+
             }
         });
 

@@ -215,25 +215,26 @@
 	</div>
 </div>
 
-<div class="row" style="justify-content: left; margin-left: 4%;">
+<div class="row" id="rowPic" style="justify-content: left; margin-left: 4%;">
 
-    <!--<div class="col-sm">-->
-        <!--<img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">-->
-    <!--</div>-->
-    <!--<div class="col-sm">-->
-        <!--<img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">-->
-    <!--</div>-->
-    <!--<div class="col-sm">-->
-        <!--<img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">-->
-    <!--</div>-->
-    <!--<div class="col-sm">-->
-        <!--<img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">-->
-    <!--</div>-->
-    <form id="uploadPics" style="text-align: center;" method="post" action="/profil">
+    <div class="col-sm">
+        <img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">
+    </div>
+    <div class="col-sm">
+        <img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">
+    </div>
+    <div class="col-sm">
+        <img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">
+    </div>
+    <div class="col-sm">
+        <img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">
+    </div>
+
+    <form id="uploadPics" style="text-align: center;" enctype="multipart/form-data" method="POST" action="/profil">
         <label for="inputFile"><span><i class="fas fa-plus-circle fa-5x" style="color: #888888; text-align: center;"></i></span><br/>
             Ajouter une image
         </label>
-            <input id="inputFile" type="file" name="pictures" style="display: none">
+            <input id="inputFile" type="file" name="inputFile" style="display: none">
     </form>
 
 </div>
@@ -244,11 +245,10 @@
 
     $(function () {
 
-
         $(document).ready(function() {
 
-            $( "#inputFile" ).change(function() {
-                alert( "Handler for .change() called." );
+            $("#inputFile").change(function() {
+                $("#uploadPics").submit();
             });
 
             $('#exampleModalCenter').modal('show');
@@ -436,10 +436,8 @@
                 $('.form-group').removeClass('has-error'); // remove the error class
                 $('.help-block').remove(); // remove the error text
 
-                // get the form data
-                // there are many ways to get this data using jQuery (you can use the class or id also)
                 var formData = {
-                    'gender'              : $('select[name=editGender]').val(),
+                    'gender'         : $('select[name=editGender]').val(),
                     'orientation'    : $('select[name=editOrientation]').val(),
                     'description'    : $('textarea[name=editDescription]').val(),
                     'submit': 'modifyProfile'
@@ -484,6 +482,51 @@
                         }
                     });
                 // stop the form from submitting the normal way and refreshing the page
+                event.preventDefault();
+            });
+
+            $('form[id=uploadPics]').submit(function (event) {
+
+                var form = $('#uploadPics').get(0);
+                var formData = new FormData(form);
+
+                $.ajax({
+                    type		: 'POST',
+                    url		: '/profil',
+                    data		: formData,
+                    dataType	: 'json',
+                    processData: false,
+                    contentType: false,
+                    encode		: true
+                })
+                    .done(function (data) {
+                        if (data.errors) {
+                            if (document.getElementById('messages')) {
+                                const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                flash[0].innerHTML = data.errors;
+                            } else {
+                                $('#container').prepend('<div id="messages"></div>');
+                                $('#messages').append('<div class="alert alert-dark alert-dismissible">' + data.errors + '</div>')
+                            }
+                        } else {
+                            if (data.file) {
+                                // if (($('.img-thumbnail.carroussel').length) < 5) {
+                                //     $('#rowPic').prepend('<div class="col-sm">\n' +
+                                //         '<img src="' + data.file + '" class="img-thumbnail carroussel" alt="...">\n' +
+                                //         '</div>');
+                                // } else {
+                                //     if (document.getElementById('messages')) {
+                                //         const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                //         flash[0].innerHTML = 'Vous ne pouvez uploader que 5 images au maximum';
+                                //     } else {
+                                //         $('#container').prepend('<div id="messages"></div>');
+                                //         $('#messages').append('<div class="alert alert-dark alert-dismissible">Vous ne pouvez uploader que 5 images au maximum</div>')
+                                //     }
+                                // }
+                            }
+                        }
+                        console.log(data);
+                    });
                 event.preventDefault();
             });
         });

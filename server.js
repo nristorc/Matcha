@@ -3,7 +3,6 @@ const express = require("express");
 const http = require('http');
 const bodyParser = require('body-parser');
 const path = require('path');
-const multer = require('multer');
 
 const session = require('express-session');
 var cookieParser = require('cookie-parser');
