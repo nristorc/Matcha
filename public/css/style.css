@@ -199,3 +199,31 @@ a {
 a:hover {
 	color: rgba(0,0,0,.8);
 }
+
+.popularity-search-1 {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+    margin: 210px 0 0 85px;
+    position : right;
+}
+
+.popularity-search-1:hover {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.search-pic {
+    display: flex;
+    position: relative;
+}
+
+.img-pop {
+    display: flex;
+    justify-content : center
+}

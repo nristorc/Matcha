@@ -4,7 +4,7 @@
 
 	<ul class="nav nav-pills">
 		<li class="nav-item dropdown">
-		  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+		  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
 		  <div class="dropdown-menu">
 			<a class="dropdown-item" href="#">Age</a>
 			<a class="dropdown-item" href="#">Localisation</a>
@@ -13,9 +13,6 @@
 	  </ul>
 
 <%}%>
-
-
-
 
 <div class="scroll">
 	<% var x = index;
@@ -26,7 +23,10 @@
 		<%}%>
 		<div class="col-sm">
 			<% if (users[x]){%>
-				<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic">
+				<div class="img-pop">
+					<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic search-pic">
+					<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
+				</div>
 				<h5><%=users[x]['username']%></h5>
 				<h6>
 					<% if (users[x]['gender'] === null) { %>
