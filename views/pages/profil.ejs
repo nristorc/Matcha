@@ -217,21 +217,23 @@
 
 <div class="row" style="justify-content: left; margin-left: 4%;">
 
-    <div class="col-sm">
-        <img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">
-    </div>
-    <div class="col-sm">
-        <img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">
-    </div>
-    <div class="col-sm">
-        <img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">
-    </div>
-    <div class="col-sm">
-        <img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">
-    </div>
-    <form id="uploadPics" style="text-align: center">
-        <button style="background: none; border: none;" class="btn btn-secondary"><span><i class="fas fa-plus-circle fa-5x" style="color: #888888"></i></span></button>
-        <p>Ajouter une image</p>
+    <!--<div class="col-sm">-->
+        <!--<img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">-->
+    <!--</div>-->
+    <!--<div class="col-sm">-->
+        <!--<img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">-->
+    <!--</div>-->
+    <!--<div class="col-sm">-->
+        <!--<img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">-->
+    <!--</div>-->
+    <!--<div class="col-sm">-->
+        <!--<img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">-->
+    <!--</div>-->
+    <form id="uploadPics" style="text-align: center;" method="post" action="/profil">
+        <label for="inputFile"><span><i class="fas fa-plus-circle fa-5x" style="color: #888888; text-align: center;"></i></span><br/>
+            Ajouter une image
+        </label>
+            <input id="inputFile" type="file" name="pictures" style="display: none">
     </form>
 
 </div>
@@ -239,9 +241,15 @@
 <% include ../partial/footer.ejs%>
 
 <script>
-	$(function () {
+
+    $(function () {
+
 
         $(document).ready(function() {
+
+            $( "#inputFile" ).change(function() {
+                alert( "Handler for .change() called." );
+            });
 
             $('#exampleModalCenter').modal('show');
 
