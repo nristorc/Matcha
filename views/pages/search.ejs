@@ -31,8 +31,15 @@
 						<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
 					<% } else { %>
 						<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
-					<%}%>
-					<i class="fas fa-thumbs-up liked"></i>
+					<%}
+					var a = 0;
+					while (likes[a]){
+						if (users[x]['id'] === likes[a]['user_liked']) {%>
+							<i class="fas fa-thumbs-up liked" id="liked"></i>
+						<% }
+						a++;
+					}%>
+					<!-- <i class="fas fa-heart matched" id="matched"></i> -->
 				</div>
 				<h5><%=users[x]['username']%></h5>
 				<h6>

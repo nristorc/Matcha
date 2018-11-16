@@ -313,6 +313,24 @@ class DatabaseRequest {
         }
     }
 
+    async getLikes(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.likes WHERE user_id = ?";
+                this.query(sql, params).then((likes) => {
+                    if (likes){
+                        resolve(likes);
+                    } else {
+                        reject(likes);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
 }
 
 module.exports = DatabaseRequest;

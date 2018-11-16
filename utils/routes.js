@@ -427,29 +427,53 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-                checkDb.setOrientation(request.session.user.id).then((filter) => {
-                    checkDb.getAllUsers(filter, request.query.sort).then((users) => {
-                        if (!request.query.index) {
-                            response.render('pages/search', {
-                                users: users,
-                                index: 0
-                            });
-                        } else {
-                            if (request.query.index < users.length){
-                                response.render('pages/search', {
-                                    users: users,
-                                    index: request.query.index
-                                });
-                            } else {
-                                response.end();
-                            }
-                        }
-                    }).catch((users) => {
-                        return response.render('index');
-                    });
-                }).catch((filter) => {
-                    return response.render('index');
-                });
+				checkDb.setOrientation(request.session.user.id).then((filter) => {
+					checkDb.getAllUsers(filter, request.query.sort).then((users) => {
+						if (!request.query.index) {
+							checkDb.getLikes(request.session.user.id).then((likes) => {
+								console.log(users);
+								response.render('pages/search', {
+									users: users,
+									index: 0,
+									likes: likes
+								});
+							}).catch((likes) => {
+								// console.log(likes);
+								response.render('pages/search', {
+									users: users,
+									index: 0,
+									likes: likes,
+								});
+							});
+						} else {
+							if (request.query.index < users.length){
+								checkDb.getLikes(request.session.user.id).then((likes) => {
+									// console.log(likes);
+									response.render('pages/search', {
+										users: users,
+										index: request.query.index,
+										likes: likes
+									});
+								}).catch((likes) => {
+									// console.log(likes);
+									response.render('pages/search', {
+										users: users,
+										index: request.query.index,
+										likes: likes,
+									});
+								});
+							} else {
+								response.end();
+							}
+						}
+					}).catch((users) => {
+						return response.render('index');
+					});
+				}).catch((filter) => {
+					return response.render('index');
+				});					
+
+
 			}
 		});
 		

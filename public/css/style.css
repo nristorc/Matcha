@@ -258,10 +258,19 @@ a:hover {
     border:none;
     display: flex;
     position: absolute;
-    margin: 220px 0 0 40px;
-    size: 3x;
+    margin: 215px 0 0 40px;
+    font-size: 1.5rem;
+    color : rgb(254, 224, 224);
 }
 
+.matched {
+    border:none;
+    display: flex;
+    position: absolute;
+    margin: 215px 0 0 40px;
+    font-size: 1.5rem;
+    color : rgb(255, 0, 100);
+}
 .search-pic {
     display: flex;
     position: relative;
