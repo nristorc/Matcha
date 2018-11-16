@@ -456,9 +456,9 @@ class Routes{
                     orientation: request.body.orientation,
                     description: request.body.description,
                 };
-                await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
+                await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format de genre");
                 await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
-                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
+                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format d'orientation");
                 await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
 
                 if (validation.errors.length === 0) {
@@ -486,8 +486,8 @@ class Routes{
                     orientation: request.body.orientation,
                     description: request.body.description,
                 };
-                await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
-                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
+                await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format de genre");
+                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format d'orientation");
                 await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
 
                 if (validation.errors.length === 0) {
