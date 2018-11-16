@@ -254,7 +254,13 @@ a:hover {
     position : right;
 }
 
-
+.liked {
+    border:none;
+    display: flex;
+    position: absolute;
+    margin: 220px 0 0 40px;
+    size: 3x;
+}
 
 .search-pic {
     display: flex;

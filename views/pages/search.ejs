@@ -32,6 +32,7 @@
 					<% } else { %>
 						<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
 					<%}%>
+					<i class="fas fa-thumbs-up liked"></i>
 				</div>
 				<h5><%=users[x]['username']%></h5>
 				<h6>
@@ -53,6 +54,18 @@
 						<%=users[x]['description']%>
 					<% } %>
 				</h6>
+
+
+				<!-- <i class="fas fa-heart"></i>
+				<i class="far fa-thumbs-up"></i>
+				<i class="fas fa-thumbs-up"></i> 
+
+				<form method="POST" action="/search">
+					<span><i class="fas fa-ban" style="text-align: center;"></i></span>
+				</form> 
+			-->
+
+
 			<%} %>
 		</div>
 		<% if (x===2 || x===5){ %>

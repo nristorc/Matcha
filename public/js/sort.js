@@ -35,14 +35,5 @@ $(function () {
 				});
 			}
 
-
-
-			// age.onclick(function() {
-
-				// if ($(document).height() - win.height() == win.scrollTop() && end == 0) {
-				// 	$('#loading').show();
-				// 	i=i+6;
-				// }
-			// });
 		});
 });
