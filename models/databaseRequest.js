@@ -79,6 +79,30 @@ class DatabaseRequest {
         return await this.query(`SELECT count(username) as count FROM matcha.users WHERE username = ?`, [params]);
     }
 
+    async checkPassword(params, user){
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT password FROM matcha.users WHERE id = ?", [user]).then((hash) => {
+                    if (hash && hash[0] && hash[0].password) {
+                        bcrypt.compare(params.currentPassword, hash[0].password, (err, res) => {
+                            if (res === true) {
+                                resolve(res);
+                            } else {
+                                reject({errorMsg: 'Mot de passe actuel incorrect'});
+                            }
+                        });
+                    } else {
+                        reject({errorMsg:"Une erreur s'est produite, merci de bien vouloir reéessayer ultérieurement"});
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+
+    }
+
     async checkResetToken(params){
         return await this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]);
     }
@@ -90,25 +114,41 @@ class DatabaseRequest {
     async checkRegisterToken(param){
         try {
             return new Promise((resolve, reject) => {
-                //console.log('param: ',param);
+
                 this.query(`SELECT * FROM matcha.users WHERE registerToken = ?`, [param]).then((result) => {
-                    //console.log('select query: ', result);
                     if (result && result[0] && result[0].registerToken === param && result[0].active === 0) {
-                        //console.log('le token existe');
                         this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);
                         resolve(
                             this.query(`SELECT username, password, id, email FROM matcha.users WHERE id = ?`, [result[0].id])
                         );
                     } else {
-                        //console.log("Le token n'existe pas");
                         reject();
                     }
                 });
             });
         } catch (error) {
-            //console.log(error);
+            console.log(error);
             return false;
         }
+    }
+
+    async updateInfoWithPass(param, id){
+        try {
+            bcrypt.hash(param.newPassword, saltRounds, (err, hash) => {
+                const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y'), password = ? WHERE id = ?";
+                this.query(sql, [param.firstname, param.lastname, param.email, param.username, param.birthdate, hash, id],
+                    function (error, results, fields) { if (error) throw error; });
+            });
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    async updateInfoWithoutPass(param, id){
+        const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y') WHERE id = ?";
+            return await this.query(sql, [param.firstname, param.lastname, param.email, param.username, param.birthdate, id]);
     }
 
     async registerUser(params) {
