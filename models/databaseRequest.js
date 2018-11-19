@@ -364,10 +364,10 @@ class DatabaseRequest {
 					} else if (pref[0]['orientation'] == "Pansexuel") {
 						if (pref[0]['gender'] == "Femme"){
 							// console.log("----- 16 -----");
-							resolve("AND ((`gender` = \"Femme\" OR `gender` = \"Femme\-Transgenre\") AND `orientation` != \"Hétérosexuel\") OR ((`gender` = \"Homme\" OR `gender` = \"Homme\-Transgenre\") AND `orientation` != \"Homosexuel\") AND id !="+params);
+							resolve("AND (((`gender` = \"Femme\" OR `gender` = \"Femme\-Transgenre\") AND `orientation` != \"Hétérosexuel\") OR ((`gender` = \"Homme\" OR `gender` = \"Homme\-Transgenre\") AND `orientation` != \"Homosexuel\")) AND id !="+params);
 						} else if (pref[0]['gender'] == "Homme") {
 							// console.log("----- 17 -----");
-							resolve("AND ((`gender` = \"Femme\" OR `gender` = \"Femme\-Transgenre\") AND `orientation` != \"Homosexuel\") OR ((`gender` = \"Homme\" OR `gender` = \"Homme\-Transgenre\") AND `orientation` != \"Hétérosexuel\") AND id !="+params);
+							resolve("AND (((`gender` = \"Femme\" OR `gender` = \"Femme\-Transgenre\") AND `orientation` != \"Homosexuel\") OR ((`gender` = \"Homme\" OR `gender` = \"Homme\-Transgenre\") AND `orientation` != \"Hétérosexuel\")) AND id !="+params);
 						} else if (pref[0]['gender'] == "Femme-Transgenre") {
 							// console.log("----- 18 -----");
 							resolve("AND `orientation` = \"Pansexuel\" AND id !="+params);

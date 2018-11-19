@@ -280,3 +280,7 @@ a:hover {
     display: flex;
     justify-content : center
 }
+
+.search-col {
+    padding: 30px;
+}

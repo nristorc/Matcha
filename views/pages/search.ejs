@@ -21,7 +21,7 @@
 		if (i===0 || i===3){ %>
 			<div class="row">
 		<%}%>
-		<div class="col-sm">
+		<div class="col-sm search-col">
 			<% if (users[x]){%>
 				<div class="img-pop">
 					<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic search-pic">
@@ -34,11 +34,11 @@
 					<%}
 					var a = 0;
 					while (likes[a]){
-						if (users[x]['id'] === likes[a]['user_liked']) {
+						if (users[x]['id'] === likes[a]['user_id']) {
 							var b = 0;
 							var match = 0;
 							while (likes[b]){
-								if (users[x]['id'] === likes[b]['user_id']){ %>
+								if (users[x]['id'] === likes[b]['user_liked']){ %>
 									<i class="fas fa-heart" id="matched"></i>
 								<% match = 1;
 								}
@@ -73,17 +73,12 @@
 					<% } %>
 				</h6>
 
-
-				<!-- <i class="fas fa-heart"></i>
-				<i class="far fa-thumbs-up"></i>
-				<i class="fas fa-thumbs-up"></i> 
-
-				<form method="POST" action="/search">
-					<span><i class="fas fa-ban" style="text-align: center;"></i></span>
+			
+				<form id="likes-report">
+					<button type="submit" value="<%=users[x]['id']%>" style="background:none; border:none"><i class="far fa-thumbs-up" style="text-align: center;"></i></button>
+					<!-- <button type="submit" style="background:none; border:none"><i class="fas fa-ban" style="text-align: center;"></i></button> -->
 				</form> 
-			-->
-
-
+			
 			<%} %>
 		</div>
 		<% if (x===2 || x===5){ %>
@@ -96,7 +91,6 @@
 
 </div>
 
-
 <% if (index == 0){ %>
 	<p id="loading" style="display:none">
 			<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
@@ -104,6 +98,23 @@
 
 <script src="./public/js/scroll.js"></script>
 <script src="./public/js/sort.js"></script>
+<script>
+	
+		$('form[id=likes-report]').submit(function(event) {
+			var formData = {
+						'submit' : $('button:submit').val()}
+			event.preventDefault();
+			console.log("lol");
+			$.ajax({
+				type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+				url         : '/search', // the url where we want to POST
+				data		: formData, // our data object
+				dataType    : 'json', // what type of data do we expect back from the server
+				encode		: true
+			})
+		});
+</script>
+
 
 <% } %>
 
