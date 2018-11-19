@@ -536,14 +536,13 @@ class Routes{
 					checkDb.getAllUsers(filter, request.query.sort).then((users) => {
 						if (!request.query.index) {
 							checkDb.getLikes(request.session.user.id).then((likes) => {
-								console.log(users);
+								console.log(likes);
 								response.render('pages/search', {
 									users: users,
 									index: 0,
 									likes: likes
 								});
 							}).catch((likes) => {
-								// console.log(likes);
 								response.render('pages/search', {
 									users: users,
 									index: 0,
@@ -553,14 +552,12 @@ class Routes{
 						} else {
 							if (request.query.index < users.length){
 								checkDb.getLikes(request.session.user.id).then((likes) => {
-									// console.log(likes);
 									response.render('pages/search', {
 										users: users,
 										index: request.query.index,
 										likes: likes
 									});
 								}).catch((likes) => {
-									// console.log(likes);
 									response.render('pages/search', {
 										users: users,
 										index: request.query.index,
@@ -577,8 +574,6 @@ class Routes{
 				}).catch((filter) => {
 					return response.render('index');
 				});					
-
-
 			}
 		});
 		

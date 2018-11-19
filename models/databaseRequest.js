@@ -410,8 +410,8 @@ class DatabaseRequest {
     async getLikes(params){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT * FROM matcha.likes WHERE user_id = ?";
-                this.query(sql, params).then((likes) => {
+                const sql = "SELECT * FROM matcha.likes WHERE user_id = ? OR user_liked = ?";
+                this.query(sql, [params, params]).then((likes) => {
                     if (likes){
                         resolve(likes);
                     } else {

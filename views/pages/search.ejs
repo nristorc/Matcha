@@ -34,12 +34,23 @@
 					<%}
 					var a = 0;
 					while (likes[a]){
-						if (users[x]['id'] === likes[a]['user_liked']) {%>
-							<i class="fas fa-thumbs-up liked" id="liked"></i>
-						<% }
+						if (users[x]['id'] === likes[a]['user_liked']) {
+							var b = 0;
+							var match = 0;
+							while (likes[b]){
+								if (users[x]['id'] === likes[b]['user_id']){ %>
+									<i class="fas fa-heart" id="matched"></i>
+								<% match = 1;
+								}
+								b++;
+							}
+							if (match == 0){ %>
+								<i class="fas fa-thumbs-up liked" id="liked"></i>
+							<% }
+						}%>
+						<%
 						a++;
 					}%>
-					<!-- <i class="fas fa-heart matched" id="matched"></i> -->
 				</div>
 				<h5><%=users[x]['username']%></h5>
 				<h6>
