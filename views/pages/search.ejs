@@ -2,6 +2,8 @@
 	<%- include('../partial/head')%>
 	<%- include('../partial/header')%>
 
+<!-- Filtres -->
+
 	<ul class="nav nav-pills">
 		<li class="nav-item dropdown">
 		  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
@@ -13,6 +15,8 @@
 	  </ul>
 
 <%}%>
+
+<!-- Resultats -->
 
 <div class="scroll">
 	<% var x = index;
@@ -31,27 +35,11 @@
 						<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
 					<% } else { %>
 						<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
-					<%}
-					var a = 0;
-					while (likes[a]){
-						if (users[x]['id'] === likes[a]['user_id']) {
-							var b = 0;
-							var match = 0;
-							while (likes[b]){
-								if (users[x]['id'] === likes[b]['user_liked']){ %>
-									<i class="fas fa-heart" id="matched"></i>
-								<% match = 1;
-								}
-								b++;
-							}
-							if (match == 0){ %>
-								<i class="fas fa-thumbs-up liked" id="liked"></i>
-							<% }
-						}%>
-						<%
-						a++;
-					}%>
+					<%}%>
+					<i class="fas fa-heart matched" id="matched<%=users[x]['id']%>" alt="c\'est un match !'" style="display:none"></i>
+					<i class="fas fa-thumbs-up liked" id="liked<%=users[x]['id']%>" alt="Ce membre vous a liké !" style="display:none"></i>
 				</div>
+
 				<h5><%=users[x]['username']%></h5>
 				<h6>
 					<% if (users[x]['gender'] === null) { %>
@@ -73,23 +61,66 @@
 					<% } %>
 				</h6>
 
-			
+
 				<form id="likes-report">
-					<button type="submit" value="<%=users[x]['id']%>" style="background:none; border:none"><i class="far fa-thumbs-up" style="text-align: center;"></i></button>
+				<% var c = 0;
+				var liked = 0;
+				while (likes[c]){
+					if (users[x]['id'] === likes[c]['user_liked']) { %>
+						<button type="submit" value="<%=users[x]['id']%>" style="background:none; border:none"><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center; display: none"></i></button>
 					<!-- <button type="submit" style="background:none; border:none"><i class="fas fa-ban" style="text-align: center;"></i></button> -->
-				</form> 
+					<% liked = 1;
+					}
+					c++;
+				}
+				c = 0;
+				if (liked === 0) { %>
+					<button type="submit" value="<%=users[x]['id']%>" style="background:none; border:none"><i class="fas fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center; display: none"></i></button>
+				<% } %>
+				</form>
 			
 			<%} %>
 		</div>
 		<% if (x===2 || x===5){ %>
 			</div>
-		<%}
+		<%} %>
+
+<!-- Likes and matches check -->
+
+		<% var a = 0;
+		while (likes[a]){
+			if (users[x]['id'] === likes[a]['user_id']) {
+				var b = 0;
+				var match = 0;
+				while (likes[b]){
+					if (users[x]['id'] === likes[b]['user_liked']){ %>
+						<script>
+							document.getElementById("matched<%=users[x]['id']%>").style.display = "flex";
+						</script>
+						<!-- <i class="fas fa-heart" id="matched" alt="c\'est un match !'" style="display:none"></i> -->
+					<% match = 1;x
+					}
+					b++;
+				}
+				if (match == 0){ %>
+					<script>
+							document.getElementById("liked<%=users[x]['id']%>").style.display = "flex";
+					</script>
+					<!-- <i class="fas fa-thumbs-up liked" id="liked" alt="Ce membre vous a liké !" style="display:none"></i> -->
+				<% }
+			}%>
+			<%
+			a++;
+		}
+
+
 		x++;
 		i++;	
 	}
 %>
 
 </div>
+
 
 <% if (index == 0){ %>
 	<p id="loading" style="display:none">
@@ -101,6 +132,7 @@
 <script>
 	
 		$('form[id=likes-report]').submit(function(event) {
+			document.getElementById("like-search").className = document.getElementById("likeSearch-<%=users[x]['id']%>").className.replace("far fa-thumbs-up", "fas fa-thumbs-up")
 			var formData = {
 						'submit' : $('button:submit').val()}
 			event.preventDefault();

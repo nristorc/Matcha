@@ -254,7 +254,7 @@ a:hover {
     position : right;
 }
 
-#liked {
+.liked {
     border:none;
     display: flex;
     position: absolute;
@@ -263,7 +263,7 @@ a:hover {
     color : rgb(254, 224, 224);
 }
 
-#matched {
+.matched {
     border:none;
     display: flex;
     position: absolute;
