@@ -8,5 +8,6 @@ module.exports = {
     },
     'database': 'Matcha',
     'user_table': 'users',
-    'tags_table': 'tags'
+    'tags_table': 'tags',
+    'photos_table': 'photos',
 };

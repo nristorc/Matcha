@@ -12,10 +12,12 @@ const userData = new userDatabase();
 const multer = require('multer');
 const path = require('path');
 
+const fs = require('fs');
+
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function (request, file, callback) {
-        callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+        callback(null, request.session.user.id + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 
@@ -314,18 +316,6 @@ class Routes{
             }
         });
 
-        /*this.app.get('/loggedIn', (request, response) => {
-            console.log('Je suis dans LOGGEDIN');
-            //console.log(request.session);
-            //console.log(request.session.user);
-            if (!request.session.user) {
-                //console.log('pas de session');
-                return response.status(401).send();
-            }
-            //console.log('1 session');
-            return response.status(200).send('Welcome to your Dashboard !');
-        });*/
-
         this.app.get('/logout', function(request, result){
             console.log("Je suis dans LOGOUT");
             let cookie = request.cookies;
@@ -347,24 +337,25 @@ class Routes{
 			}
 			checkDb.getUser(request.session.user.username).then((user) => {
 				checkDb.getTags(request.session.user.id).then((tags) => {
-					//console.log(tags);
-					userData.userAge(user[0]['birth']).then((age) => {
-					    //console.log('thne', age);
-						response.render('pages/profil', {
-						user: user,
-						userage: age,
-						usertags: tags
-						});
-					}).catch((age) => {
-                        //console.log('catch', age);
-						response.render('pages/profil', {
-						user: user,
-						usertags: tags,
-						userage: null
-						});
-					});
+				    checkDb.getPhotos(request.session.user.id).then((photos) => {
+                        userData.userAge(user[0]['birth']).then((age) => {
+                            response.render('pages/profil', {
+                                user: user,
+                                userage: age,
+                                usertags: tags,
+                                userphotos: photos
+                            });
+                        }).catch((age) => {
+                            response.render('pages/profil', {
+                                user: user,
+                                usertags: tags,
+                                userage: null
+                            });
+                        });
+                    });
 				});
 			});
+
         }).post(async (request, response) => {
             if (request.body.submit === 'modifyParams') {
                 const data = {
@@ -508,21 +499,64 @@ class Routes{
                     validation.errors = [];
                 }
             } else {
-
-                //pour avoir une info spp sur le POST de files : request.body.submit a l'interieur d'upload() // En ajax, formData.append('submit', valeur)
-                upload(request, response, (error) => {
-                    if (error) {
-                        response.json({errors: error.message});
+                fs.readdir('public/uploads/', (err, items) => {
+                    var i = 0;
+                    while (items[i] && items[i].split('-')[0] == request.session.user.id) {
+                        i++;
+                    }
+                    if (i >= 5) {
+                        response.json({errors: 'Nombre maximum de photos uploadées atteint'});
                     } else {
-                        if (request.file === undefined) {
-                            response.json({errors: 'No file selected !'});
-                        } else {
-                            console.log('file :',request.file.filename);
-                            response.json({file: `uploads/${request.file.filename}`});
-                        }
+                        upload(request, response, (error) => {
+                            if (error) {
+                                response.json({errors: error.message});
+                            } else {
+                                if (request.file === undefined) {
+                                    response.json({errors: 'No file selected !'});
+                                }
+                                else {
+                                    const insert = "INSERT INTO matcha.photos (user_id, photo) VALUES (?, ?)";
+                                    checkDb.query(insert, [request.session.user.id, request.file.path]).then((result) => {
+                                        if (result) {
+                                            console.log('1- nouvelle photo uploade');
+                                            const checkProfilPic = "SELECT profil FROM matcha.users WHERE id = ?";
+                                            checkDb.query(checkProfilPic, [request.session.user.id]).then((result) => {
+                                            console.log('2- checkPic: ',result);
+                                                if (result[0].profil === 'public/img/avatarDefault.png') {
+                                                    console.log('3- je vais updater la db');
+                                                    const update = "UPDATE matcha.users SET profil = ? WHERE id = ?";
+                                                    checkDb.query(update, [request.file.path, request.session.user.id]).then((result) => {
+                                                        console.log('4- result update: ', result);
+                                                    }).catch((result) => {
+                                                        console.log('result CATCH update: ', result);
+                                                        response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb UPDATE"});
+                                                    });
+
+                                                    //         const data = {'flag': 1};
+                                                    //     } else {
+                                                    //         const data = {'flag': 0};
+                                                    //      }
+                                                    //     console.log("je suis sortie de l'update de la db");
+                                                } else {
+                                                    console.log("3bis- pas d'update de la DB profil");
+                                                }
+                                            }).catch((result) => {
+                                                console.log('result CATCH checkphoto: ', result);
+                                                response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb CHECK"});
+                                            });
+                                            // console.log("je renvoie a l'ajax");
+                                            // console.log('data: ', data);
+                                            //response.json({file: `uploads/${request.file.filename}`, data});
+                                        }
+                                    }).catch((result) => {
+                                        console.log('result CATCH insert: ', result);
+                                        response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb INSERT"});
+                                    });
+                                }
+                            }
+                        });
                     }
                 });
-
             }
         });
 

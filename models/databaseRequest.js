@@ -321,6 +321,26 @@ class DatabaseRequest {
         }
     }
 
+    async getPhotos(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.photos WHERE user_id = ? ORDER BY id DESC";
+                this.query(sql, params).then((photos) => {
+                    if (photos){
+                        // console.log(tags);
+                        resolve(photos);
+                    } else {
+                        // console.log(tags);
+                        reject(photos);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
 }
 
 module.exports = DatabaseRequest;

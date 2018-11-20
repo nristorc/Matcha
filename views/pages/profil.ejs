@@ -217,20 +217,15 @@
 
 <div class="row" id="rowPic" style="justify-content: left; margin-left: 4%;">
 
+    <% if (userphotos !== []) {
+        console.log(userphotos.length);
+    for (var j = 0; j < userphotos.length; j++) { %>
     <div class="col-sm">
-        <img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">
+        <img src="<%=userphotos[j]['photo']%>" class="img-thumbnail carroussel" alt="...">
     </div>
-    <div class="col-sm">
-        <img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">
-    </div>
-    <div class="col-sm">
-        <img src="http://www.journeedelafemme.com/wp-content/uploads/2018/05/pexels-photo-733872.jpeg" class="img-thumbnail carroussel" alt="...">
-    </div>
-    <div class="col-sm">
-        <img src="https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2016/02/Femme-m%C3%A8re-et-manager-6-astuces-pour-gagner-en-s%C3%A9r%C3%A9nit%C3%A9CDM.jpg" class="img-thumbnail carroussel" alt="...">
-    </div>
+    <% }} %>
 
-    <form id="uploadPics" style="text-align: center;" enctype="multipart/form-data" method="POST" action="/profil">
+    <form id="uploadPics" style="text-align: center; display: flex; align-items: center" enctype="multipart/form-data" method="POST" action="/profil">
         <label for="inputFile"><span><i class="fas fa-plus-circle fa-5x" style="color: #888888; text-align: center;"></i></span><br/>
             Ajouter une image
         </label>
@@ -250,6 +245,11 @@
             $("#inputFile").change(function() {
                 $("#uploadPics").submit();
             });
+
+            if (($('.img-thumbnail.carroussel').length) === 5) {
+                $('form[id=uploadPics]').hide();
+            }
+
 
             $('#exampleModalCenter').modal('show');
 
@@ -510,19 +510,14 @@
                             }
                         } else {
                             if (data.file) {
-                                // if (($('.img-thumbnail.carroussel').length) < 5) {
-                                //     $('#rowPic').prepend('<div class="col-sm">\n' +
-                                //         '<img src="' + data.file + '" class="img-thumbnail carroussel" alt="...">\n' +
-                                //         '</div>');
-                                // } else {
-                                //     if (document.getElementById('messages')) {
-                                //         const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
-                                //         flash[0].innerHTML = 'Vous ne pouvez uploader que 5 images au maximum';
-                                //     } else {
-                                //         $('#container').prepend('<div id="messages"></div>');
-                                //         $('#messages').append('<div class="alert alert-dark alert-dismissible">Vous ne pouvez uploader que 5 images au maximum</div>')
-                                //     }
-                                // }
+                                if (($('.img-thumbnail.carroussel').length) < 5) {
+                                    $('#rowPic').prepend('<div class="col-sm">\n' +
+                                        '<img src="' + data.file + '" class="img-thumbnail carroussel" alt="...">\n' +
+                                        '</div>');
+                                    if (($('.img-thumbnail.carroussel').length) === 5) {
+                                        $('form[id=uploadPics]').hide();
+                                    }
+                                }
                             }
                         }
                         console.log(data);
