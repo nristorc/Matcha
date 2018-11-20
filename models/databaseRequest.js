@@ -425,6 +425,24 @@ class DatabaseRequest {
         }
     }
 
+    // async getMatches(params){
+    //     try {
+    //         return new Promise((resolve, reject) => {
+    //             const sql = "SELECT * FROM matcha.likes WHERE user_id = ? OR user_liked = ?";
+    //             this.query(sql, [params, params]).then((likes) => {
+    //                 if (likes){
+    //                     resolve(likes);
+    //                 } else {
+    //                     reject(likes);
+    //                 }
+    //             });
+    //         });
+    //     } catch (error){
+    //         console.log(error);
+    //         return false;
+    //     }
+    // }
+
 }
 
 module.exports = DatabaseRequest;
