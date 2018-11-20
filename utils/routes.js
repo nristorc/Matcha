@@ -536,7 +536,7 @@ class Routes{
 					checkDb.getAllUsers(filter, request.query.sort).then((users) => {
 						if (!request.query.index) {
 							checkDb.getLikes(request.session.user.id).then((likes) => {
-								console.log(likes);
+								// console.log(likes);
 								response.render('pages/search', {
 									users: users,
 									index: 0,
@@ -575,8 +575,11 @@ class Routes{
 					return response.render('index');
 				});					
 			}
-        }).post(async (request, response) => {
-			console.log(request.body.data);
+        }).post('/search', async(request, response) => {
+            console.log("Je suis dans LIKE");
+            console.log("url", request.body.url);
+            console.log("data", request.body.data);
+            // console.log(request.body.dataType);
 			return response.render('index');
         });
 		
