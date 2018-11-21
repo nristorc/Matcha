@@ -515,38 +515,31 @@ class Routes{
                                     response.json({errors: 'No file selected !'});
                                 }
                                 else {
-                                    const insert = "INSERT INTO matcha.photos (user_id, photo) VALUES (?, ?)";
-                                    checkDb.query(insert, [request.session.user.id, request.file.path]).then((result) => {
+                                    checkDb.insertPhoto(request.session.user.id, request.file.path).then((result) => {
+                                        //console.log('result THEN insert: ', result);
                                         if (result) {
-                                            console.log('1- nouvelle photo uploade');
-                                            const checkProfilPic = "SELECT profil FROM matcha.users WHERE id = ?";
-                                            checkDb.query(checkProfilPic, [request.session.user.id]).then((result) => {
-                                            console.log('2- checkPic: ',result);
-                                                if (result[0].profil === 'public/img/avatarDefault.png') {
-                                                    console.log('3- je vais updater la db');
-                                                    const update = "UPDATE matcha.users SET profil = ? WHERE id = ?";
-                                                    checkDb.query(update, [request.file.path, request.session.user.id]).then((result) => {
-                                                        console.log('4- result update: ', result);
+                                            //console.log('1- nouvelle photo uploade');
+                                            checkDb.checkProfilPic(request.session.user.id).then((resultFlag) => {
+                                            //console.log('2- checkPic: ',result);
+                                                if (resultFlag && resultFlag.flag === 0) {
+                                                    //console.log('3- je vais updater la db');
+                                                    checkDb.updateProfilPic(request.file.path, request.session.user.id).then((result) => {
+                                                        //console.log('4- result update: ', result);
+                                                        //console.log("5- je renvoie a l'ajax // Db Update DONE");
+                                                        response.json({file: `uploads/${request.file.filename}`, flag: resultFlag.flag});
                                                     }).catch((result) => {
                                                         console.log('result CATCH update: ', result);
                                                         response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb UPDATE"});
                                                     });
-
-                                                    //         const data = {'flag': 1};
-                                                    //     } else {
-                                                    //         const data = {'flag': 0};
-                                                    //      }
-                                                    //     console.log("je suis sortie de l'update de la db");
-                                                } else {
-                                                    console.log("3bis- pas d'update de la DB profil");
+                                                } else if (resultFlag && resultFlag.flag === 1) {
+                                                   // console.log("3bis- pas d'update de la DB profil");
+                                                    //console.log("5- je renvoie a l'ajax // Db Update NO");
+                                                    response.json({file: `uploads/${request.file.filename}`, flag: resultFlag.flag});
                                                 }
                                             }).catch((result) => {
                                                 console.log('result CATCH checkphoto: ', result);
                                                 response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb CHECK"});
                                             });
-                                            // console.log("je renvoie a l'ajax");
-                                            // console.log('data: ', data);
-                                            //response.json({file: `uploads/${request.file.filename}`, data});
                                         }
                                     }).catch((result) => {
                                         console.log('result CATCH insert: ', result);

@@ -55,7 +55,7 @@
 <% } %>
 
 <div class="media">
-    <img src="<%=user[0]['profil']%>" alt="profilPic" class="rounded float-left profile-pic" height="240px" width="240px">
+    <img src="<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
     <div class="media-body">
 		<button type="button" class="btn btn-primary popularity">
 			Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
@@ -241,6 +241,8 @@
     $(function () {
 
         $(document).ready(function() {
+
+            console.log('image load page: ',document.getElementById('avatarPic').src);
 
             $("#inputFile").change(function() {
                 $("#uploadPics").submit();
@@ -500,6 +502,7 @@
                     encode		: true
                 })
                     .done(function (data) {
+                        console.log('data: ', data);
                         if (data.errors) {
                             if (document.getElementById('messages')) {
                                 const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
@@ -518,9 +521,17 @@
                                         $('form[id=uploadPics]').hide();
                                     }
                                 }
+                                if (data.flag === 0) {
+                                    const avatar = document.getElementById('avatarPic');
+                                    // console.log("file: ", data.file);
+                                    // console.log('image avec flag: ',document.getElementById('avatarPic').src);
+                                    avatar.src = data.file;
+                                    avatar.style = 'border-radius: 50%';
+                                    // console.log('image apres changement: ',document.getElementById('avatarPic').src);
+                                }
                             }
                         }
-                        console.log(data);
+                        //console.log(data);
                     });
                 event.preventDefault();
             });

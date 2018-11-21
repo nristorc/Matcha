@@ -151,6 +151,23 @@ class DatabaseRequest {
             return await this.query(sql, [param.firstname, param.lastname, param.email, param.username, param.birthdate, id]);
     }
 
+    async updateProfilPic(path, id){
+        try {
+            return new Promise((resolve, reject) => {
+                //console.log('3.1 - je rentre dans Update Profil')
+                this.query(`UPDATE matcha.users SET profil = ? WHERE id = ?`, [path, id]).then((result) => {
+                    //console.log('3.2 - result Update fonction: ', result);
+                    resolve(result);
+                }).catch((result) => {
+                    reject(result);
+                });
+            });
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
     async registerUser(params) {
         try {
             bcrypt.hash(params['password'], saltRounds, (err, hash) => {
@@ -259,6 +276,32 @@ class DatabaseRequest {
                     function (error, results, fields) { if (error) throw error; });
             });
             return true;
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+    async insertPhoto(id, path) {
+        const sql = "INSERT INTO matcha.photos (user_id, photo) VALUES (?, ?)";
+        return await this.query(sql, [id, path]);
+    }
+
+    async checkProfilPic(params) {
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT profil FROM matcha.users WHERE id = ?";
+                this.query(sql, [params]).then((profil) => {
+                    console.log(profil[0].profil);
+                    if (profil && profil[0] && profil[0].profil === 'public/img/avatarDefault.png'){
+                        resolve({flag: 0});
+                    } else if (profil && profil[0] && profil[0].profil !== 'public/img/avatarDefault.png') {
+                        resolve({flag: 1});
+                    } else {
+                        reject({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
+                    }
+                });
+            });
         } catch (error){
             console.log(error);
             return false;
