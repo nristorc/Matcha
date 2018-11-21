@@ -166,6 +166,14 @@ p {
     /* max-width: 200px; */
 }
 
+button {
+    cursor: pointer;
+}
+
+button:focus {
+    outline: 0;
+}
+
 .btn:not(:disabled):not(.disabled) .popularity {
     background-color: rgb(255, 0, 100);
     border:none;

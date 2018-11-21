@@ -221,7 +221,7 @@
         console.log(userphotos.length);
     for (var j = 0; j < userphotos.length; j++) { %>
     <div class="col-sm">
-        <img src="<%=userphotos[j]['photo']%>" class="img-thumbnail carroussel" alt="...">
+        <button type="button" style="background: none; border: none;" class="photos"><img src="<%=userphotos[j]['photo']%>" class="img-thumbnail carroussel" alt="..."></button>
     </div>
     <% }} %>
 
@@ -244,7 +244,7 @@
 
             for (var i = 0; i < document.getElementsByClassName('img-thumbnail carroussel').length; i++){
                 if (document.getElementsByClassName('img-thumbnail carroussel')[i].src === document.getElementById('avatarPic').src) {
-                    document.getElementsByClassName('img-thumbnail carroussel')[i].style = 'border: solid rgb(159, 197, 0) thick';
+                    document.getElementsByClassName('img-thumbnail carroussel')[i].style = 'border: solid rgb(225, 0, 100) thick';
                 }
             }
 
@@ -518,12 +518,12 @@
                                 }
                                 if (($('.img-thumbnail.carroussel').length) < 5) {
                                     if (data.flag === 0) {
-                                        $('#rowPic').prepend('<div class="col-sm"><img src="' + data.file + '" class="img-thumbnail carroussel" style="border: solid rgb(159, 197, 0) thick" alt="..."></div>');
+                                        $('#rowPic').prepend('<div class="col-sm"><button type="submit" style="background: none; border: none;"><img src="' + data.file + '" class="img-thumbnail carroussel" style="border: solid rgb(255, 0, 100) thick" alt="..."></button></div>');
                                         const avatar = document.getElementById('avatarPic');
                                         avatar.src = data.file;
                                         avatar.style = 'border-radius: 50%';
                                     } else {
-                                        $('#rowPic').prepend('<div class="col-sm"><img src="' + data.file + '" class="img-thumbnail carroussel" alt="..."></div>');
+                                        $('#rowPic').prepend('<div class="col-sm"><button type="submit" style="background: none; border: none;"><img src="' + data.file + '" class="img-thumbnail carroussel" alt="..."></button></div>');
                                     }
                                     if (($('.img-thumbnail.carroussel').length) === 5) {
                                         $('form[id=uploadPics]').hide();
@@ -533,6 +533,18 @@
                         }
                     });
                 event.preventDefault();
+            });
+
+            $('button[class=photos]').click(function (event) {
+                event.preventDefault();
+                console.log($(this)[0].children[0].src);
+                const srcImg = $(this)[0].children[0].src;
+                var formData = {
+                    'image': srcImg,
+                    'submit': 'updateProfilPic'
+                }
+
+                console.log('formData: ', formData);
             });
         });
 	});
