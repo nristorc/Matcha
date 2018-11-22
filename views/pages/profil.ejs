@@ -505,11 +505,11 @@
                         console.log('data: ', data);
                         if (data.errors) {
                             if (document.getElementById('messages')) {
-                                const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
                                 flash[0].innerHTML = data.errors;
                             } else {
                                 $('#container').prepend('<div id="messages"></div>');
-                                $('#messages').append('<div class="alert alert-dark alert-dismissible">' + data.errors + '</div>')
+                                $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
                             }
                         } else {
                             if (data.file) {
@@ -537,14 +537,53 @@
 
             $('button[class=photos]').click(function (event) {
                 event.preventDefault();
-                console.log($(this)[0].children[0].src);
-                const srcImg = $(this)[0].children[0].src;
+                const srcImg = $(this)[0].children[0];
+
                 var formData = {
-                    'image': srcImg,
+                    'image': srcImg.src,
                     'submit': 'updateProfilPic'
                 }
 
-                console.log('formData: ', formData);
+                $.ajax({
+                    type		: 'POST',
+                    url		: '/profil',
+                    data		: formData,
+                    dataType	: 'json',
+                    encode		: true
+                })
+                    .done(function (data) {
+                        if (data.errors) {
+                            if (document.getElementById('messages')) {
+                                const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
+                                flash[0].innerHTML = data.errors;
+                            } else {
+                                $('#container').prepend('<div id="messages"></div>');
+                                $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                            }
+                        } else if (data.message) {
+                            if (document.getElementById('messages')) {
+                                const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                flash[0].innerHTML = data.message;
+                            } else {
+                                $('#container').prepend('<div id="messages"></div>');
+                                $('#messages').append('<div class="alert alert-dark alert-dismissible">' + data.message + '</div>')
+                            }
+                            if (data.image) {
+                                const avatar = document.getElementById('avatarPic');
+                                avatar.src = data.image;
+
+                                console.log('source: ', srcImg);
+                                for (var i = 0; i < document.getElementsByClassName('img-thumbnail').length; i++) {
+                                    if (document.getElementsByClassName('img-thumbnail')[i] !== srcImg) {
+                                        document.getElementsByClassName('img-thumbnail')[i].style.border = 'none';
+                                    }
+                                }
+                                srcImg.style = 'border: solid rgb(255, 0, 100) thick';
+                            }
+                        }
+
+                        console.log(data);
+                    });
             });
         });
 	});

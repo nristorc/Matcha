@@ -498,6 +498,27 @@ class Routes{
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
+            } else if (request.body.submit === 'updateProfilPic') {
+
+                checkDb.checkProfilPic(request.session.user.id).then((result) => {
+                    const imagePath = request.body.image.substring(22);
+                    if (result && result.picture) {
+                        if (result.picture === imagePath) {
+                            response.json({message: 'Cette photo est déja votre photo de profil'});
+                        } else {
+                            checkDb.updateProfilPic(imagePath, request.session.user.id).then((result) => {
+                                if (result) {
+                                    response.json({image: imagePath, message: 'Votre photo de profil a bien été mise à jour'});
+                                }
+                            }).catch((result) => {
+                                response.json({errors: "Une erreur s'est produite: " + result});
+                            });
+                        }
+                    }
+                }).catch((result) => {
+                    response.json({errors: "Une erreur s'est produite: " + result});
+                });
+
             } else {
                 fs.readdir('public/uploads/', (err, items) => {
                     var i = 0;
