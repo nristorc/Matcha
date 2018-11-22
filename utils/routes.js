@@ -401,10 +401,10 @@ class Routes{
 
                 if (validation.errors.length === 0) {
                     if (data.newPassword !== '') {
-                        console.log("Pass");
+                        //console.log("Pass");
                         checkDb.updateInfoWithPass(data, request.session.user.id).then(() => {
                             checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                                console.log('result THEN :', result);
+                                //console.log('result THEN :', result);
                                 response.json({user: result[0]});
                                 request.session.user.username = data.username;
                                 request.session.user.email = data.email;
@@ -417,10 +417,10 @@ class Routes{
                             console.log('result CATCH:',result);
                         });
                     } else if (data.newPassword === '') {
-                        console.log("No Pass");
+                        //console.log("No Pass");
                         checkDb.updateInfoWithoutPass(data, request.session.user.id).then(() => {
                             checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                                console.log('result THEN :', result);
+                                //console.log('result THEN :', result);
                                 response.json({user: result[0]});
                                 request.session.user.username = data.username;
                                 request.session.user.email = data.email;
@@ -519,6 +519,50 @@ class Routes{
                     response.json({errors: "Une erreur s'est produite: " + result});
                 });
 
+            } else if (request.body.submit === 'deletePic') {
+
+                console.log('image node: ',request.body.image);
+
+                checkDb.checkProfilPic(request.session.user.id).then((result) => {
+                    const imagePath = request.body.image.substring(22);
+                    if (result && result.picture) {
+                        if (result.picture === imagePath) {
+
+                            //console.log('image path profil', imagePath);
+                            checkDb.updateProfilPic('public/img/avatarDefault.png', request.session.user.id).then((result) => {
+                                if (result) {
+                                    checkDb.deletePhoto(request.session.user.id, imagePath).then((deleteRes) => {
+                                        //console.log('image path delete', imagePath);
+                                        fs.unlink(imagePath, (err) => {
+                                            if (err) throw err;
+                                            console.log('successfully deleted '+ imagePath);
+                                        });
+                                        //console.log('image path response', imagePath);
+                                        response.json({image: imagePath, message: 'Votre photo a bien été supprimée', flag: 'profil'});
+                                    }).catch((deleteRes) => {
+                                        response.json({errors: "Une erreur s'est produite: " + deleteRes});
+                                    });
+                                }
+                            }).catch((result) => {
+                                response.json({errors: "Une erreur s'est produite: " + result});
+                            });
+
+                        } else {
+                            checkDb.deletePhoto(request.session.user.id, imagePath).then((deleteRes) => {
+                                fs.unlink(imagePath, (err) => {if (err) throw err;
+                                    console.log('successfully deleted '+ imagePath);
+                                });
+                                response.json({image: imagePath, message: 'Votre photo a bien été supprimée'});
+                            }).catch((deleteRes) => {
+                                response.json({errors: "Une erreur s'est produite: " + deleteRes});
+                            });
+                        }
+                    }
+                }).catch((result) => {
+                    response.json({errors: "Une erreur s'est produite: " + result});
+                });
+
+
             } else {
                 fs.readdir('public/uploads/', (err, items) => {
                     var i = 0;
@@ -536,6 +580,7 @@ class Routes{
                                     response.json({errors: 'No file selected !'});
                                 }
                                 else {
+                                    //console.log('request file path: ',request.file.path);
                                     checkDb.insertPhoto(request.session.user.id, request.file.path).then((result) => {
                                         //console.log('result THEN insert: ', result);
                                         if (result) {
@@ -547,7 +592,7 @@ class Routes{
                                                     checkDb.updateProfilPic(request.file.path, request.session.user.id).then((result) => {
                                                         //console.log('4- result update: ', result);
                                                         //console.log("5- je renvoie a l'ajax // Db Update DONE");
-                                                        response.json({file: `uploads/${request.file.filename}`, flag: resultFlag.flag});
+                                                        response.json({file: request.file.path, flag: resultFlag.flag});
                                                     }).catch((result) => {
                                                         console.log('result CATCH update: ', result);
                                                         response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb UPDATE"});
@@ -555,7 +600,7 @@ class Routes{
                                                 } else if (resultFlag && resultFlag.flag === 1) {
                                                    // console.log("3bis- pas d'update de la DB profil");
                                                     //console.log("5- je renvoie a l'ajax // Db Update NO");
-                                                    response.json({file: `uploads/${request.file.filename}`, flag: resultFlag.flag});
+                                                    response.json({file: request.file.path, flag: resultFlag.flag});
                                                 }
                                             }).catch((result) => {
                                                 console.log('result CATCH checkphoto: ', result);
@@ -597,7 +642,7 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-                console.log(request.query.index);
+                //console.log(request.query.index);
 				checkDb.getAllUsers().then((users) => {
 					response.render('pages/search-infinite', {
                     users: users,

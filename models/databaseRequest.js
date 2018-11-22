@@ -287,6 +287,11 @@ class DatabaseRequest {
         return await this.query(sql, [id, path]);
     }
 
+    async deletePhoto(id, path) {
+        const sql = "DELETE FROM matcha.photos WHERE user_id = ? AND photo = ?";
+        return await this.query(sql, [id, path]);
+    }
+
     async checkProfilPic(params) {
         try {
             return new Promise((resolve, reject) => {
