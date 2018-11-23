@@ -577,8 +577,7 @@ class Routes{
 			}
         }).post('/search', async(request, response) => {
             console.log("Je suis dans LIKE");
-            console.log("body", request.body  );
-            console.log("data", request.body.data);
+            console.log("body", request.body.id_liked);
             // console.log(request.body.dataType);
 			return response.render('index');
         });
