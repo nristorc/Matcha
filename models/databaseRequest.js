@@ -497,7 +497,9 @@ class DatabaseRequest {
 		this.query("SELECT * FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
 			if (exist == ""){
 				if (bool == 1){
-					this.query("INSERT INTO `likes`(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
+					this.query("INSERT INTO `matcha.likes`(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
+                        // this.query("UPDATE `matcha.users  VALUES (?, ?)", [user_id, id]).then(() => {
+                            // mettre la popularite a jour
 						return true;
 					}).catch(() => {
 						return false;
@@ -510,6 +512,8 @@ class DatabaseRequest {
 					return false;
 				} else if (bool == -1) {
 					this.query("DELETE FROM `likes` WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
+                            // this.query("UPDATE `matcha.users  VALUES (?, ?)", [user_id, id]).then(() => {
+                            // mettre la popularite a jour
 						return true;
 					}).catch(() => {
 						return false;

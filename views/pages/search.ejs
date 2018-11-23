@@ -28,7 +28,9 @@
 		<div class="col-sm search-col">
 			<% if (users[x]){%>
 				<div class="img-pop">
-					<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic search-pic">
+					<div class="containerPic">
+						<img src="<%=users[x]['profil']%>" title="<%=users[x]['username']%>" alt="<%=users[x]['username']%>" class="profile-pic search-pic">
+					</div>
 					<%if (users[x]['popularity'] < 50){ %>
 						<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
 					<% } else if (users[x]['popularity'] < 85) { %>
