@@ -316,7 +316,7 @@ class DatabaseRequest {
     async getUser(params){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE username = ?";
+                const sql = "SELECT * FROM matcha.users WHERE username = ?";
                 this.query(sql, params).then((user) => {
                     if (user){
                         resolve(user);
@@ -335,9 +335,9 @@ class DatabaseRequest {
         try {
             return new Promise((resolve, reject) => {
                 if (sort){
-                    var sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
+                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
                 } else {
-                    var sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'"+filter;
+                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter;
                 }
                 this.query(sql).then((users) => {
                     if (users){

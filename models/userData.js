@@ -7,7 +7,9 @@ class User{
         try {
             return new Promise((resolve, reject) => {
 				var dob = params;
-				if (dob != null) {
+				console.log('dob', typeof dob)
+				if (dob !== null) {
+				    console.log('birthdate from DB/ userAge', typeof dob);
 				    var year = dob.getFullYear();
 					var month = dob.getMonth();
 					var day = dob.getDate();
@@ -19,6 +21,7 @@ class User{
                         }
                     resolve(age);
                 } else {
+				    console.log('dob', dob);
 					reject(null);
 				}
                });
