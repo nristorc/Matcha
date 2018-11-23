@@ -9,6 +9,35 @@ let validation = new registerValidation();
 const userDatabase =require('../models/userData');
 const userData = new userDatabase();
 
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+    destination: './public/uploads/',
+    filename: function (request, file, callback) {
+        callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {fileSize: 1000000},
+    fileFilter: function(request, file, callback) {
+        checkFileType(file, callback);
+    }
+}).single('inputFile');
+
+function checkFileType(file, callback) {
+    const filetypes = /jpeg|jpg|png|gif/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+    if (mimetype && extname) {
+        return callback(null, true);
+    } else {
+        callback({message: "Image corrompue !"});
+    }
+}
+
 class Routes{
     constructor(app){
         this.app = app;
@@ -337,13 +366,16 @@ class Routes{
 				});
 			});
         }).post(async (request, response) => {
-            if (request.body.submit === 'modifyProfile') {
+            if (request.body.submit === 'modifyParams') {
                 const data = {
                     firstname: request.body.firstname,
                     lastname: request.body.lastname,
                     email: request.body.email,
                     username: request.body.username,
-                    birthdate: request.body.birthdate
+                    birthdate: request.body.birthdate,
+                    currentPassword: request.body.currentPassword,
+                    newPassword: request.body.newPassword,
+                    confirmPassword: request.body.confirmNewPass
                 };
 
                 await validation.isName(data.firstname, "Mauvais format de prénom");
@@ -351,6 +383,17 @@ class Routes{
                 await validation.isEmail(data.email, "Mauvais format d'email");
                 await validation.isAlpha(data.username, "Mauvais format d'identifiant");
                 await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
+
+
+                if (data.currentPassword !== '' || data.newPassword !== '' || data.confirmPassword !== '') {
+                    await checkDb.checkPassword(data, request.session.user.id).then((result) => {
+                        if (result === true) {
+                            validation.isConfirmed(data.newPassword, data.confirmPassword, "Nouveau mot de passe incorrect");
+                        }
+                    }).catch((result) => {
+                        validation.errors.push(result);
+                    });
+                }
 
                 if (data.username !== request.session.user.username) {
                     const resultUsername  = await checkDb.checkUsername(data.username);
@@ -366,22 +409,41 @@ class Routes{
                 }
 
                 if (validation.errors.length === 0) {
-                    const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y') WHERE users.id = ?";
-                    checkDb.query(sql, [data.firstname, data.lastname, data.email, data.username, data.birthdate, request.session.user.id]).then(() => {
-                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                            console.log('result THEN: ', result);
-                            response.json({user: result[0]});
-                            request.session.user.username = data.username;
-                            request.session.user.username = data.email;
+                    if (data.newPassword !== '') {
+                        console.log("Pass");
+                        checkDb.updateInfoWithPass(data, request.session.user.id).then(() => {
+                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                                console.log('result THEN :', result);
+                                response.json({user: result[0]});
+                                request.session.user.username = data.username;
+                                request.session.user.email = data.email;
+                                request.session.user.password = data.newPassword;
 
+                            }).catch((result) => {
+                                console.log('result CATCH:',result);
+                            });
                         }).catch((result) => {
                             console.log('result CATCH:',result);
                         });
-                    }).catch((result) => {
-                        console.log('result CATCH:',result);
-                    });
+                    } else if (data.newPassword === '') {
+                        console.log("No Pass");
+                        checkDb.updateInfoWithoutPass(data, request.session.user.id).then(() => {
+                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                                console.log('result THEN :', result);
+                                response.json({user: result[0]});
+                                request.session.user.username = data.username;
+                                request.session.user.email = data.email;
+                                request.session.user.password = data.newPassword;
+
+                            }).catch((result) => {
+                                console.log('result CATCH:',result);
+                            });
+                        }).catch((result) => {
+                            console.log('result CATCH:',result);
+                        });
+                    }
+
                 } else {
-                    //console.log('errors: ', validation.errors);
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
@@ -394,9 +456,9 @@ class Routes{
                     orientation: request.body.orientation,
                     description: request.body.description,
                 };
-                await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
+                await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format de genre");
                 await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
-                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
+                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format d'orientation");
                 await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
 
                 if (validation.errors.length === 0) {
@@ -414,28 +476,53 @@ class Routes{
                         console.log('result CATCH:',result);
                     });
                 } else {
-                    //console.log('erreurs: ', validation.errors);
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
-            }
-        });
+            } else if (request.body.submit === 'modifyProfile') {
 
-		/* Routes for Search */
+                const data = {
+                    gender: request.body.gender,
+                    orientation: request.body.orientation,
+                    description: request.body.description,
+                };
+                await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format de genre");
+                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format d'orientation");
+                await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
 
-                checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
-                    checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                        response.json({user: result[0]});
+                if (validation.errors.length === 0) {
+                    const sql = "UPDATE matcha.users SET `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
+
+                    checkDb.query(sql, [data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
+                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                            response.json({user: result[0]});
+
+                        }).catch((result) => {
+                            console.log('result CATCH:',result);
+                        });
                     }).catch((result) => {
                         console.log('result CATCH:',result);
                     });
-                }).catch((result) => {
-                    console.log('result CATCH:',result);
-                });
+                } else {
+                    response.json({errors: validation.errors});
+                    validation.errors = [];
+                }
             } else {
-                console.log('erreurs: ', validation.errors);
-                response.json({errors: validation.errors});
-                validation.errors = [];
+
+                //pour avoir une info spp sur le POST de files : request.body.submit a l'interieur d'upload() // En ajax, formData.append('submit', valeur)
+                upload(request, response, (error) => {
+                    if (error) {
+                        response.json({errors: error.message});
+                    } else {
+                        if (request.file === undefined) {
+                            response.json({errors: 'No file selected !'});
+                        } else {
+                            console.log('file :',request.file.filename);
+                            response.json({file: `uploads/${request.file.filename}`});
+                        }
+                    }
+                });
+
             }
         });
 
@@ -445,29 +532,55 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-				checkDb.getAllUsers().then((users) => {
-					if (!request.query.index) {
-						console.log("oups");
-						response.render('pages/search', {
-							users: users,
-							index: 0
-						});
-					} else {
-						console.log(request.query.index);
-						if (request.query.index < users.length){
-							response.render('pages/search', {
-								users: users,
-								index: request.query.index
+				checkDb.setOrientation(request.session.user.id).then((filter) => {
+					checkDb.getAllUsers(filter, request.query.sort).then((users) => {
+						if (!request.query.index) {
+							checkDb.getLikes(request.session.user.id).then((likes) => {
+								// console.log(likes);
+								response.render('pages/search', {
+									users: users,
+									index: 0,
+									likes: likes
+								});
+							}).catch((likes) => {
+								response.render('pages/search', {
+									users: users,
+									index: 0,
+									likes: likes,
+								});
 							});
 						} else {
-							response.end();
+							if (request.query.index < users.length){
+								checkDb.getLikes(request.session.user.id).then((likes) => {
+									response.render('pages/search', {
+										users: users,
+										index: request.query.index,
+										likes: likes
+									});
+								}).catch((likes) => {
+									response.render('pages/search', {
+										users: users,
+										index: request.query.index,
+										likes: likes,
+									});
+								});
+							} else {
+								response.end();
+							}
 						}
-					}
-				}).catch((users) => {
+					}).catch((users) => {
+						return response.render('index');
+					});
+				}).catch((filter) => {
 					return response.render('index');
-				});
+				});					
 			}
-		});
+        }).post('/search', async(request, response) => {
+            console.log("Je suis dans LIKE");
+            console.log("body", request.body.id_liked);
+            // console.log(request.body.dataType);
+			return response.render('index');
+        });
 		
 		/* Routes for ... */
 
