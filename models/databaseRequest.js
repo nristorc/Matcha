@@ -492,6 +492,35 @@ class DatabaseRequest {
             return false;
         }
     }
+
+    async updateLikes(user_id, id, bool){
+		this.query("SELECT * FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
+			if (exist == ""){
+				if (bool == 1){
+					this.query("INSERT INTO `likes`(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
+						return true;
+					}).catch(() => {
+						return false;
+					});
+				} else if (bool == -1) {
+					return false;
+				}
+			} else {
+				if (bool == 1){
+					return false;
+				} else if (bool == -1) {
+					this.query("DELETE FROM `likes` WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
+						return true;
+					}).catch(() => {
+						return false;
+					});
+				}
+			}
+		}).catch(()=> {
+			return(false);
+		});
+    }
+
 }
 
 module.exports = DatabaseRequest;

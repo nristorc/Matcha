@@ -68,7 +68,7 @@
 
 
 					<span><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)"></i></span>
-					<span><i class="fas fa-thumbs-up" id="likedSearch-<%=users[x]['id']%>" style="text-align: center; display: none;"></i></span>
+					<span><i class="fas fa-thumbs-up" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)"></i></span>
 
 
 <!-- Like and match check -->
@@ -88,6 +88,8 @@
 			if (like === 1 && liked === 1){ %>
 				<script>
 					document.getElementById("matched<%=users[x]['id']%>").style.display = "flex";
+					document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "none";
+					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
 				</script>
 			<% } else if (like === 1 && liked === 0){ %>
 				<script>
@@ -96,7 +98,7 @@
 			<% } else if (liked === 1 && like === 0) { %>
 				<script>
 					document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "none";
-					document.getElementById("likedSearch-<%=users[x]['id']%>").style.display = "flex";
+					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
 				</script>
 			<% }
 		} %>
@@ -126,38 +128,38 @@
 	
 		function like(id){
 			event.preventDefault();
-			console.log(id);
+			document.getElementById(id).style.display = "none";
+			document.getElementById("un"+id).style.display = "flex";
 			var data = {
 				id_liked	: id,
 			}
 			$.ajax({
-				type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-				url         : '/search', // the url where we want to POST
-				data		: data, // our data object
-				dataType    : 'json', // what type of data do we expect back from the server
+				type        : 'POST',
+				url         : '/search',
+				data		: data,
+				dataType    : 'json',
 				encode		: true
 			})
 		}
 
+		function unlike(id){
+			event.preventDefault();
+			var display = id.substring(2)
+			console.log(display);
+			document.getElementById(id).style.display = "none";
+			document.getElementById(display).style.display = "flex";
+			var data = {
+				id_liked	: id,
+			}
+			$.ajax({
+				type        : 'POST',
+				url         : '/search',
+				data		: data,
+				dataType    : 'json',
+				encode		: true
+			})
+		}
 
-		// $('form[id=likes-report]').submit(function(event) {
-		// 	// const x = document.getElementsByClassName("fa-thumbs-up").value;
-		// 	const x = document.getElementById("button").value; 
-		// 	console.log(x);
-		// 	// console.log("likeSearch-<%=users[x]['id']%>");
-		// 	document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "flex";
-		// 	document.getElementById("likedSearch-<%=users[x]['id']%>").style.display = "none";
-		// 	var formData = {
-		// 				'submit' : $('button:submit').val()}
-		// 	console.log(formData);
-		// 	$.ajax({
-		// 		type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-		// 		url         : '/search', // the url where we want to POST
-		// 		data		: formData, // our data object
-		// 		dataType    : 'json', // what type of data do we expect back from the server
-		// 		encode		: true
-		// 	})
-		// });
 </script>
 
 <% } %>
