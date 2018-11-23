@@ -22,9 +22,10 @@
 						<div class="form-group">
 							<label for="gender" class="col-form-label">Votre Genre</label>
 							<select name="gender" class="form-control" id="gender">
-								<option value="Autre" selected>Autre</option>
-								<option value="Femme">Femme</option>
-								<option value="Homme">Homme</option>
+								<option value="Femme" selected>Femme</option>
+                                <option value="Homme">Homme</option>
+                                <option value="Femme-Transgenre">Femme Transgenre</option>
+                                <option value="Homme-Transgenre">Homme Transgenre</option>
 							</select>
 						</div>
 						<div class="form-group">
@@ -34,9 +35,10 @@
 						<div class="form-group">
 							<label for="sexOrientation" class="col-form-label">Votre Orientation Sexuelle</label>
 							<select name="orientation" class="form-control" id="sexOrientation">
-								<option value="Autre" selected>Autre</option>
 								<option value="Hétérosexuel">Hétérosexuel</option>
-								<option value="Homosexuel">Homosexuel</option>
+                                <option value="Homosexuel">Homosexuel</option>
+                                <option value="Bisexuel" selected>Bisexuel</option>
+                                <option value="Homosexuel">Pansexuel</option>
 							</select>
 						</div>
 						<div class="form-group">
@@ -144,9 +146,10 @@
                             <div class="form-group">
                                 <label for="editGender" class="col-form-label">Votre Genre</label>
                                 <select name="editGender" class="form-control" id="editGender">
-                                    <option value="Homme"<% if (user[0].gender === 'Homme') {%> selected <%}%>>Homme</option>
                                     <option value="Femme"<% if (user[0].gender === 'Femme') {%> selected <%}%>>Femme</option>
-                                    <option value="Autre"<% if (user[0].gender === 'Autre') {%> selected <%}%>>Autre</option>
+                                    <option value="Homme"<% if (user[0].gender === 'Homme') {%> selected <%}%>>Homme</option>
+                                    <option value="Femme-Transgenre"<% if (user[0].gender === 'Femme-Transgenre') {%> selected <%}%>>Femme Transgenre</option>
+                                    <option value="Homme-Transgenre"<% if (user[0].gender === 'Homme-Transgenre') {%> selected <%}%>>Homme Transgenre</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -154,7 +157,8 @@
                                 <select name="editOrientation" class="form-control" id="editOrientation">
                                     <option value="Hétérosexuel"<% if (user[0].orientation === 'Hétérosexuel') {%> selected <%}%>>Hétérosexuel</option>
                                     <option value="Homosexuel"<% if (user[0].orientation === 'Homosexuel') {%> selected <%}%>>Homosexuel</option>
-                                    <option value="Autre"<% if (user[0].orientation === 'Autre') {%> selected <%}%>>Autre</option>
+                                    <option value="Bisexuel"<% if (user[0].orientation === 'Bisexuel') {%> selected <%}%>>Bisexuel</option>
+                                    <option value="Pansexuel"<% if (user[0].orientation === 'Pansexuel') {%> selected <%}%>>Pansexuel</option>
                                 </select>
                             </div>
                             <div class="form-group">

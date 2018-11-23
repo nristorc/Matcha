@@ -1,4 +1,4 @@
-'use strict';
+
 
 const databaseRequest = require("../models/databaseRequest");
 const checkDb = new databaseRequest();
@@ -447,9 +447,9 @@ class Routes{
                     orientation: request.body.orientation,
                     description: request.body.description,
                 };
-                await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
+                await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format de genre");
                 await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
-                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
+                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format d'orientation");
                 await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
 
                 if (validation.errors.length === 0) {
@@ -477,8 +477,8 @@ class Routes{
                     orientation: request.body.orientation,
                     description: request.body.description,
                 };
-                await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
-                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
+                await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format de genre");
+                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format d'orientation");
                 await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
 
                 if (validation.errors.length === 0) {
@@ -619,43 +619,61 @@ class Routes{
             }
         });
 
-		/* Routes for Search */
+		/* Routes for search */
 
         this.app.get('/search', (request, response) => {
-            if (!request.session.user) {
-                return response.render('index');
-			}
-			checkDb.getAllUsers().then((users) => {
-				response.render('pages/search', {
-				users: users,
-				});
-			}).catch((users) => {
-				response.render('pages/search', {
-				users: users,
-				});
-			});
-        });
-
-		/* Routes for infinite */
-
-        this.app.get('/search-infinite', (request, response) => {
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-                //console.log(request.query.index);
-				checkDb.getAllUsers().then((users) => {
-					response.render('pages/search-infinite', {
-                    users: users,
-                    index: request.query.index
+				checkDb.setOrientation(request.session.user.id).then((filter) => {
+					checkDb.getAllUsers(filter, request.query.sort).then((users) => {
+						if (!request.query.index) {
+							checkDb.getLikes(request.session.user.id).then((likes) => {
+								// console.log(likes);
+								response.render('pages/search', {
+									users: users,
+									index: 0,
+									likes: likes
+								});
+							}).catch((likes) => {
+								response.render('pages/search', {
+									users: users,
+									index: 0,
+									likes: likes,
+								});
+							});
+						} else {
+							if (request.query.index < users.length){
+								checkDb.getLikes(request.session.user.id).then((likes) => {
+									response.render('pages/search', {
+										users: users,
+										index: request.query.index,
+										likes: likes
+									});
+								}).catch((likes) => {
+									response.render('pages/search', {
+										users: users,
+										index: request.query.index,
+										likes: likes,
+									});
+								});
+							} else {
+								response.end();
+							}
+						}
+					}).catch((users) => {
+						return response.render('index');
 					});
-				}).catch((users) => {
-					// console.log(users);
-					response.render('index',{
-					users: users,
-					});
-				});
+				}).catch((filter) => {
+					return response.render('index');
+				});					
 			}
-		});
+        }).post('/search', async(request, response) => {
+            console.log("Je suis dans LIKE");
+            console.log("body", request.body.id_liked);
+            // console.log(request.body.dataType);
+			return response.render('index');
+        });
 		
 		/* Routes for ... */
 

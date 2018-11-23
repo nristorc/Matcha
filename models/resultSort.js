@@ -1,9 +1,9 @@
-class User{
+class Sort{
     constructor(){
         this.errors = []
     }
 
-    async userAge(params){
+    async sortBy(json, params){
         try {
             return new Promise((resolve, reject) => {
 				var dob = params;
@@ -30,4 +30,4 @@ class User{
 
 }
 
-module.exports = User;
+module.exports = Sort;

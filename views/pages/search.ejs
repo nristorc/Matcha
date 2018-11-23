@@ -1,54 +1,166 @@
-<%- include('../partial/head')%>
-<%- include('../partial/header')%>
+<% if(!index) {%>
+	<%- include('../partial/head')%>
+	<%- include('../partial/header')%>
 
-<div class="container2">
-		<%=users[0]['username']%>
-		<%
-		for (var i=0; i<10; i++){%>
-	<%=i%>
-		<%} %>
+<!-- Filters -->
+
+	<ul class="nav nav-pills">
+		<li class="nav-item dropdown">
+		  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
+		  <div class="dropdown-menu">
+			<a class="dropdown-item" id="sort-age">Age</a>
+			<a class="dropdown-item" id="sort-loc">Localisation</a>
+			<a class="dropdown-item" id="sort-pop">Popularite</a>
+		</li>
+	  </ul>
+
+<%}%>
+
+<!-- Results -->
+
+<div class="scroll">
+	<% var x = index;
+	var i = 0;
+	while (i < 6){ 
+		if (i===0 || i===3){ %>
+			<div class="row">
+		<%}%>
+		<div class="col-sm search-col">
+			<% if (users[x]){%>
+				<div class="img-pop">
+					<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic search-pic">
+					<%if (users[x]['popularity'] < 50){ %>
+						<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
+					<% } else if (users[x]['popularity'] < 85) { %>
+						<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
+					<% } else { %>
+						<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
+					<%}%>
+					<i class="fas fa-heart matched" id="matched<%=users[x]['id']%>" title="c'est un match !" style="display:none"></i>
+					<i class="fas fa-thumbs-up liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i>
+				</div>
+
+				<h5><%=users[x]['username']%></h5>
+				<h6>
+					<% if (users[x]['gender'] === null) { %>
+						Genre non renseigne,
+					<%} else { %>
+						<%=users[x]['gender']%>,
+					<% } %>
+					<% if (users[x]['orientation'] === null) { %>
+						orientation non renseignee
+					<%} else { %>
+						<%=users[x]['orientation']%>
+					<% } %>
+				</h6>
+				<h6>
+					<% if (users[x]['description'] == null) { %>
+						Description manquante
+					<%} else { %>
+						<%=users[x]['description']%>
+					<% } %>
+				</h6>
+
+				<!-- <form id="likes-report">
+					<button type="submit" value="like<%=users[x]['id']%>" style="background:none; border:none"><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;"></i></button>
+					<button type="submit" value="unlike<%=users[x]['id']%>" style="background:none; border:none" id="button"><i class="fas fa-thumbs-up" id="likedSearch-<%=users[x]['id']%>" style="text-align: center; display: none;"></i></button>
+				</form> -->
+
+
+					<span><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)"></i></span>
+					<span><i class="fas fa-thumbs-up" id="likedSearch-<%=users[x]['id']%>" style="text-align: center; display: none;"></i></span>
+
+
+<!-- Like and match check -->
+
+			<% var a = 0;
+			var like = 0;
+			var liked = 0;
+			while (likes[a]){
+				if (users[x]['id'] === likes[a]['user_id']) {
+					like = 1;
+				}
+				if (users[x]['id'] === likes[a]['user_liked']){
+					liked = 1;
+				}
+				a++;
+			}
+			if (like === 1 && liked === 1){ %>
+				<script>
+					document.getElementById("matched<%=users[x]['id']%>").style.display = "flex";
+				</script>
+			<% } else if (like === 1 && liked === 0){ %>
+				<script>
+					document.getElementById("liked<%=users[x]['id']%>").style.display = "flex";
+				</script>
+			<% } else if (liked === 1 && like === 0) { %>
+				<script>
+					document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "none";
+					document.getElementById("likedSearch-<%=users[x]['id']%>").style.display = "flex";
+				</script>
+			<% }
+		} %>
+		</div>
+		<% if (x===2 || x===5){ %>
+			</div>
+		<% }  
+		x++;
+		i++;
+	}
+%>
 
 </div>
 
+<!-- Loading animation -->
 
-<p id="loading" style="display:none">
-		<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
-</p>
+<% if (index == 0){ %>
+	<p id="loading" style="display:none">
+			<img style="width:40px; margin-left:50%" src="https://ubisafe.org/images/transparent-gif-loading-1.gif" alt="Loading…" />
+	</p>
 
+<!-- Scripts -->
 
-
-
-
+<script src="./public/js/scroll.js"></script>
+<script src="./public/js/sort.js"></script>
 <script>
-	var i =1;
-
-	$(document).ready(function() {
-		var win = $(window);
-		win.scroll(function() {
-			if ($(document).height() - win.height() == win.scrollTop()) {
-				$('#loading').show();	
-				$.ajax({
-					method: "GET",
-					data: {
-						index:i
-					},
-					url: 'search-infinite',
-					success: function(html) {
-						$('.container2').append(html);
-						$('#loading').hide();
-					},
-					error: function() {
-						$('#loading').hide();
-					}
-				});
-				i++;
+	
+		function like(id){
+			event.preventDefault();
+			console.log(id);
+			var data = {
+				id_liked	: id,
 			}
-		});
-	});
+			$.ajax({
+				type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+				url         : '/search', // the url where we want to POST
+				data		: data, // our data object
+				dataType    : 'json', // what type of data do we expect back from the server
+				encode		: true
+			})
+		}
+
+
+		// $('form[id=likes-report]').submit(function(event) {
+		// 	// const x = document.getElementsByClassName("fa-thumbs-up").value;
+		// 	const x = document.getElementById("button").value; 
+		// 	console.log(x);
+		// 	// console.log("likeSearch-<%=users[x]['id']%>");
+		// 	document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "flex";
+		// 	document.getElementById("likedSearch-<%=users[x]['id']%>").style.display = "none";
+		// 	var formData = {
+		// 				'submit' : $('button:submit').val()}
+		// 	console.log(formData);
+		// 	$.ajax({
+		// 		type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+		// 		url         : '/search', // the url where we want to POST
+		// 		data		: formData, // our data object
+		// 		dataType    : 'json', // what type of data do we expect back from the server
+		// 		encode		: true
+		// 	})
+		// });
 </script>
-		
 
-
+<% } %>
 
 
 <% include ../partial/footer.ejs%>

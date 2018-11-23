@@ -54,6 +54,12 @@ const sql_photos = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.photos_table +
     "`photo` VARCHAR(255) NOT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
+const sql_likes = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.likes_table +
+	"(`id` INT(9) NOT NULL AUTO_INCREMENT," +
+	"`user_id` INT(11) NOT NULL," +
+    "`user_liked` INT(11) NOT NULL," +
+    "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+
 connection.query(sql_user, (err, result) => {
     if (err) {
         console.error('error creating table: ' + err.stack);
@@ -68,6 +74,14 @@ connection.query(sql_tags, (err, result) => {
         return
     }
     console.log("Table " + configDatabase.tags_table + " created");
+});
+
+connection.query(sql_likes, (err, result) => {
+    if (err) {
+        console.error('error creating table: ' + err.stack);
+        return
+    }
+    console.log("Table " + configDatabase.likes_table + " created");
 });
 
 connection.query(sql_photos, (err, result) => {

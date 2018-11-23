@@ -191,3 +191,107 @@ button:focus {
     border:none;
     cursor: auto;
 }
+
+/* Search Page */
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	background-color: rgb(238, 162, 162);
+	margin-bottom: 20px;	
+}
+
+.nav-pills .nav-link {
+	margin-bottom: 20px;
+}
+
+a {
+	color: rgba(0,0,0,.5);
+}
+
+a:hover {
+	color: rgba(0,0,0,.8);
+}
+
+.popularity-search-1 {
+    background-color:  rgb(238, 162, 162);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+    margin: 210px 0 0 85px;
+    position : right;
+}
+
+.popularity-search-1:hover {
+    background-color:  rgb(238, 162, 162);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.popularity-search-2 {
+    background-color: rgb(250, 94, 154);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+    margin: 210px 0 0 85px;
+    position : right;
+}
+
+.popularity-search-2:hover {
+    background-color: rgb(250, 94, 154);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.popularity-search-3 {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+    margin: 210px 0 0 85px;
+    position : right;
+}
+
+.popularity-search-3:hover {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.liked {
+    border:none;
+    display: flex;
+    position: absolute;
+    margin: 215px 0 0 40px;
+    font-size: 1.5rem;
+    color : rgb(254, 224, 224);
+}
+
+.matched {
+    border:none;
+    display: flex;
+    position: absolute;
+    margin: 215px 0 0 40px;
+    font-size: 1.5rem;
+    color : rgb(255, 0, 100);
+}
+.search-pic {
+    display: flex;
+    position: relative;
+}
+
+.img-pop {
+    display: flex;
+    justify-content : center
+}
+
+.search-col {
+    padding: 30px;
+}
