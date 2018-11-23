@@ -336,9 +336,14 @@ class Routes{
                 return response.render('index');
 			}
 			checkDb.getUser(request.session.user.username).then((user) => {
+			    // console.log('user THEN: ', user);
 				checkDb.getTags(request.session.user.id).then((tags) => {
+                    // console.log('tags THEN: ', tags);
 				    checkDb.getPhotos(request.session.user.id).then((photos) => {
+                        // console.log('photos THEN: ', photos);
+                        // console.log('get DB age', user[0]['birth']);
                         userData.userAge(user[0]['birth']).then((age) => {
+                            console.log('age THEN: ', age);
                             response.render('pages/profil', {
                                 user: user,
                                 userage: age,
@@ -346,15 +351,36 @@ class Routes{
                                 userphotos: photos
                             });
                         }).catch((age) => {
+                            // console.log('age CATCH: ', age);
                             response.render('pages/profil', {
                                 user: user,
                                 usertags: tags,
-                                userage: null
+                                userage: null,
+                                userphotos: photos
                             });
                         });
+                    }).catch((photos) => {
+                        // console.log('photos CATCH: ', photos);
+                        response.render('pages/profil', {
+                            user: user,
+                            usertags: tags,
+                            userage: null,
+                            userphotos: null
+                        });
                     });
-				});
-			});
+				}).catch((tags) => {
+                    // console.log('tags CATCH: ', tags);
+                    response.render('pages/profil', {
+                        user: user,
+                        usertags: tags,
+                        userage: null,
+                        userphotos: photos
+                    });
+                });
+			}).catch((user) => {
+                // console.log('user CATCH: ', user);
+                response.render('index');
+            });
 
         }).post(async (request, response) => {
             if (request.body.submit === 'modifyParams') {
@@ -401,7 +427,6 @@ class Routes{
 
                 if (validation.errors.length === 0) {
                     if (data.newPassword !== '') {
-                        //console.log("Pass");
                         checkDb.updateInfoWithPass(data, request.session.user.id).then(() => {
                             checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
                                 //console.log('result THEN :', result);
@@ -417,10 +442,8 @@ class Routes{
                             console.log('result CATCH:',result);
                         });
                     } else if (data.newPassword === '') {
-                        //console.log("No Pass");
                         checkDb.updateInfoWithoutPass(data, request.session.user.id).then(() => {
                             checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                                //console.log('result THEN :', result);
                                 response.json({user: result[0]});
                                 request.session.user.username = data.username;
                                 request.session.user.email = data.email;
