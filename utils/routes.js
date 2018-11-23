@@ -698,7 +698,27 @@ class Routes{
 			return response.render('index');
         });
 		
-		/* Routes for ... */
+		/* Routes for TestTags */
+        this.app.get('/tags', (request, response) => {
+            if (!request.session.user) {
+                return response.render('index');
+            }
+            checkDb.getUser(request.session.user.username).then((user) => {
+                checkDb.getTags(request.session.user.id).then((tags) => {
+                    response.render('pages/testTags', {
+                        user: user,
+                        usertags: tags,
+                            });
+                }).catch((tags) => {
+                    response.render('pages/testTags', {
+                        user: user,
+                        usertags: tags,
+                    });
+                });
+            }).catch((user) => {
+                response.render('index');
+            });
+        })
 
     }
 
