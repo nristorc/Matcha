@@ -79,6 +79,30 @@ class DatabaseRequest {
         return await this.query(`SELECT count(username) as count FROM matcha.users WHERE username = ?`, [params]);
     }
 
+    async checkPassword(params, user){
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT password FROM matcha.users WHERE id = ?", [user]).then((hash) => {
+                    if (hash && hash[0] && hash[0].password) {
+                        bcrypt.compare(params.currentPassword, hash[0].password, (err, res) => {
+                            if (res === true) {
+                                resolve(res);
+                            } else {
+                                reject({errorMsg: 'Mot de passe actuel incorrect'});
+                            }
+                        });
+                    } else {
+                        reject({errorMsg:"Une erreur s'est produite, merci de bien vouloir reéessayer ultérieurement"});
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+
+    }
+
     async checkResetToken(params){
         return await this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]);
     }
@@ -90,23 +114,56 @@ class DatabaseRequest {
     async checkRegisterToken(param){
         try {
             return new Promise((resolve, reject) => {
-                //console.log('param: ',param);
+
                 this.query(`SELECT * FROM matcha.users WHERE registerToken = ?`, [param]).then((result) => {
-                    //console.log('select query: ', result);
                     if (result && result[0] && result[0].registerToken === param && result[0].active === 0) {
-                        //console.log('le token existe');
                         this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);
                         resolve(
                             this.query(`SELECT username, password, id, email FROM matcha.users WHERE id = ?`, [result[0].id])
                         );
                     } else {
-                        //console.log("Le token n'existe pas");
                         reject();
                     }
                 });
             });
         } catch (error) {
-            //console.log(error);
+            console.log(error);
+            return false;
+        }
+    }
+
+    async updateInfoWithPass(param, id){
+        try {
+            bcrypt.hash(param.newPassword, saltRounds, (err, hash) => {
+                const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y'), password = ? WHERE id = ?";
+                this.query(sql, [param.firstname, param.lastname, param.email, param.username, param.birthdate, hash, id],
+                    function (error, results, fields) { if (error) throw error; });
+            });
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    async updateInfoWithoutPass(param, id){
+        const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y') WHERE id = ?";
+            return await this.query(sql, [param.firstname, param.lastname, param.email, param.username, param.birthdate, id]);
+    }
+
+    async updateProfilPic(path, id){
+        try {
+            return new Promise((resolve, reject) => {
+                //console.log('3.1 - je rentre dans Update Profil')
+                this.query(`UPDATE matcha.users SET profil = ? WHERE id = ?`, [path, id]).then((result) => {
+                    //console.log('3.2 - result Update fonction: ', result);
+                    resolve(result);
+                }).catch((result) => {
+                    reject(result);
+                });
+            });
+        } catch (error) {
+            console.log(error);
             return false;
         }
     }
@@ -225,6 +282,37 @@ class DatabaseRequest {
         }
     }
 
+    async insertPhoto(id, path) {
+        const sql = "INSERT INTO matcha.photos (user_id, photo) VALUES (?, ?)";
+        return await this.query(sql, [id, path]);
+    }
+
+    async deletePhoto(id, path) {
+        const sql = "DELETE FROM matcha.photos WHERE user_id = ? AND photo = ?";
+        return await this.query(sql, [id, path]);
+    }
+
+    async checkProfilPic(params) {
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT profil FROM matcha.users WHERE id = ?";
+                this.query(sql, [params]).then((profil) => {
+                    //console.log(profil[0].profil);
+                    if (profil && profil[0] && profil[0].profil === 'public/img/avatarDefault.png'){
+                        resolve({picture: profil[0].profil, flag: 0});
+                    } else if (profil && profil[0] && profil[0].profil !== 'public/img/avatarDefault.png') {
+                        resolve({picture: profil[0].profil, flag: 1});
+                    } else {
+                        reject({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async getUser(params){
         try {
             return new Promise((resolve, reject) => {
@@ -272,6 +360,26 @@ class DatabaseRequest {
                     } else {
                         // console.log(tags);
                         reject(tags);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+    async getPhotos(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.photos WHERE user_id = ? ORDER BY id DESC";
+                this.query(sql, params).then((photos) => {
+                    if (photos){
+                        // console.log(tags);
+                        resolve(photos);
+                    } else {
+                        // console.log(tags);
+                        reject(photos);
                     }
                 });
             });

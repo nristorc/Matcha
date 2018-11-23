@@ -9,6 +9,37 @@ let validation = new registerValidation();
 const userDatabase =require('../models/userData');
 const userData = new userDatabase();
 
+const multer = require('multer');
+const path = require('path');
+
+const fs = require('fs');
+
+const storage = multer.diskStorage({
+    destination: './public/uploads/',
+    filename: function (request, file, callback) {
+        callback(null, request.session.user.id + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {fileSize: 1000000},
+    fileFilter: function(request, file, callback) {
+        checkFileType(file, callback);
+    }
+}).single('inputFile');
+
+function checkFileType(file, callback) {
+    const filetypes = /jpeg|jpg|png|gif/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+    if (mimetype && extname) {
+        return callback(null, true);
+    } else {
+        callback({message: "Image corrompue !"});
+    }
+}
+
 class Routes{
     constructor(app){
         this.app = app;
@@ -285,18 +316,6 @@ class Routes{
             }
         });
 
-        /*this.app.get('/loggedIn', (request, response) => {
-            console.log('Je suis dans LOGGEDIN');
-            //console.log(request.session);
-            //console.log(request.session.user);
-            if (!request.session.user) {
-                //console.log('pas de session');
-                return response.status(401).send();
-            }
-            //console.log('1 session');
-            return response.status(200).send('Welcome to your Dashboard !');
-        });*/
-
         this.app.get('/logout', function(request, result){
             console.log("Je suis dans LOGOUT");
             let cookie = request.cookies;
@@ -318,32 +337,36 @@ class Routes{
 			}
 			checkDb.getUser(request.session.user.username).then((user) => {
 				checkDb.getTags(request.session.user.id).then((tags) => {
-					//console.log(tags);
-					userData.userAge(user[0]['birth']).then((age) => {
-					    //console.log('thne', age);
-						response.render('pages/profil', {
-						user: user,
-						userage: age,
-						usertags: tags
-						});
-					}).catch((age) => {
-                        //console.log('catch', age);
-						response.render('pages/profil', {
-						user: user,
-						usertags: tags,
-						userage: null
-						});
-					});
+				    checkDb.getPhotos(request.session.user.id).then((photos) => {
+                        userData.userAge(user[0]['birth']).then((age) => {
+                            response.render('pages/profil', {
+                                user: user,
+                                userage: age,
+                                usertags: tags,
+                                userphotos: photos
+                            });
+                        }).catch((age) => {
+                            response.render('pages/profil', {
+                                user: user,
+                                usertags: tags,
+                                userage: null
+                            });
+                        });
+                    });
 				});
 			});
+
         }).post(async (request, response) => {
-            if (request.body.submit === 'modifyProfile') {
+            if (request.body.submit === 'modifyParams') {
                 const data = {
                     firstname: request.body.firstname,
                     lastname: request.body.lastname,
                     email: request.body.email,
                     username: request.body.username,
-                    birthdate: request.body.birthdate
+                    birthdate: request.body.birthdate,
+                    currentPassword: request.body.currentPassword,
+                    newPassword: request.body.newPassword,
+                    confirmPassword: request.body.confirmNewPass
                 };
 
                 await validation.isName(data.firstname, "Mauvais format de prénom");
@@ -351,6 +374,17 @@ class Routes{
                 await validation.isEmail(data.email, "Mauvais format d'email");
                 await validation.isAlpha(data.username, "Mauvais format d'identifiant");
                 await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
+
+
+                if (data.currentPassword !== '' || data.newPassword !== '' || data.confirmPassword !== '') {
+                    await checkDb.checkPassword(data, request.session.user.id).then((result) => {
+                        if (result === true) {
+                            validation.isConfirmed(data.newPassword, data.confirmPassword, "Nouveau mot de passe incorrect");
+                        }
+                    }).catch((result) => {
+                        validation.errors.push(result);
+                    });
+                }
 
                 if (data.username !== request.session.user.username) {
                     const resultUsername  = await checkDb.checkUsername(data.username);
@@ -366,22 +400,41 @@ class Routes{
                 }
 
                 if (validation.errors.length === 0) {
-                    const sql = "UPDATE matcha.users SET `firstname` = ?, lastname = ?, email = ?, username = ?, `birth` = str_to_date(?, '%d/%m/%Y') WHERE users.id = ?";
-                    checkDb.query(sql, [data.firstname, data.lastname, data.email, data.username, data.birthdate, request.session.user.id]).then(() => {
-                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                            console.log('result THEN: ', result);
-                            response.json({user: result[0]});
-                            request.session.user.username = data.username;
-                            request.session.user.username = data.email;
+                    if (data.newPassword !== '') {
+                        //console.log("Pass");
+                        checkDb.updateInfoWithPass(data, request.session.user.id).then(() => {
+                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                                //console.log('result THEN :', result);
+                                response.json({user: result[0]});
+                                request.session.user.username = data.username;
+                                request.session.user.email = data.email;
+                                request.session.user.password = data.newPassword;
 
+                            }).catch((result) => {
+                                console.log('result CATCH:',result);
+                            });
                         }).catch((result) => {
                             console.log('result CATCH:',result);
                         });
-                    }).catch((result) => {
-                        console.log('result CATCH:',result);
-                    });
+                    } else if (data.newPassword === '') {
+                        //console.log("No Pass");
+                        checkDb.updateInfoWithoutPass(data, request.session.user.id).then(() => {
+                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                                //console.log('result THEN :', result);
+                                response.json({user: result[0]});
+                                request.session.user.username = data.username;
+                                request.session.user.email = data.email;
+                                request.session.user.password = data.newPassword;
+
+                            }).catch((result) => {
+                                console.log('result CATCH:',result);
+                            });
+                        }).catch((result) => {
+                            console.log('result CATCH:',result);
+                        });
+                    }
+
                 } else {
-                    //console.log('errors: ', validation.errors);
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
@@ -414,10 +467,155 @@ class Routes{
                         console.log('result CATCH:',result);
                     });
                 } else {
-                    //console.log('erreurs: ', validation.errors);
                     response.json({errors: validation.errors});
                     validation.errors = [];
                 }
+            } else if (request.body.submit === 'modifyProfile') {
+
+                const data = {
+                    gender: request.body.gender,
+                    orientation: request.body.orientation,
+                    description: request.body.description,
+                };
+                await validation.matchingRegex(data.gender, /^Autre|Femme|Homme$/, "Mauvais format de genre");
+                await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Autre$/, "Mauvais format d'orientation");
+                await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
+
+                if (validation.errors.length === 0) {
+                    const sql = "UPDATE matcha.users SET `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
+
+                    checkDb.query(sql, [data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
+                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                            response.json({user: result[0]});
+
+                        }).catch((result) => {
+                            console.log('result CATCH:',result);
+                        });
+                    }).catch((result) => {
+                        console.log('result CATCH:',result);
+                    });
+                } else {
+                    response.json({errors: validation.errors});
+                    validation.errors = [];
+                }
+            } else if (request.body.submit === 'updateProfilPic') {
+
+                checkDb.checkProfilPic(request.session.user.id).then((result) => {
+                    const imagePath = request.body.image.substring(22);
+                    if (result && result.picture) {
+                        if (result.picture === imagePath) {
+                            response.json({message: 'Cette photo est déja votre photo de profil'});
+                        } else {
+                            checkDb.updateProfilPic(imagePath, request.session.user.id).then((result) => {
+                                if (result) {
+                                    response.json({image: imagePath, message: 'Votre photo de profil a bien été mise à jour'});
+                                }
+                            }).catch((result) => {
+                                response.json({errors: "Une erreur s'est produite: " + result});
+                            });
+                        }
+                    }
+                }).catch((result) => {
+                    response.json({errors: "Une erreur s'est produite: " + result});
+                });
+
+            } else if (request.body.submit === 'deletePic') {
+
+                console.log('image node: ',request.body.image);
+
+                checkDb.checkProfilPic(request.session.user.id).then((result) => {
+                    const imagePath = request.body.image.substring(22);
+                    if (result && result.picture) {
+                        if (result.picture === imagePath) {
+
+                            //console.log('image path profil', imagePath);
+                            checkDb.updateProfilPic('public/img/avatarDefault.png', request.session.user.id).then((result) => {
+                                if (result) {
+                                    checkDb.deletePhoto(request.session.user.id, imagePath).then((deleteRes) => {
+                                        //console.log('image path delete', imagePath);
+                                        fs.unlink(imagePath, (err) => {
+                                            if (err) throw err;
+                                            console.log('successfully deleted '+ imagePath);
+                                        });
+                                        //console.log('image path response', imagePath);
+                                        response.json({image: imagePath, message: 'Votre photo a bien été supprimée', flag: 'profil'});
+                                    }).catch((deleteRes) => {
+                                        response.json({errors: "Une erreur s'est produite: " + deleteRes});
+                                    });
+                                }
+                            }).catch((result) => {
+                                response.json({errors: "Une erreur s'est produite: " + result});
+                            });
+
+                        } else {
+                            checkDb.deletePhoto(request.session.user.id, imagePath).then((deleteRes) => {
+                                fs.unlink(imagePath, (err) => {if (err) throw err;
+                                    console.log('successfully deleted '+ imagePath);
+                                });
+                                response.json({image: imagePath, message: 'Votre photo a bien été supprimée'});
+                            }).catch((deleteRes) => {
+                                response.json({errors: "Une erreur s'est produite: " + deleteRes});
+                            });
+                        }
+                    }
+                }).catch((result) => {
+                    response.json({errors: "Une erreur s'est produite: " + result});
+                });
+
+
+            } else {
+                fs.readdir('public/uploads/', (err, items) => {
+                    var i = 0;
+                    while (items[i] && items[i].split('-')[0] == request.session.user.id) {
+                        i++;
+                    }
+                    if (i >= 5) {
+                        response.json({errors: 'Nombre maximum de photos uploadées atteint'});
+                    } else {
+                        upload(request, response, (error) => {
+                            if (error) {
+                                response.json({errors: error.message});
+                            } else {
+                                if (request.file === undefined) {
+                                    response.json({errors: 'No file selected !'});
+                                }
+                                else {
+                                    //console.log('request file path: ',request.file.path);
+                                    checkDb.insertPhoto(request.session.user.id, request.file.path).then((result) => {
+                                        //console.log('result THEN insert: ', result);
+                                        if (result) {
+                                            //console.log('1- nouvelle photo uploade');
+                                            checkDb.checkProfilPic(request.session.user.id).then((resultFlag) => {
+                                            //console.log('2- checkPic: ',result);
+                                                if (resultFlag && resultFlag.flag === 0) {
+                                                    //console.log('3- je vais updater la db');
+                                                    checkDb.updateProfilPic(request.file.path, request.session.user.id).then((result) => {
+                                                        //console.log('4- result update: ', result);
+                                                        //console.log("5- je renvoie a l'ajax // Db Update DONE");
+                                                        response.json({file: request.file.path, flag: resultFlag.flag});
+                                                    }).catch((result) => {
+                                                        console.log('result CATCH update: ', result);
+                                                        response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb UPDATE"});
+                                                    });
+                                                } else if (resultFlag && resultFlag.flag === 1) {
+                                                   // console.log("3bis- pas d'update de la DB profil");
+                                                    //console.log("5- je renvoie a l'ajax // Db Update NO");
+                                                    response.json({file: request.file.path, flag: resultFlag.flag});
+                                                }
+                                            }).catch((result) => {
+                                                console.log('result CATCH checkphoto: ', result);
+                                                response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb CHECK"});
+                                            });
+                                        }
+                                    }).catch((result) => {
+                                        console.log('result CATCH insert: ', result);
+                                        response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb INSERT"});
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
             }
         });
 
@@ -428,12 +626,10 @@ class Routes{
                 return response.render('index');
 			}
 			checkDb.getAllUsers().then((users) => {
-				// console.log(users);
 				response.render('pages/search', {
 				users: users,
 				});
 			}).catch((users) => {
-				// console.log(users);
 				response.render('pages/search', {
 				users: users,
 				});
@@ -446,7 +642,7 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-                console.log(request.query.index);
+                //console.log(request.query.index);
 				checkDb.getAllUsers().then((users) => {
 					response.render('pages/search-infinite', {
                     users: users,
