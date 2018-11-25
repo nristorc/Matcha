@@ -49,10 +49,8 @@ class Routes{
         this.app.get('/', async (request,response) => {
             console.log("Je suis dans INDEX");
             if (!request.session.user) {
-                //console.log('session KO: ', request.session);
                 response.status(200).render('index');
             } else {
-                //console.log('session OK: ', request.session);
                 console.log(request.session.user);
                 response.status(200).redirect('/profil');
             }
@@ -383,6 +381,7 @@ class Routes{
             });
 
         }).post(async (request, response) => {
+            //console.log('general request', request.body);
             if (request.body.submit === 'modifyParams') {
                 const data = {
                     firstname: request.body.firstname,
@@ -544,7 +543,7 @@ class Routes{
 
             } else if (request.body.submit === 'deletePic') {
 
-                console.log('image node: ',request.body.image);
+                //console.log('image node: ', request.body.image);
 
                 checkDb.checkProfilPic(request.session.user.id).then((result) => {
                     const imagePath = request.body.image.substring(22);
@@ -558,10 +557,14 @@ class Routes{
                                         //console.log('image path delete', imagePath);
                                         fs.unlink(imagePath, (err) => {
                                             if (err) throw err;
-                                            console.log('successfully deleted '+ imagePath);
+                                            console.log('successfully deleted ' + imagePath);
                                         });
                                         //console.log('image path response', imagePath);
-                                        response.json({image: imagePath, message: 'Votre photo a bien été supprimée', flag: 'profil'});
+                                        response.json({
+                                            image: imagePath,
+                                            message: 'Votre photo a bien été supprimée',
+                                            flag: 'profil'
+                                        });
                                     }).catch((deleteRes) => {
                                         response.json({errors: "Une erreur s'est produite: " + deleteRes});
                                     });
@@ -572,8 +575,9 @@ class Routes{
 
                         } else {
                             checkDb.deletePhoto(request.session.user.id, imagePath).then((deleteRes) => {
-                                fs.unlink(imagePath, (err) => {if (err) throw err;
-                                    console.log('successfully deleted '+ imagePath);
+                                fs.unlink(imagePath, (err) => {
+                                    if (err) throw err;
+                                    console.log('successfully deleted ' + imagePath);
                                 });
                                 response.json({image: imagePath, message: 'Votre photo a bien été supprimée'});
                             }).catch((deleteRes) => {
@@ -585,8 +589,46 @@ class Routes{
                     response.json({errors: "Une erreur s'est produite: " + result});
                 });
 
-
-            } else {
+            } else if (request.body.submit === 'addTag') {
+                if (request.body.tag) {
+                        checkDb.getTags(request.session.user.id).then((result) => {
+                            if (result) {
+                                if (result.length >= 6){
+                                    response.json({errors: "Vous avez atteint le nombre maximum de tags autorisé"});
+                                } else {
+                                    var flag = false;
+                                    for (var i = 0; i < result.length; i++) {
+                                        if (result[i].tag === request.body.tag) {
+                                            flag = true;
+                                        }
+                                    }
+                                    if (flag === true) {
+                                        response.json({errors: "Vous possédez déjà un tag similaire"});
+                                    } else {
+                                        checkDb.insertTag(request.session.user.id, request.body.tag).then((resTag) => {
+                                            response.json({message: "Tag added"});
+                                        }).catch((resTag) => {
+                                            response.json({errors: "Une erreur s'est produite: " + resTag});
+                                        })
+                                    }
+                                }
+                            }
+                        }).catch((result) => {
+                            response.json({errors: "Une erreur s'est produite: " + result});
+                        });
+                }
+            } else if(request.body.submit === 'deleteTag') {
+                if (request.body.tag) {
+                    checkDb.deleteTag(request.session.user.id, request.body.tag).then((resTag) => {
+                        console.log('then', resTag);
+                        response.json({message: "Tag deleted"});
+                    }).catch((resTag) => {
+                        console.log('catch', resTag);
+                        response.json({errors: "Une erreur s'est produite: " + resTag});
+                    })
+                }
+            }
+            else {
                 fs.readdir('public/uploads/', (err, items) => {
                     var i = 0;
                     while (items[i] && items[i].split('-')[0] == request.session.user.id) {
@@ -698,27 +740,7 @@ class Routes{
 			return response.render('index');
         });
 		
-		/* Routes for TestTags */
-        this.app.get('/tags', (request, response) => {
-            if (!request.session.user) {
-                return response.render('index');
-            }
-            checkDb.getUser(request.session.user.username).then((user) => {
-                checkDb.getTags(request.session.user.id).then((tags) => {
-                    response.render('pages/testTags', {
-                        user: user,
-                        usertags: tags,
-                            });
-                }).catch((tags) => {
-                    response.render('pages/testTags', {
-                        user: user,
-                        usertags: tags,
-                    });
-                });
-            }).catch((user) => {
-                response.render('index');
-            });
-        })
+		/* Routes for...... */
 
     }
 

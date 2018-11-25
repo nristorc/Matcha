@@ -287,9 +287,19 @@ class DatabaseRequest {
         return await this.query(sql, [id, path]);
     }
 
+    async insertTag(id, tag) {
+        const sql = "INSERT INTO matcha.tags (user_id, tag) VALUES (?, ?)";
+        return await this.query(sql, [id, tag]);
+    }
+
     async deletePhoto(id, path) {
         const sql = "DELETE FROM matcha.photos WHERE user_id = ? AND photo = ?";
         return await this.query(sql, [id, path]);
+    }
+
+    async deleteTag(id, tag) {
+        const sql = "DELETE FROM matcha.tags WHERE user_id = ? AND tag = ?";
+        return await this.query(sql, [id, tag]);
     }
 
     async checkProfilPic(params) {

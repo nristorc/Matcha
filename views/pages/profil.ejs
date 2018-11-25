@@ -212,13 +212,16 @@
 			<% } %>
 		</div>
 
-		<% if (usertags != "") { 
-			for (var i=0; i<usertags.length; i++){ %>
-				<a class="btn btn-primary hashtag" href="#" role="button">#<%=usertags[i]['tag']%></a>
-		<% }} %>
+        <div id="tags">
+            <% if (usertags != "") {
+            for (var i=0; i<usertags.length; i++){ %>
+            <a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#<%=usertags[i]['tag']%></a>
+            <% }} %>
+            <input type="text" placeholder="Ajouter un Tag" id="addTag" value=""/>
+        </div>
 	</div>
 </div>
-
+<br>
 <div class="row" id="rowPic" style="justify-content: left; margin-left: 4%;">
 
     <% if (userphotos !== []) {
@@ -244,10 +247,42 @@
 
 <script>
 
+    function deleteTag(tag) {
+        const delTag = tag.innerHTML.substring(1);
+
+        var formData = {
+            'tag': delTag,
+            'submit': 'deleteTag'
+        }
+
+        $.ajax({
+            type		: 'POST',
+            url		: '/profil',
+            data		: formData,
+            dataType	: 'json',
+            encode		: true
+        })
+            .done(function (data) {
+                console.log('delete Pic data: ', data);
+                if (data.errors) {
+                    if (document.getElementById('messages')) {
+                        const flash = document.getElementsByClassName('alert');
+                        flash[0].className = 'alert alert-warning alert-dismissible';
+                        flash[0].innerHTML = data.errors;
+                    } else {
+                        $('#container').prepend('<div id="messages"></div>');
+                        $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                    }
+                } else if (data.message) {
+                    /*$('#tags').on('click','.hashtag',function(){*/
+                        tag.remove();
+                    //});
+                }
+            });
+    }
+
     function deletePic(image) {
-        event.preventDefault();
         const srcImg = image.previousElementSibling.children[0];
-        //console.log('image ajax : ', image.parentElement);
 
         var formData = {
             'image': srcImg.src,
@@ -347,6 +382,10 @@
 
         $(document).ready(function() {
 
+            if ($(".hashtag").length === 6) {
+                $("#addTag").hide();
+            }
+
             for (var i = 0; i < document.getElementsByClassName('img-thumbnail carroussel').length; i++){
                 if (document.getElementsByClassName('img-thumbnail carroussel')[i].src === document.getElementById('avatarPic').src) {
                     document.getElementsByClassName('img-thumbnail carroussel')[i].style = 'border: solid rgb(225, 0, 100) thick';
@@ -355,6 +394,10 @@
 
             $("#inputFile").change(function() {
                 $("#uploadPics").submit();
+            });
+
+            $("#addTag").change(function() {
+                $("#addTag").submit();
             });
 
             if (($('.img-thumbnail.carroussel').length) === 5) {
@@ -650,6 +693,72 @@
                 event.preventDefault();
             });
 
+            $("#addTag").submit(function(event) {
+
+                if ($('.hashtag').length < 6) {
+                    const addedTag = $("#addTag")[0].value;
+
+                    var match = new RegExp('^[a-zA-Z]+');
+
+                    if (match.test(addedTag)) {
+                        const formData = {
+                            'tag': addedTag,
+                            'submit': 'addTag'
+                        };
+
+                        $.ajax({
+                            type		: 'POST',
+                            url		: '/profil',
+                            data		: formData,
+                            dataType	: 'json',
+                            encode		: true
+                        })
+                            .done(function (data) {
+                                console.log('data', data);
+                                if (data.errors) {
+                                    if (document.getElementById('messages')) {
+                                        const flash = document.getElementsByClassName('alert');
+                                        console.log('flash', flash);
+                                        flash[0].className = 'alert alert-warning alert-dismissible';
+                                        flash[0].innerHTML = data.errors;
+                                    } else {
+                                        $('#container').prepend('<div id="messages"></div>');
+                                        $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                                    }
+                                } else {
+                                    if (document.getElementById('messages')) {
+                                        $('#messages').remove();
+                                    }
+                                    $('#tags input').on('focusout', function(){
+                                        var txt= this.value.replace(/[^a-zA-Z0-9\-]/g,'');
+                                        if(txt) $(this).before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ txt +'</a>');
+                                        this.value="";
+                                        this.focus();
+                                    }).on('keyup',function( e ){
+                                        if(/(188|13)/.test(e.which)) $(this).focusout();
+                                        if ($(".hashtag").length === 6) {
+                                            $("#addTag").hide();
+                                        }
+                                    });
+                                }
+
+
+                            });
+                    } else {
+                        if (document.getElementById('messages')) {
+                            const flash = document.getElementsByClassName('alert');
+                            console.log('flash', flash);
+                            flash[0].className = 'alert alert-warning alert-dismissible';
+                            flash[0].innerHTML = "Mauvais format de tag";
+                        } else {
+                            $('#container').prepend('<div id="messages"></div>');
+                            $('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag</div>')
+                        }
+                    }
+
+                }
+                event.preventDefault();
+            });
         });
 	});
 </script>
