@@ -335,10 +335,10 @@ class DatabaseRequest {
         try {
             return new Promise((resolve, reject) => {
                 if (sort){
-                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
-                } else {
-					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter;
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
 					console.log(sql);
+                } else {
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter; //+" ORDER BY";
                 }
                 this.query(sql).then((users) => {
                     if (users){

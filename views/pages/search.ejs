@@ -4,15 +4,34 @@
 
 <!-- Filters -->
 
+<p>Filtres :</p>
+
+<!-- <div>
+  <input type="range" id="age-range" name="volume"
+         min="0" max="10">
+  <label for="volume">Age</label>
+</div>
+
+<div>
+  <input type="range" id="pop-range" name="cowbell" 
+         min="0" max="100" step="10">
+  <label for="cowbell">Popularité</label>
+</div> -->
+
+<!-- Sort -->
+
+<form action="/search" method="get">
 	<ul class="nav nav-pills">
 		<li class="nav-item dropdown">
-		  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
-		  <div class="dropdown-menu">
-			<a class="dropdown-item" id="sort-age">Age</a>
-			<a class="dropdown-item" id="sort-loc">Localisation</a>
-			<a class="dropdown-item" id="sort-pop">Popularite</a>
+			<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
+			<div class="dropdown-menu">
+				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by `birth`">
+				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by loc">
+				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by `popularity`">
+			</div>
 		</li>
-	  </ul>
+	</ul>
+</form>
 
 <%}%>
 
@@ -136,44 +155,8 @@
 <!-- Scripts -->
 
 <script src="./public/js/scroll.js"></script>
-<script src="./public/js/sort.js"></script>
-<script>
-	
-		function like(id){
-			event.preventDefault();
-			document.getElementById(id).style.display = "none";
-			document.getElementById("un"+id).style.display = "flex";
-			var data = {
-				id_liked	: id,
-			}
-			$.ajax({
-				type        : 'POST',
-				url         : '/search',
-				data		: data,
-				dataType    : 'json',
-				encode		: true
-			})
-		}
-
-		function unlike(id){
-			event.preventDefault();
-			var display = id.substring(2)
-			console.log(display);
-			document.getElementById(id).style.display = "none";
-			document.getElementById(display).style.display = "flex";
-			var data = {
-				id_liked	: id,
-			}
-			$.ajax({
-				type        : 'POST',
-				url         : '/search',
-				data		: data,
-				dataType    : 'json',
-				encode		: true
-			})
-		}
-
-</script>
+<!-- <script src="./public/js/sort.js"></script> -->
+<script src="./public/js/like.js"></script>
 
 <% } %>
 

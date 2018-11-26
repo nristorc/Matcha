@@ -648,8 +648,9 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-				checkDb.setOrientation(request.session.user.id).then((filter) => {
-					checkDb.getAllUsers(filter, request.query.sort).then((users) => {
+                // console.log(request.query.sort);
+				checkDb.setOrientation(request.session.user.id).then((orientation) => {
+					checkDb.getAllUsers(orientation, request.query.sort).then((users) => {
 						if (!request.query.index) {
 							checkDb.getLikes(request.session.user.id).then((likes) => {
 								response.render('pages/search', {
@@ -686,7 +687,7 @@ class Routes{
 					}).catch((users) => {
 						return response.render('index');
 					});
-				}).catch((filter) => {
+				}).catch((orientation) => {
 					return response.render('index');
 				});					
 			}
