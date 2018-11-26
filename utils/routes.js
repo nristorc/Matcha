@@ -200,46 +200,42 @@ class Routes{
         this.app.post('/resetPassword', async (request, response) => {
             const checkingResponse = {};
             const valid = await validation.isEmail(request.body.checkEmail, "Wrong Email");
-            console.log("Email du formulaire ",request.body.checkEmail);
-            console.log("Variable Valid: ",valid);
-            console.log("Tableau d'erreur: ",validation.errors);
             if (valid && validation.errors !== []) {
-                console.log("Le format de l'email est incorrect");
                 checkingResponse.error = true;
+                checkingResponse.type = 'warning';
                 checkingResponse.message = `Mauvais format d'email`;
-                response.status(417).json(checkingResponse);
+                request.flash(checkingResponse.type, checkingResponse.message);
                 validation.errors = [];
+                response.status(417).redirect('/');
             } else {
                 console.log("Format OK, je checke la DB");
                 const resultEmail = await checkDb.checkEmail(request.body.checkEmail);
                 if (resultEmail[0].count === 0) {
-                    console.log("DB: Email non trouvé");
-                    response.status(401).json({
-                        error:true,
-                        message: 'Aucun email correspondant dans la base de données'
-                    });
+                    checkingResponse.error = true;
+                    checkingResponse.type = 'warning';
+                    checkingResponse.message = 'Aucun email correspondant dans la base de données';
+                    request.flash(checkingResponse.type, checkingResponse.message);
+                    response.status(417).redirect('/');
                 } else {
                     checkDb.checkActive(request.body.checkEmail).then(() => {
-                        console.log('All good, je peux envoyer mon mail de reset');
                         checkDb.resetToken(request.body.checkEmail);
-                        response.redirect('/');
+                        request.flash('dark', 'Un email pour réinitialiser votre mot de passe vous a été envoyé');
+                        response.status(200).redirect('/');
                     }).catch(() => {
-                        console.log("DB: Compte pas actif");
-                        response.status(401).json({
-                            error:true,
-                            message: "Votre compte n'est pas encore actif..."
-                        });
+                        checkingResponse.error = true;
+                        checkingResponse.type = 'warning';
+                        checkingResponse.message = "Votre compte n'est pas encore actif";
+                        request.flash(checkingResponse.type, checkingResponse.message);
+                        response.status(401).redirect('/');
                     });
                 }
             }
         });
 
         this.app.get('/verify/register/:registerToken', async (request, response) => {
-            console.log("Jesuis dans VERIFY REGISTER");
             const loginResponse = {};
             checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
                 if (result && result !== undefined) {
-                    console.log("Then: ", result);
                     const data = {
                         username: result[0].username,
                         password: result[0].password,
@@ -263,55 +259,70 @@ class Routes{
                 loginResponse.message = `Token not valid`;
                 request.flash(loginResponse.type, loginResponse.message);
                 response.status(401).redirect('/');
-                console.log('response catch: ', response.status);
             });
         });
 
         this.app.route('/verify/reset/:resetToken')
             .get((request, response) => {
+                const resetResponse = {};
                 checkDb.checkResetToken(request.params.resetToken).then((result) => {
-                    if (result[0].count === 0) {
-                        response.status(401).json({
-                            error:true,
-                            message: 'Token invalide...'
-                        });
-                    } else {
+                    // console.log('reset', result);
+                    if (result) {
                         response.render('pages/resetPassword', {resetToken: request.params.resetToken});
-                        console.log("Je rentre dans GET");
+                        //console.log("Je rentre dans GET");
+                    } else {
+                        resetResponse.error = true;
+                        resetResponse.type = 'warning';
+                        resetResponse.message = "Un problème est survenu, merci de réitérer votre demande ultérieurement";
+                        request.flash(resetResponse.type, resetResponse.message);
+                        response.status(401).redirect('/');
                     }
-                }).catch(() => {
-                    response.status(417).json("Une erreur s'est produite, merci de bien vouloir reessayer");
+                }).catch((result) => {
+                    // console.log('pb', result);
+                    if (result) {
+                        resetResponse.error = true;
+                        resetResponse.type = 'warning';
+                        resetResponse.message = "Token not valid";
+                        request.flash(resetResponse.type, resetResponse.message);
+                        response.status(401).redirect('/');
+                    } else {
+                        resetResponse.error = true;
+                        resetResponse.type = 'warning';
+                        resetResponse.message = "Un problème est survenu, merci de réitérer votre demande ultérieurement";
+                        request.flash(resetResponse.type, resetResponse.message);
+                        response.status(417).redirect('/');
+                    }
                 });
             }).post(async (request, response) => {
-            console.log("Je rentre dans POST");
-            const resetResponse = {};
-            const data = {
-                resetToken: request.body.resetToken,
-                newPassword: request.body.modifyPassword,
-                confirmPassword: request.body.modifyPasswordConfirm
-            };
-            await validation.isConfirmed(data.newPassword, data.confirmPassword, "Wrong matching password");
-            console.log(validation.errors);
-            if (validation.errors.length === 0) {
-                const result = await checkDb.resetPassword(data);
-                console.log(result);
-                if (result === false) {
-                    resetResponse.error = true;
-                    resetResponse.message = `Reset password unsuccessful,try after some time.`;
-                    response.status(417).json(resetResponse);
-                } else {
-                    resetResponse.error = false;
-                    //resetResponse.userId = result.insertId;
-                    resetResponse.message = `Votre mot de passe a bien été modifié`;
-                    response.status(200).redirect('/');
-                }
-
-            } else {
-                resetResponse.error = true;
-                resetResponse.message = `Error fields format...`;
-                response.status(417).json(resetResponse);
-                validation.errors = [];
-            }
+            // console.log("Je rentre dans POST");
+            // const resetResponse = {};
+            // const data = {
+            //     resetToken: request.body.resetToken,
+            //     newPassword: request.body.modifyPassword,
+            //     confirmPassword: request.body.modifyPasswordConfirm
+            // };
+            // await validation.isConfirmed(data.newPassword, data.confirmPassword, "Wrong matching password");
+            // console.log(validation.errors);
+            // if (validation.errors.length === 0) {
+            //     const result = await checkDb.resetPassword(data);
+            //     console.log(result);
+            //     if (result === false) {
+            //         resetResponse.error = true;
+            //         resetResponse.message = `Reset password unsuccessful,try after some time.`;
+            //         response.status(417).json(resetResponse);
+            //     } else {
+            //         resetResponse.error = false;
+            //         //resetResponse.userId = result.insertId;
+            //         resetResponse.message = `Votre mot de passe a bien été modifié`;
+            //         response.status(200).redirect('/');
+            //     }
+            //
+            // } else {
+            //     resetResponse.error = true;
+            //     resetResponse.message = `Error fields format...`;
+            //     response.status(417).json(resetResponse);
+            //     validation.errors = [];
+            // }
         });
 
         this.app.get('/logout', function(request, result){

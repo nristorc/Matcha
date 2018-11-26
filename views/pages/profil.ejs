@@ -217,7 +217,7 @@
             for (var i=0; i<usertags.length; i++){ %>
             <a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#<%=usertags[i]['tag']%></a>
             <% }} %>
-            <input type="text" placeholder="Ajouter un Tag" id="addTag" value=""/>
+            <input type="text" placeholder="Ajouter un Tag" id="addTag"/>
         </div>
 	</div>
 </div>
@@ -393,10 +393,6 @@
 
             $("#inputFile").change(function() {
                 $("#uploadPics").submit();
-            });
-
-            $("#addTag").change(function() {
-                $("#addTag").submit();
             });
 
             if (($('.img-thumbnail.carroussel').length) === 5) {
@@ -692,14 +688,29 @@
                 event.preventDefault();
             });
 
-            $("#addTag").submit(function(event) {
+            $('#addTag').on('keydown', (e) => {
+                var k = e.which || e.key
+                if(/^(9)$/.test(k)) {
+                    $(this).value = ""
+                    //console.log("Tabulation catch:" + k)
+                    e.preventDefault()
+                }
+                if(/^(188|13)$/.test(k)) {
+                    //console.log("Submit form:"+ $(this))
+                    validFormTag();
+                }
+            })
 
+            const validFormTag = () => {
+                //console.log($("#addTag")[0].value);
                 if ($('.hashtag').length < 6) {
-                    const addedTag = $("#addTag")[0].value;
+                    //console.log("Submit call")
 
-                    var match = new RegExp('^[a-zA-Z]+');
+                    var inputTag = $('#addTag')[0]
+                    var addedTag = $("#addTag")[0].value;
+                    var match = new RegExp('^[a-zA-Z]+$');
 
-                    if (match.test(addedTag)) {
+                    if (match.test(addedTag) === true) {
                         const formData = {
                             'tag': addedTag,
                             'submit': 'addTag'
@@ -712,8 +723,7 @@
                             dataType	: 'json',
                             encode		: true
                         })
-                            .done(function (data) {
-                                console.log('data', data);
+                            .done((data) => {
                                 if (data.errors) {
                                     if (document.getElementById('messages')) {
                                         const flash = document.getElementsByClassName('alert');
@@ -728,36 +738,30 @@
                                     if (document.getElementById('messages')) {
                                         $('#messages').remove();
                                     }
-                                    $('#tags input').on('focusout', function(){
-                                        var txt= this.value.replace(/[^a-zA-Z0-9\-]/g,'');
-                                        if(txt) $(this).before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ txt +'</a>');
-                                        this.value="";
-                                        this.focus();
-                                    }).on('keyup',function( e ){
-                                        if(/(188|13)/.test(e.which)) $(this).focusout();
-                                        if ($(".hashtag").length === 6) {
-                                            $("#addTag").hide();
-                                        }
-                                    });
+                                    // console.log("Je dois ajouter un tag")
+                                    // console.log(addedTag)
+                                    if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag +'</a>');
+                                    inputTag.value = ""
+                                    inputTag.focus();
                                 }
-
-
+                                if ($(".hashtag").length === 6) {
+                                    $("#addTag").hide();
+                                }
                             });
                     } else {
                         if (document.getElementById('messages')) {
                             const flash = document.getElementsByClassName('alert');
-                            console.log('flash', flash);
+                            // console.log('flash', flash);
                             flash[0].className = 'alert alert-warning alert-dismissible';
                             flash[0].innerHTML = "Mauvais format de tag";
                         } else {
                             $('#container').prepend('<div id="messages"></div>');
-                            $('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag</div>')
+                            $('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag JQUERY</div>')
                         }
                     }
 
                 }
-                event.preventDefault();
-            });
+            }
         });
 	});
 </script>

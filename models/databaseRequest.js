@@ -104,7 +104,22 @@ class DatabaseRequest {
     }
 
     async checkResetToken(params){
-        return await this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]);
+        try {
+            return new Promise((resolve, reject) => {
+
+                this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]).then((result) => {
+                    if (result && result[0] && result[0].count === 1) {
+                        this.query("UPDATE matcha.users SET `resetToken` = null, `reset_at` = null WHERE users.resetToken = ?", [params]);
+                        resolve('Reset effectué');
+                    } else {
+                        reject('Probleme');
+                    }
+                });
+            });
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 
     async checkEmail(params){
@@ -117,7 +132,7 @@ class DatabaseRequest {
 
                 this.query(`SELECT * FROM matcha.users WHERE registerToken = ?`, [param]).then((result) => {
                     if (result && result[0] && result[0].registerToken === param && result[0].active === 0) {
-                        this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);
+                        this.query("UPDATE matcha.users SET `registerToken` = null, `active` = 1 WHERE users.registerToken = ?", [param]);
                         resolve(
                             this.query(`SELECT username, password, id, email FROM matcha.users WHERE id = ?`, [result[0].id])
                         );
@@ -201,7 +216,7 @@ class DatabaseRequest {
                     from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>', // sender address
                     to: params['email'], // list of receivers
                     subject: 'Confirm your Registration to Matcha website', // Subject line
-                    text: 'Hello world?', // plain text body
+                    // text: 'Hello world?', // plain text body
                     html: compiledTemplate.render({username: params['username'], registerToken: registerToken}) // render template
                 };
 
@@ -227,12 +242,8 @@ class DatabaseRequest {
                     function (error, results, fields) { if (error) throw error; });
 
                 //Sending emails
-                const output = `
-                    <p>You ask for a reset of your Password :-)</p>
-                    
-                    <h3>Clink of this link to RESET</h3>
-                    <p><a href="http://localhost:3000/verify/reset/${resetToken}">Reset</a></p>
-                    `;
+                const template = fs.readFileSync('views/pages/resetPasswordEmail.ejs', 'utf-8');
+                const compiledTemplate = hogan.compile(template);
 
                 let transporter = nodemailer.createTransport({
                     host: 'smtp.gmail.com',
@@ -247,13 +258,13 @@ class DatabaseRequest {
                     }
                 });
 
-                let mailOptions = {
-                    from: '"RoooCool Team" <nina.ristorcelli@gmail.com>', // sender address
-                    to: params, // list of receivers
-                    subject: 'Reset your password of your Rooocool account', // Subject line
-                    text: 'Hello world?', // plain text body
-                    html: output // html body
-                };
+            let mailOptions = {
+                from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>', // sender address
+                to: params, // list of receivers
+                subject: 'Réinitialisation de votre mot de passe RoooCool', // Subject line
+                //text: 'Hello world?', // plain text body
+                html: compiledTemplate.render({resetToken: resetToken})
+            };
 
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
@@ -261,7 +272,7 @@ class DatabaseRequest {
                     }
                     console.log('Message sent: %s', info.messageId);
                 });
-            return true;
+                return true;
         } catch (error){
             console.log(error);
             return false;
