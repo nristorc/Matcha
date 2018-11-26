@@ -42,6 +42,9 @@
 					<i class="fas fa-thumbs-up liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i>
 				</div>
 
+				<span><i class="far fa-thumbs-up picto" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
+				<span><i class="fas fa-thumbs-up picto" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)">Unlike</i></span>
+
 				<h5><%=users[x]['username']%></h5>
 				<h6>
 					<% if (users[x]['gender'] === null) { %>
@@ -67,11 +70,6 @@
 					<button type="submit" value="like<%=users[x]['id']%>" style="background:none; border:none"><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;"></i></button>
 					<button type="submit" value="unlike<%=users[x]['id']%>" style="background:none; border:none" id="button"><i class="fas fa-thumbs-up" id="likedSearch-<%=users[x]['id']%>" style="text-align: center; display: none;"></i></button>
 				</form> -->
-
-
-					<span><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)"></i></span>
-					<span><i class="fas fa-thumbs-up" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)"></i></span>
-
 
 <!-- Like and match check -->
 

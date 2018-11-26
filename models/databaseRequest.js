@@ -493,12 +493,40 @@ class DatabaseRequest {
         }
     }
 
+
+    async updatePop(user_id, bool){
+		this.query("SELECT `popularity` FROM matcha.users WHERE `id` = ?", [user_id]).then((score) => {
+			if (bool == 1){
+				if (score < 50){
+					score += 10;
+				} else if (score < 80){
+					score += 5;
+				} else if (score <= 98){
+					score +=2
+				}
+				console.log("je suis dans la bonne fonction", score);
+				this.query("UPDATE matcha.users SET `popularity`= ? WHERE `id` = ?", [score, user_id]);
+			} else if (bool == -1){
+				// if (score < 10){
+				// 	score -= 12;
+				// }
+			}
+			// console.log("nouveau score", score);
+		}).catch(() => {
+			console.log("mais ca marche pas");
+			return false;
+		});
+	}
+	
+
+
     async updateLikes(user_id, id, bool){
-		this.query("SELECT * FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
+		this.query("SELECT `user_id` FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
 			if (exist == ""){
 				if (bool == 1){
-					this.query("INSERT INTO `matcha.likes`(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
-                        // this.query("UPDATE `matcha.users  VALUES (?, ?)", [user_id, id]).then(() => {
+					this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
+						console.log("j'ai liké");
+						this.updatePop(id, 1);
                             // mettre la popularite a jour
 						return true;
 					}).catch(() => {
@@ -511,7 +539,7 @@ class DatabaseRequest {
 				if (bool == 1){
 					return false;
 				} else if (bool == -1) {
-					this.query("DELETE FROM `likes` WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
+					this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
                             // this.query("UPDATE `matcha.users  VALUES (?, ?)", [user_id, id]).then(() => {
                             // mettre la popularite a jour
 						return true;

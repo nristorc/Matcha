@@ -695,24 +695,16 @@ class Routes{
 			if (!request.session.user) {
 				return response.render('index');
 			} else {
-			// console.log("Je suis dans LIKE");
 				var data = request.body.id_liked;
 				var likeAction = data.substring(0, data.length - 2);
 				var userLiked =  data.substring(data.length - 1);
 				if (likeAction == "likeSearch"){
-					console.log("ca marche");
 					checkDb.updateLikes(request.session.user.id, userLiked, 1).then((update) => {
-						// return ('/search');
 					});
 				} else if (likeAction == "unlikeSearch"){
 					checkDb.updateLikes(request.session.user.id, userLiked, -1).then((update) => {
-						// return ('/search');
 					});
 				}
-
-				console.log(likeAction);
-				console.log(userLiked);
-				// return response.render('index');
 			}
 		});
 		
