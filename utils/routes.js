@@ -652,7 +652,6 @@ class Routes{
 					checkDb.getAllUsers(filter, request.query.sort).then((users) => {
 						if (!request.query.index) {
 							checkDb.getLikes(request.session.user.id).then((likes) => {
-								// console.log(likes);
 								response.render('pages/search', {
 									users: users,
 									index: 0,

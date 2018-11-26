@@ -337,7 +337,8 @@ class DatabaseRequest {
                 if (sort){
                     var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
                 } else {
-                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter;
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter;
+					console.log(sql);
                 }
                 this.query(sql).then((users) => {
                     if (users){
@@ -504,19 +505,19 @@ class DatabaseRequest {
                 this.query("SELECT `popularity` FROM matcha.users WHERE `id` = ?", [user_id]).then((score) => {
 					var newpop = score[0].popularity;
 					if (flag == 1) {
-						if (newpop < 50) {
+						if (newpop < 50 && newpop > -50) {
 							newpop += 10;
-						} else if (newpop <80) {
+						} else if (newpop < 80 && newpop > -80) {
 							newpop += 5;
-						} else if (newpop < 99) {
+						} else if (newpop < 99 && newpop >= -100) {
 							newpop += 2;
 						}
 					} else if (flag == 2) {
-						if (newpop < 50) {
+						if (newpop < 50 && newpop > -50) {
 							newpop -= 10;
-						} else if (newpop < 80) {
+						} else if (newpop < 80 && newpop > -80) {
 							newpop -= 5;
-						} else if (newpop <= 100) {
+						} else if (newpop <= 100 && newpop > -99) {
 							newpop -= 2;
 						}
 					} else if (flag == 3){
@@ -548,7 +549,6 @@ class DatabaseRequest {
 			if (exist == ""){
 				if (bool == 1){
 					this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
-						console.log("j'ai liké");
 						this.updatePop(id, 1);
 						return true;
 					}).catch(() => {

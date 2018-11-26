@@ -31,13 +31,25 @@
 					<div class="containerPic">
 						<img src="<%=users[x]['profil']%>" title="<%=users[x]['username']%>" alt="<%=users[x]['username']%>" class="profile-pic search-pic">
 					</div>
-					<%if (users[x]['popularity'] < 50){ %>
-						<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
-					<% } else if (users[x]['popularity'] < 85) { %>
-						<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
-					<% } else { %>
-						<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
-					<%}%>
+					<% if (users[x]['popularity'] >= 0){
+						if (users[x]['popularity'] < 50){ %>
+							<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
+						<% } else if (users[x]['popularity'] < 85) { %>
+							<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
+						<% } else { %>
+							<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
+						<%}
+					} else {
+						if (users[x]['popularity'] > -50){ %>
+							<button type="button" class="btn btn-primary popularity-search-4"><%=users[x]['popularity']%>%</button>
+						<% } else if (users[x]['popularity'] > -85) { %>
+							<button type="button" class="btn btn-primary popularity-search-5"><%=users[x]['popularity']%>%</button>
+						<% } else { %>
+							<button type="button" class="btn btn-primary popularity-search-6"><%=users[x]['popularity']%>%</button>
+						<%}
+					}
+			
+					%>
 					<i class="fas fa-heart matched" id="matched<%=users[x]['id']%>" title="c'est un match !" style="display:none"></i>
 					<i class="fas fa-thumbs-up liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i>
 				</div>

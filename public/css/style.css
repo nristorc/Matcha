@@ -266,6 +266,61 @@ a:hover {
     position : right;
 }
 
+.popularity-search-4 {
+    background-color:  rgb(179, 179, 179);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+	margin-top: -10px;
+	margin-left: 60px;
+}
+
+.popularity-search-4:hover {
+    background-color:  rgb(179, 179, 179);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.popularity-search-5 {
+    background-color: rgb(132, 132, 132);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+	margin-top: -10px;
+	margin-left: 60px;
+
+}
+
+.popularity-search-5:hover {
+    background-color: rgb(132, 132, 132);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.popularity-search-6 {
+    background-color: rgb(99, 99, 99);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+	margin-top: -10px;
+	margin-left: 60px;
+}
+
+.popularity-search-6:hover {
+    background-color: rgb(99, 99, 99);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
 .liked {
     border:none;
     display: flex;
