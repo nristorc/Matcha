@@ -274,9 +274,8 @@
                         $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
                     }
                 } else if (data.message) {
-                    /*$('#tags').on('click','.hashtag',function(){*/
                         tag.remove();
-                    //});
+                        $('#addTag').show();
                 }
             });
     }
