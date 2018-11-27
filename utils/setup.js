@@ -57,7 +57,8 @@ const sql_photos = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.photos_table +
 const sql_likes = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.likes_table +
 	"(`id` INT(9) NOT NULL AUTO_INCREMENT," +
 	"`user_id` INT(11) NOT NULL," +
-    "`user_liked` INT(11) NOT NULL," +
+    "`user_liked` INT(11) DEFAULT NULL," +
+    "`user_disliked` INT(11) DEFAULT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql_user, (err, result) => {

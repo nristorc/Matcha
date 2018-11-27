@@ -10,30 +10,31 @@ $(function () {
 				$.ajax({
 					method: "GET",
 					data: {
-						sort: "ORDER by age"
+						sort: " ORDER by `birth`"
 					},
-					// url: 'search',
+					url: 'search',
 				});
 			}
 			function sortLoc(){
 				$.ajax({
 					method: "GET",
 					data: {
-						sort: "ORDER by loc"
+						sort: " ORDER by loc"
 					},
-					// url: 'search',
+					url: 'search',
 				});
 			}
-
+			
 			function sortPop(){
 				$.ajax({
 					method: "GET",
 					data: {
 						sort: " ORDER by `popularity`"
 					},
-					// url: 'search',
+					url: 'search',
 				});
 			}
-
+			
+			// document.location.reload(true);
 		});
 });

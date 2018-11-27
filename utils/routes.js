@@ -698,11 +698,11 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-				checkDb.setOrientation(request.session.user.id).then((filter) => {
-					checkDb.getAllUsers(filter, request.query.sort).then((users) => {
+                // console.log(request.query.sort);
+				checkDb.setOrientation(request.session.user.id).then((orientation) => {
+					checkDb.getAllUsers(orientation, request.query.sort).then((users) => {
 						if (!request.query.index) {
 							checkDb.getLikes(request.session.user.id).then((likes) => {
-								// console.log(likes);
 								response.render('pages/search', {
 									users: users,
 									index: 0,
@@ -737,16 +737,29 @@ class Routes{
 					}).catch((users) => {
 						return response.render('index');
 					});
-				}).catch((filter) => {
+				}).catch((orientation) => {
 					return response.render('index');
 				});					
 			}
         }).post('/search', async(request, response) => {
-            console.log("Je suis dans LIKE");
-            console.log("body", request.body.id_liked);
-            // console.log(request.body.dataType);
-			return response.render('index');
-        });
+            if (!request.session.user) {
+                return response.render('index');
+			} else {
+                var data = request.body.id_liked;
+				var likeAction = data.substring(0, data.length - 2);
+                var userLiked =  data.substring(data.length - 1);
+                console.log("userliked =", userLiked);
+                // console.log(likeAction);
+				if (likeAction == "likeSearch"){
+                    // console.log("on rentre la");
+					checkDb.updateLikes(request.session.user.id, userLiked, 1).then((update) => {
+					});
+				} else if (likeAction == "unlikeSearch"){
+					checkDb.updateLikes(request.session.user.id, userLiked, -1).then((update) => {
+					});
+				}
+			}
+		});
 		
 		/* Routes for...... */
 

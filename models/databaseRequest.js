@@ -356,9 +356,10 @@ class DatabaseRequest {
         try {
             return new Promise((resolve, reject) => {
                 if (sort){
-                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
+					console.log(sql);
                 } else {
-                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter;
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter; //+" ORDER BY";
                 }
                 this.query(sql).then((users) => {
                     if (users){
@@ -513,6 +514,87 @@ class DatabaseRequest {
             return false;
         }
     }
+
+
+    async updatePop(user_id, flag){ 
+		// Flag 1 : like
+		// Flag 2 : unlike
+		// Flag 3 : block
+		// Flag 4 : report
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT `popularity` FROM matcha.users WHERE `id` = ?", [user_id]).then((score) => {
+					var newpop = score[0].popularity;
+					if (flag == 1) {
+						if (newpop < 50 && newpop > -50) {
+							newpop += 10;
+						} else if (newpop < 80 && newpop > -80) {
+							newpop += 5;
+						} else if (newpop < 99 && newpop >= -100) {
+							newpop += 2;
+						}
+					} else if (flag == 2) {
+						if (newpop < 50 && newpop > -50) {
+							newpop -= 10;
+						} else if (newpop < 80 && newpop > -80) {
+							newpop -= 5;
+						} else if (newpop <= 100 && newpop > -99) {
+							newpop -= 2;
+						}
+					} else if (flag == 3){
+						if (newpop >= -85){
+							newpop -= 15;
+						}
+					} else if (flag == 4){
+						if (newpop >= -50){
+							newpop -= 50;
+						}
+					}
+					this.query("UPDATE matcha.users SET `popularity`= ? WHERE `id` = ?", [newpop, user_id]).then(() => {
+						resolve(score);
+					}).catch(() => {
+						reject(score);
+					});
+			}).catch((score) => {
+				reject(score);
+			});
+		});
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+	}
+
+    async updateLikes(user_id, id, bool){
+		this.query("SELECT `user_id` FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
+			if (exist == ""){
+				if (bool == 1){
+					this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
+						this.updatePop(id, 1);
+						return true;
+					}).catch(() => {
+						return false;
+					});
+				} else if (bool == -1) {
+					return false;
+				}
+			} else {
+				if (bool == 1){
+					return false;
+				} else if (bool == -1) {
+					this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
+						this.updatePop(id, 2);
+						return true;
+					}).catch(() => {
+						return false;
+					});
+				}
+			}
+		}).catch(()=> {
+			return(false);
+		});
+    }
+
 }
 
 module.exports = DatabaseRequest;

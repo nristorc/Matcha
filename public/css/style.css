@@ -217,8 +217,8 @@ a:hover {
     cursor: default;
     display: flex;
     position: absolute;
-    margin: 210px 0 0 85px;
-    position : right;
+	margin-top: -10px;
+	margin-left: 60px;
 }
 
 .popularity-search-1:hover {
@@ -235,8 +235,9 @@ a:hover {
     cursor: default;
     display: flex;
     position: absolute;
-    margin: 210px 0 0 85px;
-    position : right;
+	margin-top: -10px;
+	margin-left: 60px;
+
 }
 
 .popularity-search-2:hover {
@@ -253,8 +254,8 @@ a:hover {
     cursor: default;
     display: flex;
     position: absolute;
-    margin: 210px 0 0 85px;
-    position : right;
+	margin-top: -10px;
+	margin-left: 60px;
 }
 
 .popularity-search-3:hover {
@@ -265,11 +266,66 @@ a:hover {
     position : right;
 }
 
+.popularity-search-4 {
+    background-color:  rgb(179, 179, 179);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+	margin-top: -10px;
+	margin-left: 60px;
+}
+
+.popularity-search-4:hover {
+    background-color:  rgb(179, 179, 179);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.popularity-search-5 {
+    background-color: rgb(132, 132, 132);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+	margin-top: -10px;
+	margin-left: 60px;
+
+}
+
+.popularity-search-5:hover {
+    background-color: rgb(132, 132, 132);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
+.popularity-search-6 {
+    background-color: rgb(99, 99, 99);
+    border:none;
+    cursor: default;
+    display: flex;
+    position: absolute;
+	margin-top: -10px;
+	margin-left: 60px;
+}
+
+.popularity-search-6:hover {
+    background-color: rgb(99, 99, 99);
+    border:none;
+    cursor: auto;
+    display: flex;
+    position : right;
+}
+
 .liked {
     border:none;
     display: flex;
     position: absolute;
-    margin: 215px 0 0 40px;
+    /* margin: 215px 0 0 40px; */
     font-size: 1.5rem;
     color : rgb(254, 224, 224);
 }
@@ -278,13 +334,21 @@ a:hover {
     border:none;
     display: flex;
     position: absolute;
-    margin: 215px 0 0 40px;
+    /* margin: 215px 0 0 40px; */
     font-size: 1.5rem;
     color : rgb(255, 0, 100);
 }
 .search-pic {
     display: flex;
-    position: relative;
+	position: relative;
+	width:100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.containerPic {
+	height: 200px;
+	width: 200px;
 }
 
 .img-pop {
@@ -294,4 +358,8 @@ a:hover {
 
 .search-col {
     padding: 30px;
+}
+
+.picto {
+    
 }
