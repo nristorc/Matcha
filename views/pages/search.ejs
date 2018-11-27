@@ -4,7 +4,7 @@
 
 <!-- Filters -->
 
-<p>Filtres :</p>
+<!-- <p>Filtres :</p> -->
 
 <!-- <div>
   <input type="range" id="age-range" name="volume"
@@ -18,26 +18,30 @@
   <label for="cowbell">Popularité</label>
 </div> -->
 
+
 <!-- Sort -->
 
 <form action="/search" method="get">
-	<ul class="nav nav-pills">
-		<li class="nav-item dropdown">
-			<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
-			<div class="dropdown-menu">
-				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by `birth`">
-				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by loc">
-				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by `popularity`">
+	<div class="input-group mb-3">
+			<div class="input-group-prepend">
+				<label class="input-group-text" for="inputGroupSelect01">Trier par</label>
 			</div>
-		</li>
-	</ul>
+			<select class="custom-select" name="sort" id="inputSort">
+				<option selected></option>
+				<option value="ageAsc">Age croissant</option>
+				<option value="ageDesc">Age décroissant</option>
+				<option value="loc">Localisation la plus proche</option>
+				<option value="popAsc">Popularité croissant</option>
+				<option value="popDesc">Popularité décroissant</option>
+			</select>
+			</div>			  
 </form>
 
 <%}%>
 
 <!-- Results -->
 
-<div class="scroll">
+<div class="scroll" id="scroll">
 	<% var x = index;
 	var i = 0;
 	while (i < 6){ 
@@ -96,11 +100,6 @@
 						<%=users[x]['description']%>
 					<% } %>
 				</h6>
-
-				<!-- <form id="likes-report">
-					<button type="submit" value="like<%=users[x]['id']%>" style="background:none; border:none"><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;"></i></button>
-					<button type="submit" value="unlike<%=users[x]['id']%>" style="background:none; border:none" id="button"><i class="fas fa-thumbs-up" id="likedSearch-<%=users[x]['id']%>" style="text-align: center; display: none;"></i></button>
-				</form> -->
 
 <!-- Like and match check -->
 

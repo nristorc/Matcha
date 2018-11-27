@@ -648,15 +648,29 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-                // console.log(request.query.sort);
+				var sort = request.query.sort;
+				if (sort == "popAsc"){
+					sort = " ORDER by `popularity` ASC";
+				} else if (sort == "popDesc"){
+					sort = " ORDER by `popularity` DESC";
+				} else if (sort == "ageAsc"){
+					sort = " ORDER by `birth` ASC";
+				} else if (sort == "ageAsc"){
+					sort = " ORDER by `birth` DESC";
+				} else if (sort == "loc"){
+					sort = " ORDER by `birth DESC`";
+				}
 				checkDb.setOrientation(request.session.user.id).then((orientation) => {
-					checkDb.getAllUsers(orientation, request.query.sort).then((users) => {
-						if (!request.query.index) {
+                    checkDb.getAllUsers(orientation, sort).then((users) => {
+                        console.log("Len:" + users.length)
+                        if (!request.query.index) {
+                            console.log("--1--");
+                            console.log(request.query.index)
 							checkDb.getLikes(request.session.user.id).then((likes) => {
 								response.render('pages/search', {
 									users: users,
 									index: 0,
-									likes: likes
+                                    likes: likes,
 								});
 							}).catch((likes) => {
 								response.render('pages/search', {
@@ -666,9 +680,11 @@ class Routes{
 								});
 							});
 						} else {
+                            console.log("--2--");
+                            console.log(request.query.index)
 							if (request.query.index < users.length){
 								checkDb.getLikes(request.session.user.id).then((likes) => {
-									response.render('pages/search', {
+                                    response.render('pages/search', {
 										users: users,
 										index: request.query.index,
 										likes: likes
