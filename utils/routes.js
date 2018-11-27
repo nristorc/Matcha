@@ -761,7 +761,21 @@ class Routes{
 			}
 		});
 		
-		/* Routes for...... */
+		/* Routes for search by username */
+
+        this.app.get('/usersearch', (request, response) => { // usersearch a remplacer par /search/:id
+            response.render('pages/autocomplete');
+        }).post('/usersearch', async (request, response) => {
+            const query = request.body.q;
+            console.log('query', query)
+            console.log(checkDb.query("SELECT username FROM `users` WHERE `username` LIKE '%'" + query + "'%'"))/*.then((result) => {
+                console.log('result then: ', result);
+            }).catch((result) => {
+                console.log('result catch: ', result);
+            });*/
+            // const res = "no data found";
+            // response.json(res);
+        });
 
     }
 

@@ -1,0 +1,42 @@
+<%- include('../partial/head')%>
+<%- include('../partial/header')%>
+
+<%- messages('partial/message', locals) %>
+
+<input type="text" id="searchBox" placeholder="Search...">
+
+<%- include('../partial/footer')%>
+
+<script>
+
+    $(function () {
+        $(document).ready(function () {
+
+            $('#searchBox').on('keyup', function(e) {
+
+                e.preventDefault();
+                const query = $('#searchBox').val();
+
+                if (query.length > 2) {
+                    var formData = {
+                        'search': 1,
+                        'q': query
+                    };
+                    $.ajax({
+                        type: 'POST',
+                        url: '/usersearch',
+                        data: formData,
+                        dataType: 'text',
+                        encode: true
+                    })
+                        .done(function (data) {
+                            console.log('data: ', data);
+                        });
+                    event.preventDefault();
+                }
+            });
+
+        });
+    });
+
+</script>
