@@ -692,13 +692,16 @@ class Routes{
 				});					
 			}
         }).post('/search', async(request, response) => {
-			if (!request.session.user) {
-				return response.render('index');
+            if (!request.session.user) {
+                return response.render('index');
 			} else {
-				var data = request.body.id_liked;
+                var data = request.body.id_liked;
 				var likeAction = data.substring(0, data.length - 2);
-				var userLiked =  data.substring(data.length - 1);
+                var userLiked =  data.substring(data.length - 1);
+                console.log("userliked =", userLiked);
+                // console.log(likeAction);
 				if (likeAction == "likeSearch"){
+                    // console.log("on rentre la");
 					checkDb.updateLikes(request.session.user.id, userLiked, 1).then((update) => {
 					});
 				} else if (likeAction == "unlikeSearch"){
