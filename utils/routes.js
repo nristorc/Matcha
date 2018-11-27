@@ -696,12 +696,9 @@ class Routes{
                 return response.render('index');
 			} else {
                 var data = request.body.id_liked;
-				var likeAction = data.substring(0, data.length - 2);
-                var userLiked =  data.substring(data.length - 1);
-                console.log("userliked =", userLiked);
-                // console.log(likeAction);
-				if (likeAction == "likeSearch"){
-                    // console.log("on rentre la");
+				var likeAction = data.substring(0, 12);
+                var userLiked =  data.substring(13, data.length);
+				if (likeAction == "oklikeSearch"){
 					checkDb.updateLikes(request.session.user.id, userLiked, 1).then((update) => {
 					});
 				} else if (likeAction == "unlikeSearch"){

@@ -73,7 +73,7 @@
 					<i class="fas fa-thumbs-up liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i>
 				</div>
 
-				<span><i class="far fa-thumbs-up picto" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
+				<span><i class="far fa-thumbs-up picto" id="oklikeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
 				<span><i class="fas fa-thumbs-up picto" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)">Unlike</i></span>
 
 				<h5><%=users[x]['username']%></h5>
@@ -120,7 +120,7 @@
 				<script>
 					// getscript
 					document.getElementById("matched<%=users[x]['id']%>").style.display = "flex";
-					document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "none";
+					document.getElementById("oklikeSearch-<%=users[x]['id']%>").style.display = "none";
 					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
 				</script>
 			<% } else if (like === 1 && liked === 0){ %>
@@ -129,7 +129,7 @@
 				</script>
 			<% } else if (liked === 1 && like === 0) { %>
 				<script>
-					document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "none";
+					document.getElementById("oklikeSearch-<%=users[x]['id']%>").style.display = "none";
 					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
 				</script>
 			<% }
