@@ -266,10 +266,8 @@ class Routes{
             .get((request, response) => {
                 const resetResponse = {};
                 checkDb.checkResetToken(request.params.resetToken).then((result) => {
-                    // console.log('reset', result);
                     if (result) {
                         response.render('pages/resetPassword', {resetToken: request.params.resetToken});
-                        //console.log("Je rentre dans GET");
                     } else {
                         resetResponse.error = true;
                         resetResponse.type = 'warning';
@@ -294,35 +292,34 @@ class Routes{
                     }
                 });
             }).post(async (request, response) => {
-            // console.log("Je rentre dans POST");
-            // const resetResponse = {};
-            // const data = {
-            //     resetToken: request.body.resetToken,
-            //     newPassword: request.body.modifyPassword,
-            //     confirmPassword: request.body.modifyPasswordConfirm
-            // };
-            // await validation.isConfirmed(data.newPassword, data.confirmPassword, "Wrong matching password");
-            // console.log(validation.errors);
-            // if (validation.errors.length === 0) {
-            //     const result = await checkDb.resetPassword(data);
-            //     console.log(result);
-            //     if (result === false) {
-            //         resetResponse.error = true;
-            //         resetResponse.message = `Reset password unsuccessful,try after some time.`;
-            //         response.status(417).json(resetResponse);
-            //     } else {
-            //         resetResponse.error = false;
-            //         //resetResponse.userId = result.insertId;
-            //         resetResponse.message = `Votre mot de passe a bien été modifié`;
-            //         response.status(200).redirect('/');
-            //     }
-            //
-            // } else {
-            //     resetResponse.error = true;
-            //     resetResponse.message = `Error fields format...`;
-            //     response.status(417).json(resetResponse);
-            //     validation.errors = [];
-            // }
+                console.log('request post: ', request.body);
+                const resetResponse = {};
+                const data = {
+                    resetToken: request.body.resetToken,
+                    newPassword: request.body.modifyPassword,
+                    confirmPassword: request.body. modifyPasswordConfirm
+                };
+
+                await validation.isConfirmed(data.newPassword, data.confirmPassword, "le mot de passe renseigné est incorrect");
+                if (validation.errors.length !== 0) {
+                    const msg = validation.errors[0].errorMsg;
+                    validation.errors = [];
+                    request.flash('warning', msg);
+                    response.status(401).redirect('/verify/reset/' + data.resetToken);
+
+                } else {
+                    await checkDb.resetPassword(data).then((result) => {
+                        if (result) {
+                            request.flash('dark', "Votre mot de passe a bien été mis à jour");
+                            response.status(200).redirect('/');
+                        }
+                    }).catch((result) => {
+                        if (result) {
+                            request.flash('warning', "Une erreur s'est produite: " + result);
+                            response.status(401).redirect('/verify/reset/' + data.resetToken);
+                        }
+                    });
+                }
         });
 
         this.app.get('/logout', function(request, result){

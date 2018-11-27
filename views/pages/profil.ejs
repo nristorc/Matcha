@@ -727,7 +727,7 @@
                                 if (data.errors) {
                                     if (document.getElementById('messages')) {
                                         const flash = document.getElementsByClassName('alert');
-                                        console.log('flash', flash);
+                                        // console.log('flash', flash);
                                         flash[0].className = 'alert alert-warning alert-dismissible';
                                         flash[0].innerHTML = data.errors;
                                     } else {

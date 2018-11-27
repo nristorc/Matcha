@@ -109,7 +109,7 @@ class DatabaseRequest {
 
                 this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]).then((result) => {
                     if (result && result[0] && result[0].count === 1) {
-                        this.query("UPDATE matcha.users SET `resetToken` = null, `reset_at` = null WHERE users.resetToken = ?", [params]);
+                        // this.query("UPDATE matcha.users SET `resetToken` = null, `reset_at` = null WHERE users.resetToken = ?", [params]);
                         resolve('Reset effectué');
                     } else {
                         reject('Probleme');
