@@ -2,40 +2,81 @@
 	<%- include('../partial/head')%>
 	<%- include('../partial/header')%>
 
-<!-- Filters -->
+<!-- Search navbar -->
 
-<!-- <p>Filtres :</p> -->
+<nav class="navbar fixed-top search-nav">
+		
+	<!-- Sort -->
+	
+	<form action="/search" method="get">
+		<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<label class="input-group-text" for="inputGroupSelect01">Trier par</label>
+				</div>
+				<select class="custom-select" name="sort" id="inputSort">
+					<option selected></option>
+					<option value="ageAsc">Age croissant</option>
+					<option value="ageDesc">Age décroissant</option>
+					<option value="loc">Localisation la plus proche</option>
+					<option value="popAsc">Popularité croissant</option>
+					<option value="popDesc">Popularité décroissant</option>
+				</select>
+				</div>
+	</form>
 
-<!-- <div>
-  <input type="range" id="age-range" name="volume"
-         min="0" max="10">
-  <label for="volume">Age</label>
-</div>
-
-<div>
-  <input type="range" id="pop-range" name="cowbell" 
-         min="0" max="100" step="10">
-  <label for="cowbell">Popularité</label>
-</div> -->
+		<!-- Filters -->
 
 
-<!-- Sort -->
 
-<form action="/search" method="get">
-	<div class="input-group mb-3">
-			<div class="input-group-prepend">
-				<label class="input-group-text" for="inputGroupSelect01">Trier par</label>
+		<!-- <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="14"/> -->
+		<!-- <script>
+		$('#ex1').slider({
+			formatter: function(value) {
+				return 'Current value: ' + value;
+			}
+		});
+		</script> -->
+
+		<div class="accordion" id="accordionExample">
+				<button class="btn btn-link forgot-password collapsed" type="button" data-toggle="collapse" data-target="#collapse" aria-expanded="false" aria-controls="collapse">
+					Recherche avancée
+				</button>
 			</div>
-			<select class="custom-select" name="sort" id="inputSort">
-				<option selected></option>
-				<option value="ageAsc">Age croissant</option>
-				<option value="ageDesc">Age décroissant</option>
-				<option value="loc">Localisation la plus proche</option>
-				<option value="popAsc">Popularité croissant</option>
-				<option value="popDesc">Popularité décroissant</option>
-			</select>
-			</div>			  
-</form>
+			<div id="collapse" class="collapse" data-parent="#accordionExample">
+					<div class="card-body">
+						<form action="/search" method="get">
+
+						</form>
+						<!-- <form action="/search" method="get">
+							<div class="form-group">
+								<div class="display-register">
+									<div class="form-group">
+										<h5>Ré-initialisation de votre mot de passe</h5>
+										<label for="checkEmail">Renseignez l'email associé à votre compte</label>
+										<input type="email" class="form-control" id="checkEmail" name="checkEmail" placeholder="Entrez votre Email">
+									</div>
+								</div>
+							</div>
+						</form>
+						 -->
+					</div>
+				</div>
+	<!-- <p>
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+			Recherche avancée
+		</button>
+		
+
+	</p>
+
+	<div class="collapse" id="collapseExample">
+		<div class="card card-body">
+			Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+		</div>
+		</div> -->
+
+</nav>
+
 
 <%}%>
 
@@ -144,6 +185,7 @@
 
 </div>
 
+
 <!-- Loading animation -->
 
 <% if (index == 0){ %>
@@ -154,7 +196,6 @@
 <!-- Scripts -->
 
 <script src="./public/js/scroll.js"></script>
-<!-- <script src="./public/js/sort.js"></script> -->
 <script src="./public/js/like.js"></script>
 
 <% } %>
