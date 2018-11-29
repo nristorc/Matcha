@@ -58,61 +58,61 @@ class Routes{
 
         /* Routes for Authentication */
 
-        this.app.post('/login', async (request, response)=> {
-            const loginResponse = {};
-            const data = {
-                username: request.body.username,
-                password: request.body.password,
-            };
-            if ((data.username === '' || data.username === null) && (data.password === '' || data.password === null)) {
-                loginResponse.error = true;
-                loginResponse.type = 'warning';
-                loginResponse.message = `fields cannot be empty`;
-                request.flash(loginResponse.type, loginResponse.message);
-                response.status(412).redirect('/');
-            } else if (data.username === '' || data.username === null) {
-                loginResponse.error = true;
-                loginResponse.type = 'warning';
-                loginResponse.message = `username cant be empty.`;
-                request.flash(loginResponse.type, loginResponse.message);
-                response.status(412).redirect('/');
-            } else if(data.password === '' || data.password === null){
-                loginResponse.error = true;
-                loginResponse.type = 'warning';
-                loginResponse.message = `password cant be empty.`;
-                request.flash(loginResponse.type, loginResponse.message);
-                response.status(412).redirect('/');
-            } else {
-                checkDb.checkActive(data.username).then(() => {
-                    checkDb.loginUser(data).then( (result) => {
-                        loginResponse.error = false;
-                        loginResponse.type = 'dark';
-                        loginResponse.userId = result[0].id;
-                        loginResponse.message = `User logged in.`;
-                        request.session.user = data;
-                        request.session.user.id = result[0].id;
-                        request.session.user.email = result[0].email;
-                        console.log(request.session.user);
-                        request.flash(loginResponse.type, loginResponse.message);
-                        response.status(200).redirect('/profil');
-                    }).catch((result) => {
-                        if (result === undefined || result === false) {
-                            loginResponse.error = true;
-                            loginResponse.type = 'warning';
-                            loginResponse.message = `Invalid username and password combination.`;
-                            request.flash(loginResponse.type, loginResponse.message);
-                            response.status(401).redirect('/');
-                        }
-                    });
-                }).catch((val) => {
-                    loginResponse.error = true;
-                    loginResponse.type = 'warning';
-                    loginResponse.message = val;
-                    request.flash(loginResponse.type, loginResponse.message);
-                    response.status(420).redirect('/');
-                });
-            }
-        });
+        // this.app.post('/login', async (request, response)=> {
+        //     const loginResponse = {};
+        //     const data = {
+        //         username: request.body.username,
+        //         password: request.body.password,
+        //     };
+        //     if ((data.username === '' || data.username === null) && (data.password === '' || data.password === null)) {
+        //         loginResponse.error = true;
+        //         loginResponse.type = 'warning';
+        //         loginResponse.message = `fields cannot be empty`;
+        //         request.flash(loginResponse.type, loginResponse.message);
+        //         response.status(412).redirect('/');
+        //     } else if (data.username === '' || data.username === null) {
+        //         loginResponse.error = true;
+        //         loginResponse.type = 'warning';
+        //         loginResponse.message = `username cant be empty.`;
+        //         request.flash(loginResponse.type, loginResponse.message);
+        //         response.status(412).redirect('/');
+        //     } else if(data.password === '' || data.password === null){
+        //         loginResponse.error = true;
+        //         loginResponse.type = 'warning';
+        //         loginResponse.message = `password cant be empty.`;
+        //         request.flash(loginResponse.type, loginResponse.message);
+        //         response.status(412).redirect('/');
+        //     } else {
+        //         checkDb.checkActive(data.username).then(() => {
+        //             checkDb.loginUser(data).then( (result) => {
+        //                 loginResponse.error = false;
+        //                 loginResponse.type = 'dark';
+        //                 loginResponse.userId = result[0].id;
+        //                 loginResponse.message = `User logged in.`;
+        //                 request.session.user = data;
+        //                 request.session.user.id = result[0].id;
+        //                 request.session.user.email = result[0].email;
+        //                 console.log(request.session.user);
+        //                 request.flash(loginResponse.type, loginResponse.message);
+        //                 response.status(200).redirect('/profil');
+        //             }).catch((result) => {
+        //                 if (result === undefined || result === false) {
+        //                     loginResponse.error = true;
+        //                     loginResponse.type = 'warning';
+        //                     loginResponse.message = `Invalid username and password combination.`;
+        //                     request.flash(loginResponse.type, loginResponse.message);
+        //                     response.status(401).redirect('/');
+        //                 }
+        //             });
+        //         }).catch((val) => {
+        //             loginResponse.error = true;
+        //             loginResponse.type = 'warning';
+        //             loginResponse.message = val;
+        //             request.flash(loginResponse.type, loginResponse.message);
+        //             response.status(420).redirect('/');
+        //         });
+        //     }
+        // });
 
         this.app.post('/register', async (request,response) => {
             console.log("Je suis dans REGISTER");
@@ -763,29 +763,45 @@ class Routes{
 		
 		/* Routes for search by username */
 
-        this.app.get('/usersearch', (request, response) => { // usersearch a remplacer par /search/:id
-            response.render('pages/autocomplete');
-        }).post('/usersearch', async (request, response) => {
+        this.app.post('/usersearch', async (request, response) => {
             const query = request.body.q;
-            checkDb.query("SELECT username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
-                var res = '<li>No data found !</li>';
+            checkDb.query("SELECT id, username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
+                var res = '<li class="searchLi">No data found !</li>';
                 if (result === [] || result === {} || result === null || result == "") {
                     console.log('not found; ',result);
                     response.json(res);
                 } else {
                     console.log('found; ',result);
                     res = [];
+                    // const profil = [];
                     for (var i = 0; i < result.length; i++) {
-                        res.push('<li>' + result[i].username + '</li>');
+                        // profil.push(result[i]);
+                        res.push('<li class="searchLi">' + result[i].username + '</li>');
                     }
-                    response.json(res);
+                    response.json({res: res, userdata: result});
                 }
 
             }).catch((result) => {
                 console.log('result catch: ', result);
             });
-            // const res = "no data found";
         });
+
+
+
+
+        // this.app.get('/profil/:id', async (request, response) => {
+        //     response.render('profil/');
+        //
+        // }).post('/userprofil', async (request, response) => {
+        //     // response.redirect('/userprofil/' + request.body.user);
+        //     console.log(request.body);
+        //     console.log('je suis dans POST');
+        //
+        // });
+
+
+
+
 
     }
 

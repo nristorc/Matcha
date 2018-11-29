@@ -13,11 +13,11 @@
     outline: 0;
 }
 
-li {
+li.searchLi {
     padding-left: 5px;
 }
 
-li:hover {
+li:hover.searchLi{
     color: silver;
     cursor: pointer;
     background: #0088cc;
