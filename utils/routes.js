@@ -767,14 +767,24 @@ class Routes{
             response.render('pages/autocomplete');
         }).post('/usersearch', async (request, response) => {
             const query = request.body.q;
-            console.log('query', query)
-            console.log(checkDb.query("SELECT username FROM `users` WHERE `username` LIKE '%'" + query + "'%'"))/*.then((result) => {
-                console.log('result then: ', result);
+            checkDb.query("SELECT username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
+                var res = '<li>No data found !</li>';
+                if (result === [] || result === {} || result === null || result == "") {
+                    console.log('not found; ',result);
+                    response.json(res);
+                } else {
+                    console.log('found; ',result);
+                    res = [];
+                    for (var i = 0; i < result.length; i++) {
+                        res.push('<li>' + result[i].username + '</li>');
+                    }
+                    response.json(res);
+                }
+
             }).catch((result) => {
                 console.log('result catch: ', result);
-            });*/
+            });
             // const res = "no data found";
-            // response.json(res);
         });
 
     }

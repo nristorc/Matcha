@@ -3,40 +3,28 @@
 
 <%- messages('partial/message', locals) %>
 
-<input type="text" id="searchBox" placeholder="Search...">
+
+
+<!--<input type="text" id="searchBox" placeholder="Search...">-->
+<!--<div><ul id="response"></ul></div>-->
+
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam erat ligula, sollicitudin ut finibus ut, mattis sit amet tortor. Suspendisse auctor metus eget auctor varius. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In enim leo, posuere in nisl at, aliquam faucibus tellus. Proin cursus ex nec mauris tincidunt molestie. Pellentesque molestie purus in neque facilisis, vel gravida leo laoreet. Proin blandit a enim sed lacinia. Pellentesque ultrices ipsum vel leo finibus hendrerit. Pellentesque eu risus lacus. Donec finibus tellus in sem facilisis, a vulputate diam condimentum. Aenean rhoncus dui ex, non luctus mi sagittis vel. Proin mollis varius suscipit. Sed ultrices tincidunt nunc non elementum. Nam neque nibh, mollis nec ultricies sit amet, tristique quis sem. Etiam laoreet risus et nunc porttitor lacinia.
+
+Nullam nec augue ullamcorper justo semper pretium ut ut urna. Mauris eget vehicula nisl. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam vitae blandit est. Integer posuere lacus vitae iaculis ultricies. Nam at dui est. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla vitae malesuada est. Aenean posuere, tortor aliquam pulvinar venenatis, elit est malesuada nisl, eget posuere mi velit a eros. Aenean elementum sollicitudin mi quis semper.
+
+Phasellus lorem odio, suscipit ac tempus sed, laoreet sit amet nulla. Nam euismod elementum est, aliquam efficitur nisl facilisis sit amet. Sed nisi turpis, egestas eget lobortis non, vulputate vitae urna. Vivamus nec purus sit amet risus cursus volutpat. Donec porttitor sem vitae venenatis vehicula. Nunc in placerat nisi. Nunc a quam vel orci feugiat sagittis. Integer id consequat mi, sit amet pretium augue. Maecenas ut faucibus orci. Nullam ornare lectus eget odio iaculis mollis vel sit amet sapien. Sed odio urna, tempus nec lacus id, molestie bibendum lectus. Sed convallis id tellus sed volutpat. Fusce ut convallis nunc, at viverra eros.
+
+Suspendisse posuere et purus ut eleifend. Aenean a felis interdum, egestas tortor eu, accumsan lacus. Nulla facilisi. Etiam pharetra, metus aliquet viverra imperdiet, ipsum arcu viverra metus, sed dapibus metus nulla id augue. Nulla sit amet condimentum libero. Nulla facilisi. Quisque hendrerit efficitur nibh ac pharetra. Nunc mattis, quam vel posuere egestas, est nisl feugiat enim, a facilisis augue ante quis nisl. Nam auctor justo sed est finibus malesuada. Cras eu imperdiet diam, in fermentum augue. Sed in aliquam mauris, id aliquet dolor. Nam faucibus ornare lorem, vel egestas quam aliquam eu. Sed quis sapien arcu.
+
+Sed turpis purus, ultrices et mattis non, porta at mauris. Nunc non mauris lectus. Donec tincidunt imperdiet orci ac tristique. Aliquam porta massa vitae lectus malesuada dignissim. Integer laoreet lacus quis suscipit consectetur. Phasellus n
+
 
 <%- include('../partial/footer')%>
 
 <script>
 
-    $(function () {
-        $(document).ready(function () {
 
-            $('#searchBox').on('keyup', function(e) {
 
-                e.preventDefault();
-                const query = $('#searchBox').val();
-
-                if (query.length > 2) {
-                    var formData = {
-                        'search': 1,
-                        'q': query
-                    };
-                    $.ajax({
-                        type: 'POST',
-                        url: '/usersearch',
-                        data: formData,
-                        dataType: 'text',
-                        encode: true
-                    })
-                        .done(function (data) {
-                            console.log('data: ', data);
-                        });
-                    event.preventDefault();
-                }
-            });
-
-        });
-    });
 
 </script>

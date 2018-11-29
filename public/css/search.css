@@ -1,0 +1,28 @@
+#response {
+    float: left;
+    list-style: none;
+    padding: 0;
+    border: 1px solid silver;
+    margin-top: 0;
+    background: white;
+    z-index: 5;
+}
+
+#searchBox, #response {
+    width: 250px;
+    outline: 0;
+}
+
+li {
+    padding-left: 5px;
+}
+
+li:hover {
+    color: silver;
+    cursor: pointer;
+    background: #0088cc;
+}
+
+#accessProfil {
+    margin-left: 5px;
+}
