@@ -766,14 +766,10 @@ class Routes{
             checkDb.query("SELECT id, username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
                 var res = '<li class="searchLi">No data found !</li>';
                 if (result === [] || result === {} || result === null || result == "") {
-                    // console.log('not found; ',result);
-                    response.json(res);
+                    response.json({res});
                 } else {
-                    // console.log('found; ',result);
                     res = [];
-                    // const profil = [];
                     for (var i = 0; i < result.length; i++) {
-                        // profil.push(result[i]);
                         res.push('<li class="searchLi">' + result[i].username + '</li>');
                     }
                     response.json({res: res, userdata: result});
