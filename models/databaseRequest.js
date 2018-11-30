@@ -132,7 +132,7 @@ class DatabaseRequest {
 
                 this.query(`SELECT * FROM matcha.users WHERE registerToken = ?`, [param]).then((result) => {
                     if (result && result[0] && result[0].registerToken === param && result[0].active === 0) {
-                        this.query("UPDATE matcha.users SET `registerToken` = null, `active` = 1 WHERE users.registerToken = ?", [param]);
+                        this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);
                         resolve(
                             this.query(`SELECT username, password, id, email FROM matcha.users WHERE id = ?`, [result[0].id])
                         );
@@ -483,10 +483,8 @@ class DatabaseRequest {
                 const sql = "SELECT * FROM matcha.photos WHERE user_id = ? ORDER BY id DESC";
                 this.query(sql, params).then((photos) => {
                     if (photos){
-                        // console.log(tags);
                         resolve(photos);
                     } else {
-                        // console.log(tags);
                         reject(photos);
                     }
                 });
@@ -514,7 +512,6 @@ class DatabaseRequest {
             return false;
         }
     }
-
 
     async updatePop(user_id, flag){ 
 		// Flag 1 : like
@@ -593,6 +590,28 @@ class DatabaseRequest {
 		}).catch(()=> {
 			return(false);
 		});
+    }
+
+    async profilCompleted(id) {
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT birth, gender, orientation, description FROM matcha.users WHERE `id` = ?", [id]).then((result) => {
+                    if (result) {
+                        const userInfo = result[0];
+                        if (!userInfo.birth || !userInfo.gender || !userInfo.orientation || !userInfo.description) {
+                            reject('pas complet');
+                        }
+                        resolve('complet');
+                    }
+                }).catch((result) => {
+                    console.log('catch', result);
+                })
+            });
+        }
+         catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 
 }

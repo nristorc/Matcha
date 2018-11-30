@@ -35,10 +35,10 @@
 						<div class="form-group">
 							<label for="sexOrientation" class="col-form-label">Votre Orientation Sexuelle</label>
 							<select name="orientation" class="form-control" id="sexOrientation">
-								<option value="Hétérosexuel">Hétérosexuel</option>
-                                <option value="Homosexuel">Homosexuel</option>
-                                <option value="Bisexuel" selected>Bisexuel</option>
-                                <option value="Homosexuel">Pansexuel</option>
+                                <option value="Bisexuel"<% if (user[0].orientation === 'Bisexuel') {%> selected <%}%>>Bisexuel</option>
+                                <option value="Hétérosexuel"<% if (user[0].orientation === 'Hétérosexuel') {%> selected <%}%>>Hétérosexuel</option>
+                                <option value="Homosexuel"<% if (user[0].orientation === 'Homosexuel') {%> selected <%}%>>Homosexuel</option>
+                                <option value="Pansexuel"<% if (user[0].orientation === 'Pansexuel') {%> selected <%}%>>Pansexuel</option>
 							</select>
 						</div>
 						<div class="form-group">
@@ -57,7 +57,7 @@
 <% } %>
 
 <div class="media">
-    <img src="<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
+    <img src="/<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
     <div class="media-body">
 		<button type="button" class="btn btn-primary popularity">
 			Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
@@ -155,9 +155,9 @@
                             <div class="form-group">
                                 <label for="editOrientation" class="col-form-label">Votre Orientation Sexuelle</label>
                                 <select name="editOrientation" class="form-control" id="editOrientation">
+                                    <option value="Bisexuel"<% if (user[0].orientation === 'Bisexuel') {%> selected <%}%>>Bisexuel</option>
                                     <option value="Hétérosexuel"<% if (user[0].orientation === 'Hétérosexuel') {%> selected <%}%>>Hétérosexuel</option>
                                     <option value="Homosexuel"<% if (user[0].orientation === 'Homosexuel') {%> selected <%}%>>Homosexuel</option>
-                                    <option value="Bisexuel"<% if (user[0].orientation === 'Bisexuel') {%> selected <%}%>>Bisexuel</option>
                                     <option value="Pansexuel"<% if (user[0].orientation === 'Pansexuel') {%> selected <%}%>>Pansexuel</option>
                                 </select>
                             </div>
@@ -478,9 +478,12 @@
                                 birthdate.innerHTML = age + ' ans';
 
                                 if (document.getElementById('messages')) {
-                                    const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                    console.log('il y a un message')
+                                    const flash = document.getElementsByClassName('alert');
+                                    flash[0].className = 'alert alert-dark alert-dismissible';
                                     flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
                                 } else {
+                                    console.log('pas de message');
                                     $('#container').prepend('<div id="messages"></div>');
                                     $('#messages').append('<div class="alert alert-dark alert-dismissible">Votre profil RoooCool a été créé avec succès</div>')
                                 }
@@ -494,6 +497,14 @@
 
                                 document.getElementById("editDescription").value = data.user.description;
                                 document.getElementById("editDescription").innerHTML = document.getElementById("editDescription").value;
+
+
+                                //Update dans profil de Orientation + Genre
+                                document.getElementById('editOrientation').value = data.user.orientation;
+                                console.log(document.getElementById('editOrientation').value);
+
+                                document.getElementById('editGender').value = data.user.gender;
+                                console.log(document.getElementById('editOrientation').value);
 
                             }
                         }

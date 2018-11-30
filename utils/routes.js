@@ -342,14 +342,10 @@ class Routes{
                 return response.render('index');
 			}
 			checkDb.getUser(request.session.user.username).then((user) => {
-			    // console.log('user THEN: ', user);
 				checkDb.getTags(request.session.user.id).then((tags) => {
-                    // console.log('tags THEN: ', tags);
 				    checkDb.getPhotos(request.session.user.id).then((photos) => {
-                        // console.log('photos THEN: ', photos);
-                        // console.log('get DB age', user[0]['birth']);
                         userData.userAge(user[0]['birth']).then((age) => {
-                            console.log('age THEN: ', age);
+                            // console.log('age THEN: ', age);
                             response.render('pages/profil', {
                                 user: user,
                                 userage: age,
@@ -357,7 +353,6 @@ class Routes{
                                 userphotos: photos
                             });
                         }).catch((age) => {
-                            // console.log('age CATCH: ', age);
                             response.render('pages/profil', {
                                 user: user,
                                 usertags: tags,
@@ -366,7 +361,6 @@ class Routes{
                             });
                         });
                     }).catch((photos) => {
-                        // console.log('photos CATCH: ', photos);
                         response.render('pages/profil', {
                             user: user,
                             usertags: tags,
@@ -375,7 +369,6 @@ class Routes{
                         });
                     });
 				}).catch((tags) => {
-                    // console.log('tags CATCH: ', tags);
                     response.render('pages/profil', {
                         user: user,
                         usertags: tags,
@@ -384,7 +377,6 @@ class Routes{
                     });
                 });
 			}).catch((user) => {
-                // console.log('user CATCH: ', user);
                 response.render('index');
             });
 
@@ -698,48 +690,54 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
+                checkDb.profilCompleted(request.session.user.id).then((result) => {
+                    checkDb.setOrientation(request.session.user.id).then((orientation) => {
+                        checkDb.getAllUsers(orientation, request.query.sort).then((users) => {
+                            if (!request.query.index) {
+                                checkDb.getLikes(request.session.user.id).then((likes) => {
+                                    response.render('pages/search', {
+                                        users: users,
+                                        index: 0,
+                                        likes: likes
+                                    });
+                                }).catch((likes) => {
+                                    response.render('pages/search', {
+                                        users: users,
+                                        index: 0,
+                                        likes: likes,
+                                    });
+                                });
+                            } else {
+                                if (request.query.index < users.length){
+                                    checkDb.getLikes(request.session.user.id).then((likes) => {
+                                        response.render('pages/search', {
+                                            users: users,
+                                            index: request.query.index,
+                                            likes: likes
+                                        });
+                                    }).catch((likes) => {
+                                        response.render('pages/search', {
+                                            users: users,
+                                            index: request.query.index,
+                                            likes: likes,
+                                        });
+                                    });
+                                } else {
+                                    response.end();
+                                }
+                            }
+                        }).catch((users) => {
+                            return response.render('index');
+                        });
+                    }).catch((orientation) => {
+                        return response.render('index');
+                    });
+                }).catch((result) => {
+                    console.log('catch', result);
+                    request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
+                    response.redirect('/')
+                });
                 // console.log(request.query.sort);
-				checkDb.setOrientation(request.session.user.id).then((orientation) => {
-					checkDb.getAllUsers(orientation, request.query.sort).then((users) => {
-						if (!request.query.index) {
-							checkDb.getLikes(request.session.user.id).then((likes) => {
-								response.render('pages/search', {
-									users: users,
-									index: 0,
-									likes: likes
-								});
-							}).catch((likes) => {
-								response.render('pages/search', {
-									users: users,
-									index: 0,
-									likes: likes,
-								});
-							});
-						} else {
-							if (request.query.index < users.length){
-								checkDb.getLikes(request.session.user.id).then((likes) => {
-									response.render('pages/search', {
-										users: users,
-										index: request.query.index,
-										likes: likes
-									});
-								}).catch((likes) => {
-									response.render('pages/search', {
-										users: users,
-										index: request.query.index,
-										likes: likes,
-									});
-								});
-							} else {
-								response.end();
-							}
-						}
-					}).catch((users) => {
-						return response.render('index');
-					});
-				}).catch((orientation) => {
-					return response.render('index');
-				});					
 			}
         }).post('/search', async(request, response) => {
             if (!request.session.user) {
@@ -768,10 +766,10 @@ class Routes{
             checkDb.query("SELECT id, username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
                 var res = '<li class="searchLi">No data found !</li>';
                 if (result === [] || result === {} || result === null || result == "") {
-                    console.log('not found; ',result);
+                    // console.log('not found; ',result);
                     response.json(res);
                 } else {
-                    console.log('found; ',result);
+                    // console.log('found; ',result);
                     res = [];
                     // const profil = [];
                     for (var i = 0; i < result.length; i++) {
@@ -786,22 +784,63 @@ class Routes{
             });
         });
 
+        this.app.get('/user/:id', async (request, response) => {
+
+            checkDb.profilCompleted(request.session.user.id).then((result) => {
+                const sql = 'SELECT * FROM matcha.users WHERE id = ?';
+                checkDb.query(sql, [request.params.id]).then((result) => {
+                    if (result == "") {
+                        request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
+                        response.redirect('/');
+                    } else {
+                        checkDb.getTags(request.params.id).then((tags) => {
+                            checkDb.getPhotos(request.params.id).then((photos) => {
+                                userData.userAge(result[0].birth).then((age) => {
+                                    response.render('pages/user', {
+                                        user: result,
+                                        userage: age,
+                                        usertags: tags,
+                                        userphotos: photos
+                                    });
+                                }).catch((age) => {
+                                    console.log('age CATCH: ', age);
+                                    response.render('pages/user', {
+                                        user: result,
+                                        usertags: tags,
+                                        userage: null,
+                                        userphotos: photos
+                                    });
+                                });
+                            }).catch((photos) => {
+                                response.render('pages/user', {
+                                    user: result,
+                                    usertags: tags,
+                                    userage: null,
+                                    userphotos: null
+                                });
+                            });
+                        }).catch((tags) => {
+                            response.render('pages/user', {
+                                user: result,
+                                usertags: tags,
+                                userage: null,
+                                userphotos: photos
+                            });
+                        });
+                    }
+
+                }).catch((result) => {
+                    console.log('catch', result);
+                });
+
+            }).catch((result) => {
+                console.log('catch', result);
+                request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
+                response.redirect('/')
+            });
 
 
-
-        // this.app.get('/profil/:id', async (request, response) => {
-        //     response.render('profil/');
-        //
-        // }).post('/userprofil', async (request, response) => {
-        //     // response.redirect('/userprofil/' + request.body.user);
-        //     console.log(request.body);
-        //     console.log('je suis dans POST');
-        //
-        // });
-
-
-
-
+        });
 
     }
 
