@@ -1,15 +1,15 @@
 <% if(!index) {%>
 	<%- include('../partial/head')%>
 	<%- include('../partial/header')%>
-
-<!-- Search navbar -->
-
-<nav class="navbar fixed-top search-nav">
-		
-	<!-- Sort -->
 	
-	<form action="/search" method="get">
-		<div class="input-group mb-3">
+	<!-- Search navbar -->
+	
+	<nav class="navbar fixed-top search-nav">
+		
+		<!-- Sort -->
+		
+		<form action="/search" method="get">
+			<div class="input-group mb-3">
 				<div class="input-group-prepend">
 					<label class="input-group-text" for="inputGroupSelect01">Trier par</label>
 				</div>
@@ -21,67 +21,57 @@
 					<option value="popAsc">Popularité croissant</option>
 					<option value="popDesc">Popularité décroissant</option>
 				</select>
-				</div>
-	</form>
-
-		<!-- Filters -->
-
-
-
-		<!-- <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="14"/> -->
-		<!-- <script>
-		$('#ex1').slider({
-			formatter: function(value) {
-				return 'Current value: ' + value;
-			}
-		});
-		</script> -->
-
-		<div class="accordion" id="accordionExample">
-				<button class="btn btn-link forgot-password collapsed" type="button" data-toggle="collapse" data-target="#collapse" aria-expanded="false" aria-controls="collapse">
-					Recherche avancée
-				</button>
 			</div>
-			<div id="collapse" class="collapse" data-parent="#accordionExample">
-					<div class="card-body">
-						<form action="/search" method="get">
-
-						</form>
-						<!-- <form action="/search" method="get">
-							<div class="form-group">
-								<div class="display-register">
-									<div class="form-group">
-										<h5>Ré-initialisation de votre mot de passe</h5>
-										<label for="checkEmail">Renseignez l'email associé à votre compte</label>
-										<input type="email" class="form-control" id="checkEmail" name="checkEmail" placeholder="Entrez votre Email">
-									</div>
-								</div>
-							</div>
-						</form>
-						 -->
-					</div>
-				</div>
-	<!-- <p>
-		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-			Recherche avancée
-		</button>
+		</form>
 		
-
-	</p>
-
-	<div class="collapse" id="collapseExample">
-		<div class="card card-body">
-			Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+		<!-- Filters -->
+		
+		<div class="accordion" id="accordionExample">
+			<button class="btn btn-link forgot-password collapsed" type="button" data-toggle="collapse" data-target="#collapse" aria-expanded="false" aria-controls="collapse">
+				Recherche avancée
+			</button>
 		</div>
-		</div> -->
+		<div id="collapse" class="collapse" data-parent="#accordionExample">
+			Filtrer par
+			<div class="card-body search-acc">
+				<form action="/search" method="get">
+					Age :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">18 ans</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="sl1" type="text" class="span2" value="" data-slider-min="18" data-slider-max="99" data-slider-step="1" data-slider-value="[35,80]"data-slider-handle="custom"/>
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">99+</div>
+					</div>
+					
+					Popularité :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">-100%</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="sl2" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-30,30]" data-slider-handle="custom"/>	
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">100%</div>
+					</div>
+					
+					Localisation :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">1km</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="sl3" type="text" class="span2" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="[5,20]" data-slider-handle="custom"/>
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">50km+</div>
+					</div>
 
+					<button type="button" class="btn btn-primary filter-search" id="filter-search" onclick="filter()">Rechercher</button>
+				</form>
+			</div>
+		</div>	
 </nav>
 
 
 <%}%>
 
 <!-- Results -->
-
 <div class="scroll" id="scroll">
 	<% var x = index;
 	var i = 0;
@@ -197,6 +187,7 @@
 
 <script src="./public/js/scroll.js"></script>
 <script src="./public/js/like.js"></script>
+<script src="./public/js/filter.js"></script>
 
 <% } %>
 

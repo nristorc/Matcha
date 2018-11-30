@@ -655,10 +655,10 @@ class Routes{
 					sort = " ORDER by `popularity` DESC";
 				} else if (sort == "ageAsc"){
 					sort = " ORDER by `birth` ASC";
-				} else if (sort == "ageAsc"){
+				} else if (sort == "ageDesc"){
 					sort = " ORDER by `birth` DESC";
 				} else if (sort == "loc"){
-					sort = " ORDER by `birth DESC`";
+					sort = " ORDER by `birth` DESC";
 				}
 				checkDb.setOrientation(request.session.user.id).then((orientation) => {
                     checkDb.getAllUsers(orientation, sort).then((users) => {

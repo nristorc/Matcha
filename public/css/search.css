@@ -21,7 +21,8 @@ a:hover {
 	background:rgb(254, 224, 224);
 	top : 75px;
 	box-shadow: 0px 3px 4px rgba(37, 37, 37, 0.2);
-	justify-content: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 .scroll {
@@ -175,4 +176,30 @@ a:hover {
 
 .search-col {
     padding: 30px;
+}
+
+.filter-search {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: default;
+}
+
+.filter-search:hover {
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: auto;
+}
+
+.filter-search:active{
+    background-color: rgb(255, 0, 100);
+    border:none;
+    cursor: auto;
+}
+
+.btn.btn-primary:active {
+    /* display: none; */
+    color: pink;
+    background-color: rgb(255, 0, 100) !important;
+    border:none;
+    cursor: auto;   
 }

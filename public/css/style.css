@@ -195,3 +195,21 @@ button:focus {
     border:none;
     cursor: auto;
 }
+
+.popularity:active {
+    background-color: rgb(255, 0, 100) !important;
+    border:none;
+    cursor: auto;
+}
+
+.search-acc {
+    text-align: center;
+    justify-content: space-evenly;
+    display: flex;
+}
+
+.slider-search {
+    display:flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+}
