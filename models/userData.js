@@ -31,6 +31,19 @@ class User{
         }
     }
 
+    async ageConvert(params) {
+        try {
+            return new Promise((resolve, reject)=> {
+                var today = new Date();
+                var date = today.getFullYear() - params + "-" + today.getMonth() + "-" + today.getDate();
+                resolve(date);
+            });
+        } catch (error){
+            console.log(error);
+            return false;            
+        }
+    }
+
 }
 
 module.exports = User;

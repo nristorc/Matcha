@@ -39,7 +39,7 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">18 ans</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="sl1" type="text" class="span2" value="" data-slider-min="18" data-slider-max="99" data-slider-step="1" data-slider-value="[35,80]"data-slider-handle="custom"/>
+							<input id="slideAge" type="text" class="span2" value="" data-slider-min="18" data-slider-max="99" data-slider-step="1" data-slider-value="[18,40]"data-slider-handle="round"/>
 						</div>
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">99+</div>
 					</div>
@@ -48,7 +48,7 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">-100%</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="sl2" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-30,30]" data-slider-handle="custom"/>	
+							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-100,100]" data-slider-handle="round"/>	
 						</div>
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">100%</div>
 					</div>
@@ -57,12 +57,15 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">1km</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="sl3" type="text" class="span2" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="[5,20]" data-slider-handle="custom"/>
+							<input id="slideLoc" type="text" class="span2" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="[1,50]" data-slider-handle="round"/>
 						</div>
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">50km+</div>
 					</div>
 
-					<button type="button" class="btn btn-primary filter-search" id="filter-search" onclick="filter()">Rechercher</button>
+				<!-- Tags module nina de profil ? ou de barre de recherche -->
+
+
+					<button type="button" class="btn btn-primary filter-search" id="inputFilter">Rechercher</button>
 				</form>
 			</div>
 		</div>	
@@ -187,7 +190,6 @@
 
 <script src="./public/js/scroll.js"></script>
 <script src="./public/js/like.js"></script>
-<script src="./public/js/filter.js"></script>
 
 <% } %>
 

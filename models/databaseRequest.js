@@ -354,6 +354,8 @@ class DatabaseRequest {
         }
     }
 
+
+    
     async setOrientation(params){
 		try {
             return new Promise((resolve, reject) => {

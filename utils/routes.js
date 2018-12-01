@@ -659,13 +659,41 @@ class Routes{
 					sort = " ORDER by `birth` DESC";
 				} else if (sort == "loc"){
 					sort = " ORDER by `birth` DESC";
+                }
+                var filter = request.query.filter;
+                if (filter != undefined){                    
+                    var ageFilter = filter.substring(3, filter.indexOf("pop"));
+					var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
+					var locFilter = filter.substring(filter.indexOf("loc") + 3);
+                    var ageMin = ageFilter.substring(0, ageFilter.indexOf(","));
+                    var ageMax = ageFilter.substring(ageFilter.indexOf(",")+1);
+                    if (ageMin == ageMax){
+                        ageMin -= 1;
+                    }
+					ageMin = userData.ageConvert(ageMin).then((dateMin) => {
+						ageMin = dateMin;
+						console.log(ageMin);
+
+					}).catch((error)=>{
+						console.log(error);
+					});
+					userData.ageConvert(ageMax).then((dateMax) => {
+						ageMax = dateMax;
+						console.log(ageMax);
+					}).catch((error)=>{
+						console.log(error);
+					});                   
+					var popMin = popFilter.substring(0, popFilter.indexOf(","));
+					var popMax = popFilter.substring(popFilter.indexOf(",")+1);
+					var locMin = locFilter.substring(0, locFilter.indexOf(","));
+                    var locMax = locFilter.substring(locFilter.indexOf(",")+1);
+                    filter = " AND `birth` BETWEEN " + ageMin + " AND " + ageMax + " AND `popularity` BETWEEN " + popMin + " AND " + popMax;
 				}
+                // console.log(filter);
 				checkDb.setOrientation(request.session.user.id).then((orientation) => {
-                    checkDb.getAllUsers(orientation, sort).then((users) => {
-                        console.log("Len:" + users.length)
+                    checkDb.getAllUsers(orientation, filter).then((users) => {
+                        // console.log(orientation, sort);
                         if (!request.query.index) {
-                            console.log("--1--");
-                            console.log(request.query.index)
 							checkDb.getLikes(request.session.user.id).then((likes) => {
 								response.render('pages/search', {
 									users: users,

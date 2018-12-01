@@ -203,3 +203,15 @@ a:hover {
     border:none;
     cursor: auto;   
 }
+
+.slider .slider-handle.round {
+    background: -webkit-gradient(linear, left top, left bottom, from(rgb(233, 236, 239)), to(rgb(206, 212, 218)));;
+}
+
+.slider .slider-selection {
+	background: rgb(233, 236, 239);
+}
+
+.slider:hover .tooltip.tooltip-main {
+        opacity: 1 !important;
+}

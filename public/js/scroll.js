@@ -1,6 +1,28 @@
 var i=6;
 var end = 0;
 
+var slideAge = $("#slideAge").slider();
+var slidePop = $("#slidePop").slider();
+var slideLoc = $("#slideLoc").slider();
+var valSlideAge = slideAge.slider('getValue');
+var valSlidePop = slidePop.slider('getValue');
+var valSlideLoc = slideLoc.slider('getValue');
+
+$('#slideAge').change((event) => {
+    valSlideAge = slideAge.slider('getValue');
+    console.log("age : ", valSlideAge);
+});
+
+$('#slidePop').change((event) => {
+    valSlidePop = slidePop.slider('getValue');
+	console.log("pop : ", valSlidePop);
+});
+
+$('#slideLoc').change((event) => {
+    valSlideLoc = slideLoc.slider('getValue');
+	console.log("loc : ", valSlideLoc);
+});
+
 const   requestNextPage = () => {
     $.ajax({
         method: "GET",
@@ -24,6 +46,7 @@ const   requestNextPage = () => {
         }
     });
 }
+console.log(window.location.pathname + window.location.search);
 
 $(function () {
     $(document).ready(function() {
@@ -36,7 +59,12 @@ $(function () {
             }
         });
         $('#inputSort').change((event) => {
-            $(location).attr("href", "/search?sort=" + $('#inputSort').val());
+            $(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
+        })
+
+        $('#inputFilter').click((event) => {
+            // alert("kikou");
+            $(location).attr("href", "/search?filter=" + "age" + valSlideAge + "pop" + valSlidePop + "loc" + valSlideLoc);
         })
     });
 });
