@@ -31,7 +31,6 @@ const   requestNextPage = () => {
         },
         url: window.location.pathname + window.location.search,
         success: function(html) {
-            console.log(html);
             $('.scroll').append(html);
             $('#loading').hide();
             if (html == ""){
@@ -46,7 +45,8 @@ const   requestNextPage = () => {
         }
     });
 }
-console.log(window.location.pathname + window.location.search);
+// console.log(window.location.pathname + window.location.search);
+console.log("substr:", window.location.search.substring(1, 7));
 
 $(function () {
     $(document).ready(function() {
@@ -59,11 +59,16 @@ $(function () {
             }
         });
         $('#inputSort').change((event) => {
-            $(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
+			if (window.location.search && window.location.search.substring(1, 5) == "sort"){
+				$(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
+			} else if (window.location.search && window.location.search.substring(1, 7) == "filter"){
+				$(location).attr("href", window.location.pathname + window.location.search + "&sort=" + $('#inputSort').val());
+			} else {
+				$(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
+			}
         })
 
         $('#inputFilter').click((event) => {
-            // alert("kikou");
             $(location).attr("href", "/search?filter=" + "age" + valSlideAge + "pop" + valSlidePop + "loc" + valSlideLoc);
         })
     });

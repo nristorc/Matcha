@@ -648,6 +648,8 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
+                // gerer filtre et sort
+                console.log("sort:", request.query.sort, "filter:", request.query.filter)
 				var sort = request.query.sort;
 				if (sort == "popAsc"){
 					sort = " ORDER by `popularity` ASC";
@@ -668,30 +670,18 @@ class Routes{
                     var ageMin = ageFilter.substring(0, ageFilter.indexOf(","));
                     var ageMax = ageFilter.substring(ageFilter.indexOf(",")+1);
                     if (ageMin == ageMax){
-                        ageMin -= 1;
+                        ageMin++;
                     }
-					ageMin = userData.ageConvert(ageMin).then((dateMin) => {
-						ageMin = dateMin;
-						console.log(ageMin);
-
-					}).catch((error)=>{
-						console.log(error);
-					});
-					userData.ageConvert(ageMax).then((dateMax) => {
-						ageMax = dateMax;
-						console.log(ageMax);
-					}).catch((error)=>{
-						console.log(error);
-					});                   
+                    var dateMin = userData.ageConvert(ageMin);
+                    var dateMax = userData.ageConvert(ageMax);       
 					var popMin = popFilter.substring(0, popFilter.indexOf(","));
 					var popMax = popFilter.substring(popFilter.indexOf(",")+1);
 					var locMin = locFilter.substring(0, locFilter.indexOf(","));
                     var locMax = locFilter.substring(locFilter.indexOf(",")+1);
-                    filter = " AND `birth` BETWEEN " + ageMin + " AND " + ageMax + " AND `popularity` BETWEEN " + popMin + " AND " + popMax;
+                    filter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + "\" AND `popularity` BETWEEN " + popMin + " AND " + popMax;
 				}
-                // console.log(filter);
 				checkDb.setOrientation(request.session.user.id).then((orientation) => {
-                    checkDb.getAllUsers(orientation, filter).then((users) => {
+                    checkDb.getAllUsers(orientation, filter, sort).then((users) => {
                         // console.log(orientation, sort);
                         if (!request.query.index) {
 							checkDb.getLikes(request.session.user.id).then((likes) => {
@@ -699,29 +689,53 @@ class Routes{
 									users: users,
 									index: 0,
                                     likes: likes,
+                                    ageMin: ageMin,
+                                    ageMax: ageMax,
+                                    popMin: popMin,
+                                    popMax: popMax,
+                                    locMin: locMin,
+                                    locMax: locMax,
 								});
 							}).catch((likes) => {
 								response.render('pages/search', {
 									users: users,
 									index: 0,
-									likes: likes,
+                                    likes: likes,
+                                    ageMin: ageMin,
+                                    ageMax: ageMax,
+                                    popMin: popMin,
+                                    popMax: popMax,
+                                    locMin: locMin,
+                                    locMax: locMax,
 								});
 							});
 						} else {
-                            console.log("--2--");
-                            console.log(request.query.index)
+                            // console.log("--2--");
+                            // console.log(request.query.index)
 							if (request.query.index < users.length){
 								checkDb.getLikes(request.session.user.id).then((likes) => {
                                     response.render('pages/search', {
 										users: users,
 										index: request.query.index,
-										likes: likes
+                                        likes: likes,
+                                        ageMin: ageMin,
+                                        ageMax: ageMax,
+                                        popMin: popMin,
+                                        popMax: popMax,
+                                        locMin: locMin,
+                                        locMax: locMax,
 									});
 								}).catch((likes) => {
 									response.render('pages/search', {
 										users: users,
 										index: request.query.index,
-										likes: likes,
+                                        likes: likes,
+                                        ageMin: ageMin,
+                                        ageMax: ageMax,
+                                        popMin: popMin,
+                                        popMax: popMax,
+                                        locMin: locMin,
+                                        locMax: locMax,
 									});
 								});
 							} else {

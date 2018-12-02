@@ -331,14 +331,21 @@ class DatabaseRequest {
         }
     }
 
-    async getAllUsers(filter, sort){
+    async getAllUsers(orientation, filter, sort){
         try {
             return new Promise((resolve, reject) => {
-                if (sort){
-					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
-					console.log(sql);
+                if (orientation && sort && filter){
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter+sort;
+					// console.log("--1--", sql);
+                } else if (orientation && sort){
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+sort;
+					// console.log("--2--", sql);
+                } else if (orientation && filter){
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter;
+					// console.log("--3--", sql);
                 } else {
-					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+filter; //+" ORDER BY";
+                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation;
+					// console.log("--4--", sql);
                 }
                 this.query(sql).then((users) => {
                     if (users){

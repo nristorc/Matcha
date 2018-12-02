@@ -25,7 +25,26 @@
 		</form>
 		
 		<!-- Filters -->
-		
+		<% 
+		if (!ageMin){
+			ageMin = 18;
+		}
+		if (!ageMax){
+			ageMax = 99;
+		}
+		if (!popMin){
+			popMin = -100;
+		}
+		if (!popMax){
+			popMax = 100;
+		}
+		if (!locMin){
+			locMin = 1;
+		}
+		if (!locMax){
+			locMax = 50;
+		}
+		%>
 		<div class="accordion" id="accordionExample">
 			<button class="btn btn-link forgot-password collapsed" type="button" data-toggle="collapse" data-target="#collapse" aria-expanded="false" aria-controls="collapse">
 				Recherche avancée
@@ -39,7 +58,7 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">18 ans</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="slideAge" type="text" class="span2" value="" data-slider-min="18" data-slider-max="99" data-slider-step="1" data-slider-value="[18,40]"data-slider-handle="round"/>
+							<input id="slideAge" type="text" class="span2" value="" data-slider-min="18" data-slider-max="99" data-slider-step="1" data-slider-value="[<%=ageMin%>,<%=ageMax%>]"data-slider-handle="round"/>
 						</div>
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">99+</div>
 					</div>
@@ -48,7 +67,7 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">-100%</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-100,100]" data-slider-handle="round"/>	
+							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[<%=popMin%>,<%=popMax%>]" data-slider-handle="round"/>	
 						</div>
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">100%</div>
 					</div>
@@ -57,7 +76,7 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">1km</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="slideLoc" type="text" class="span2" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="[1,50]" data-slider-handle="round"/>
+							<input id="slideLoc" type="text" class="span2" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="[<%=locMin%>,<%=locMax%>]" data-slider-handle="round"/>
 						</div>
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">50km+</div>
 					</div>
