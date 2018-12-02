@@ -58,7 +58,6 @@ $(function () {
         });
         $('#inputSort').change((event) => {
 			if (window.location.search && window.location.search.substring(1, 5) == "sort"){
-				// alert("1");
 				$(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
 			} else if (window.location.search && window.location.search.substring(1, 7) == "filter"){
 				if (window.location.search.indexOf("&sort") != -1){
@@ -67,7 +66,6 @@ $(function () {
 					$(location).attr("href", window.location.pathname +  window.location.search + "&sort=" + $('#inputSort').val());
 				}
 			} else {
-				// alert("4");
 				$(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
 			}
         })
