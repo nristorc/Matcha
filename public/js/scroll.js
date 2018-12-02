@@ -45,8 +45,6 @@ const   requestNextPage = () => {
         }
     });
 }
-// console.log(window.location.pathname + window.location.search);
-console.log("substr:", window.location.search.substring(1, 7));
 
 $(function () {
     $(document).ready(function() {
@@ -60,10 +58,16 @@ $(function () {
         });
         $('#inputSort').change((event) => {
 			if (window.location.search && window.location.search.substring(1, 5) == "sort"){
+				// alert("1");
 				$(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
 			} else if (window.location.search && window.location.search.substring(1, 7) == "filter"){
-				$(location).attr("href", window.location.pathname + window.location.search + "&sort=" + $('#inputSort').val());
+				if (window.location.search.indexOf("&sort") != -1){
+					$(location).attr("href", window.location.pathname + window.location.search.substring(0, window.location.search.indexOf("&sort")) + "&sort=" + $('#inputSort').val());
+				} else {
+					$(location).attr("href", window.location.pathname +  window.location.search + "&sort=" + $('#inputSort').val());
+				}
 			} else {
+				// alert("4");
 				$(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
 			}
         })

@@ -3,31 +3,21 @@ class Sort{
         this.errors = []
     }
 
-    async sortBy(json, params){
-        try {
-            return new Promise((resolve, reject) => {
-				var dob = params;
-				if (dob != null) {
-				    var year = dob.getFullYear();
-					var month = dob.getMonth();
-					var day = dob.getDate();
-
-					var today = new Date();
-					var age = today.getFullYear() - year;
-						if (today.getMonth() < month || (today.getMonth() === month && today.getDate() < day)) {
-						    age--;
-                        }
-                    resolve(age);
-                } else {
-					reject(null);
-				}
-               });
-        } catch (error){
-            console.log(error);
-            return false;
+    sort(params){
+        if (params == "popAsc"){
+            params = " ORDER by `popularity` ASC";
+        } else if (params == "popDesc"){
+            params = " ORDER by `popularity` DESC";
+        } else if (params == "ageAsc"){
+            params = " ORDER by `birth` ASC";
+        } else if (params == "ageDesc"){
+            params = " ORDER by `birth` DESC";
+        } else if (params == "loc"){
+            params = " ORDER by `birth` DESC";
         }
+        return(params)
     }
-
+    
 }
 
 module.exports = Sort;

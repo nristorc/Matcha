@@ -9,6 +9,9 @@ let validation = new registerValidation();
 const userDatabase =require('../models/userData');
 const userData = new userDatabase();
 
+const resultSort =require('../models/resultSort');
+const resSort = new resultSort();
+
 const multer = require('multer');
 const path = require('path');
 
@@ -648,19 +651,8 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-                // gerer filtre et sort
-                console.log("sort:", request.query.sort, "filter:", request.query.filter)
-				var sort = request.query.sort;
-				if (sort == "popAsc"){
-					sort = " ORDER by `popularity` ASC";
-				} else if (sort == "popDesc"){
-					sort = " ORDER by `popularity` DESC";
-				} else if (sort == "ageAsc"){
-					sort = " ORDER by `birth` ASC";
-				} else if (sort == "ageDesc"){
-					sort = " ORDER by `birth` DESC";
-				} else if (sort == "loc"){
-					sort = " ORDER by `birth` DESC";
+                if (request.query.sort != undefined){
+                    var sort = resSort.sort(request.query.sort);
                 }
                 var filter = request.query.filter;
                 if (filter != undefined){                    
@@ -682,7 +674,6 @@ class Routes{
 				}
 				checkDb.setOrientation(request.session.user.id).then((orientation) => {
                     checkDb.getAllUsers(orientation, filter, sort).then((users) => {
-                        // console.log(orientation, sort);
                         if (!request.query.index) {
 							checkDb.getLikes(request.session.user.id).then((likes) => {
 								response.render('pages/search', {
