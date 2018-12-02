@@ -344,7 +344,8 @@ class DatabaseRequest {
 					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter;
 					// console.log("--3--", sql);
                 } else {
-                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation;
+                    // var secretSauce =  " ORDER by `popularity` DESC, `username` DESC";
+                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation; //+secretSauce;
 					// console.log("--4--", sql);
                 }
                 this.query(sql).then((users) => {
@@ -360,9 +361,7 @@ class DatabaseRequest {
             return false;
         }
     }
-
-
-    
+  
     async setOrientation(params){
 		try {
             return new Promise((resolve, reject) => {
