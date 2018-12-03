@@ -52,10 +52,8 @@ class Routes{
         this.app.get('/', async (request,response) => {
             console.log("Je suis dans INDEX");
             if (!request.session.user) {
-                //console.log('session KO: ', request.session);
                 response.status(200).render('index');
             } else {
-                //console.log('session OK: ', request.session);
                 console.log(request.session.user);
                 response.status(200).redirect('/profil');
             }
@@ -63,61 +61,61 @@ class Routes{
 
         /* Routes for Authentication */
 
-        this.app.post('/login', async (request, response)=> {
-            const loginResponse = {};
-            const data = {
-                username: request.body.username,
-                password: request.body.password,
-            };
-            if ((data.username === '' || data.username === null) && (data.password === '' || data.password === null)) {
-                loginResponse.error = true;
-                loginResponse.type = 'warning';
-                loginResponse.message = `fields cannot be empty`;
-                request.flash(loginResponse.type, loginResponse.message);
-                response.status(412).redirect('/');
-            } else if (data.username === '' || data.username === null) {
-                loginResponse.error = true;
-                loginResponse.type = 'warning';
-                loginResponse.message = `username cant be empty.`;
-                request.flash(loginResponse.type, loginResponse.message);
-                response.status(412).redirect('/');
-            } else if(data.password === '' || data.password === null){
-                loginResponse.error = true;
-                loginResponse.type = 'warning';
-                loginResponse.message = `password cant be empty.`;
-                request.flash(loginResponse.type, loginResponse.message);
-                response.status(412).redirect('/');
-            } else {
-                checkDb.checkActive(data.username).then(() => {
-                    checkDb.loginUser(data).then( (result) => {
-                        loginResponse.error = false;
-                        loginResponse.type = 'dark';
-                        loginResponse.userId = result[0].id;
-                        loginResponse.message = `User logged in.`;
-                        request.session.user = data;
-                        request.session.user.id = result[0].id;
-                        request.session.user.email = result[0].email;
-                        console.log(request.session.user);
-                        request.flash(loginResponse.type, loginResponse.message);
-                        response.status(200).redirect('/profil');
-                    }).catch((result) => {
-                        if (result === undefined || result === false) {
-                            loginResponse.error = true;
-                            loginResponse.type = 'warning';
-                            loginResponse.message = `Invalid username and password combination.`;
-                            request.flash(loginResponse.type, loginResponse.message);
-                            response.status(401).redirect('/');
-                        }
-                    });
-                }).catch((val) => {
-                    loginResponse.error = true;
-                    loginResponse.type = 'warning';
-                    loginResponse.message = val;
-                    request.flash(loginResponse.type, loginResponse.message);
-                    response.status(420).redirect('/');
-                });
-            }
-        });
+        // this.app.post('/login', async (request, response)=> {
+        //     const loginResponse = {};
+        //     const data = {
+        //         username: request.body.username,
+        //         password: request.body.password,
+        //     };
+        //     if ((data.username === '' || data.username === null) && (data.password === '' || data.password === null)) {
+        //         loginResponse.error = true;
+        //         loginResponse.type = 'warning';
+        //         loginResponse.message = `fields cannot be empty`;
+        //         request.flash(loginResponse.type, loginResponse.message);
+        //         response.status(412).redirect('/');
+        //     } else if (data.username === '' || data.username === null) {
+        //         loginResponse.error = true;
+        //         loginResponse.type = 'warning';
+        //         loginResponse.message = `username cant be empty.`;
+        //         request.flash(loginResponse.type, loginResponse.message);
+        //         response.status(412).redirect('/');
+        //     } else if(data.password === '' || data.password === null){
+        //         loginResponse.error = true;
+        //         loginResponse.type = 'warning';
+        //         loginResponse.message = `password cant be empty.`;
+        //         request.flash(loginResponse.type, loginResponse.message);
+        //         response.status(412).redirect('/');
+        //     } else {
+        //         checkDb.checkActive(data.username).then(() => {
+        //             checkDb.loginUser(data).then( (result) => {
+        //                 loginResponse.error = false;
+        //                 loginResponse.type = 'dark';
+        //                 loginResponse.userId = result[0].id;
+        //                 loginResponse.message = `User logged in.`;
+        //                 request.session.user = data;
+        //                 request.session.user.id = result[0].id;
+        //                 request.session.user.email = result[0].email;
+        //                 console.log(request.session.user);
+        //                 request.flash(loginResponse.type, loginResponse.message);
+        //                 response.status(200).redirect('/profil');
+        //             }).catch((result) => {
+        //                 if (result === undefined || result === false) {
+        //                     loginResponse.error = true;
+        //                     loginResponse.type = 'warning';
+        //                     loginResponse.message = `Invalid username and password combination.`;
+        //                     request.flash(loginResponse.type, loginResponse.message);
+        //                     response.status(401).redirect('/');
+        //                 }
+        //             });
+        //         }).catch((val) => {
+        //             loginResponse.error = true;
+        //             loginResponse.type = 'warning';
+        //             loginResponse.message = val;
+        //             request.flash(loginResponse.type, loginResponse.message);
+        //             response.status(420).redirect('/');
+        //         });
+        //     }
+        // });
 
         this.app.post('/register', async (request,response) => {
             console.log("Je suis dans REGISTER");
@@ -205,46 +203,42 @@ class Routes{
         this.app.post('/resetPassword', async (request, response) => {
             const checkingResponse = {};
             const valid = await validation.isEmail(request.body.checkEmail, "Wrong Email");
-            console.log("Email du formulaire ",request.body.checkEmail);
-            console.log("Variable Valid: ",valid);
-            console.log("Tableau d'erreur: ",validation.errors);
             if (valid && validation.errors !== []) {
-                console.log("Le format de l'email est incorrect");
                 checkingResponse.error = true;
+                checkingResponse.type = 'warning';
                 checkingResponse.message = `Mauvais format d'email`;
-                response.status(417).json(checkingResponse);
+                request.flash(checkingResponse.type, checkingResponse.message);
                 validation.errors = [];
+                response.status(417).redirect('/');
             } else {
                 console.log("Format OK, je checke la DB");
                 const resultEmail = await checkDb.checkEmail(request.body.checkEmail);
                 if (resultEmail[0].count === 0) {
-                    console.log("DB: Email non trouvé");
-                    response.status(401).json({
-                        error:true,
-                        message: 'Aucun email correspondant dans la base de données'
-                    });
+                    checkingResponse.error = true;
+                    checkingResponse.type = 'warning';
+                    checkingResponse.message = 'Aucun email correspondant dans la base de données';
+                    request.flash(checkingResponse.type, checkingResponse.message);
+                    response.status(417).redirect('/');
                 } else {
                     checkDb.checkActive(request.body.checkEmail).then(() => {
-                        console.log('All good, je peux envoyer mon mail de reset');
                         checkDb.resetToken(request.body.checkEmail);
-                        response.redirect('/');
+                        request.flash('dark', 'Un email pour réinitialiser votre mot de passe vous a été envoyé');
+                        response.status(200).redirect('/');
                     }).catch(() => {
-                        console.log("DB: Compte pas actif");
-                        response.status(401).json({
-                            error:true,
-                            message: "Votre compte n'est pas encore actif..."
-                        });
+                        checkingResponse.error = true;
+                        checkingResponse.type = 'warning';
+                        checkingResponse.message = "Votre compte n'est pas encore actif";
+                        request.flash(checkingResponse.type, checkingResponse.message);
+                        response.status(401).redirect('/');
                     });
                 }
             }
         });
 
         this.app.get('/verify/register/:registerToken', async (request, response) => {
-            console.log("Jesuis dans VERIFY REGISTER");
             const loginResponse = {};
             checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
                 if (result && result !== undefined) {
-                    console.log("Then: ", result);
                     const data = {
                         username: result[0].username,
                         password: result[0].password,
@@ -268,55 +262,67 @@ class Routes{
                 loginResponse.message = `Token not valid`;
                 request.flash(loginResponse.type, loginResponse.message);
                 response.status(401).redirect('/');
-                console.log('response catch: ', response.status);
             });
         });
 
         this.app.route('/verify/reset/:resetToken')
             .get((request, response) => {
+                const resetResponse = {};
                 checkDb.checkResetToken(request.params.resetToken).then((result) => {
-                    if (result[0].count === 0) {
-                        response.status(401).json({
-                            error:true,
-                            message: 'Token invalide...'
-                        });
-                    } else {
+                    if (result) {
                         response.render('pages/resetPassword', {resetToken: request.params.resetToken});
-                        console.log("Je rentre dans GET");
+                    } else {
+                        resetResponse.error = true;
+                        resetResponse.type = 'warning';
+                        resetResponse.message = "Un problème est survenu, merci de réitérer votre demande ultérieurement";
+                        request.flash(resetResponse.type, resetResponse.message);
+                        response.status(401).redirect('/');
                     }
-                }).catch(() => {
-                    response.status(417).json("Une erreur s'est produite, merci de bien vouloir reessayer");
+                }).catch((result) => {
+                    // console.log('pb', result);
+                    if (result) {
+                        resetResponse.error = true;
+                        resetResponse.type = 'warning';
+                        resetResponse.message = "Token not valid";
+                        request.flash(resetResponse.type, resetResponse.message);
+                        response.status(401).redirect('/');
+                    } else {
+                        resetResponse.error = true;
+                        resetResponse.type = 'warning';
+                        resetResponse.message = "Un problème est survenu, merci de réitérer votre demande ultérieurement";
+                        request.flash(resetResponse.type, resetResponse.message);
+                        response.status(417).redirect('/');
+                    }
                 });
             }).post(async (request, response) => {
-            console.log("Je rentre dans POST");
-            const resetResponse = {};
-            const data = {
-                resetToken: request.body.resetToken,
-                newPassword: request.body.modifyPassword,
-                confirmPassword: request.body.modifyPasswordConfirm
-            };
-            await validation.isConfirmed(data.newPassword, data.confirmPassword, "Wrong matching password");
-            console.log(validation.errors);
-            if (validation.errors.length === 0) {
-                const result = await checkDb.resetPassword(data);
-                console.log(result);
-                if (result === false) {
-                    resetResponse.error = true;
-                    resetResponse.message = `Reset password unsuccessful,try after some time.`;
-                    response.status(417).json(resetResponse);
-                } else {
-                    resetResponse.error = false;
-                    //resetResponse.userId = result.insertId;
-                    resetResponse.message = `Votre mot de passe a bien été modifié`;
-                    response.status(200).redirect('/');
-                }
+                console.log('request post: ', request.body);
+                const resetResponse = {};
+                const data = {
+                    resetToken: request.body.resetToken,
+                    newPassword: request.body.modifyPassword,
+                    confirmPassword: request.body. modifyPasswordConfirm
+                };
 
-            } else {
-                resetResponse.error = true;
-                resetResponse.message = `Error fields format...`;
-                response.status(417).json(resetResponse);
-                validation.errors = [];
-            }
+                await validation.isConfirmed(data.newPassword, data.confirmPassword, "le mot de passe renseigné est incorrect");
+                if (validation.errors.length !== 0) {
+                    const msg = validation.errors[0].errorMsg;
+                    validation.errors = [];
+                    request.flash('warning', msg);
+                    response.status(401).redirect('/verify/reset/' + data.resetToken);
+
+                } else {
+                    await checkDb.resetPassword(data).then((result) => {
+                        if (result) {
+                            request.flash('dark', "Votre mot de passe a bien été mis à jour");
+                            response.status(200).redirect('/');
+                        }
+                    }).catch((result) => {
+                        if (result) {
+                            request.flash('warning', "Une erreur s'est produite: " + result);
+                            response.status(401).redirect('/verify/reset/' + data.resetToken);
+                        }
+                    });
+                }
         });
 
         this.app.get('/logout', function(request, result){
@@ -339,14 +345,10 @@ class Routes{
                 return response.render('index');
 			}
 			checkDb.getUser(request.session.user.username).then((user) => {
-			    // console.log('user THEN: ', user);
 				checkDb.getTags(request.session.user.id).then((tags) => {
-                    // console.log('tags THEN: ', tags);
 				    checkDb.getPhotos(request.session.user.id).then((photos) => {
-                        // console.log('photos THEN: ', photos);
-                        // console.log('get DB age', user[0]['birth']);
                         userData.userAge(user[0]['birth']).then((age) => {
-                            console.log('age THEN: ', age);
+                            // console.log('age THEN: ', age);
                             response.render('pages/profil', {
                                 user: user,
                                 userage: age,
@@ -354,7 +356,6 @@ class Routes{
                                 userphotos: photos
                             });
                         }).catch((age) => {
-                            // console.log('age CATCH: ', age);
                             response.render('pages/profil', {
                                 user: user,
                                 usertags: tags,
@@ -363,7 +364,6 @@ class Routes{
                             });
                         });
                     }).catch((photos) => {
-                        // console.log('photos CATCH: ', photos);
                         response.render('pages/profil', {
                             user: user,
                             usertags: tags,
@@ -372,7 +372,6 @@ class Routes{
                         });
                     });
 				}).catch((tags) => {
-                    // console.log('tags CATCH: ', tags);
                     response.render('pages/profil', {
                         user: user,
                         usertags: tags,
@@ -381,11 +380,11 @@ class Routes{
                     });
                 });
 			}).catch((user) => {
-                // console.log('user CATCH: ', user);
                 response.render('index');
             });
 
         }).post(async (request, response) => {
+            //console.log('general request', request.body);
             if (request.body.submit === 'modifyParams') {
                 const data = {
                     firstname: request.body.firstname,
@@ -547,7 +546,7 @@ class Routes{
 
             } else if (request.body.submit === 'deletePic') {
 
-                console.log('image node: ',request.body.image);
+                //console.log('image node: ', request.body.image);
 
                 checkDb.checkProfilPic(request.session.user.id).then((result) => {
                     const imagePath = request.body.image.substring(22);
@@ -561,10 +560,14 @@ class Routes{
                                         //console.log('image path delete', imagePath);
                                         fs.unlink(imagePath, (err) => {
                                             if (err) throw err;
-                                            console.log('successfully deleted '+ imagePath);
+                                            console.log('successfully deleted ' + imagePath);
                                         });
                                         //console.log('image path response', imagePath);
-                                        response.json({image: imagePath, message: 'Votre photo a bien été supprimée', flag: 'profil'});
+                                        response.json({
+                                            image: imagePath,
+                                            message: 'Votre photo a bien été supprimée',
+                                            flag: 'profil'
+                                        });
                                     }).catch((deleteRes) => {
                                         response.json({errors: "Une erreur s'est produite: " + deleteRes});
                                     });
@@ -575,8 +578,9 @@ class Routes{
 
                         } else {
                             checkDb.deletePhoto(request.session.user.id, imagePath).then((deleteRes) => {
-                                fs.unlink(imagePath, (err) => {if (err) throw err;
-                                    console.log('successfully deleted '+ imagePath);
+                                fs.unlink(imagePath, (err) => {
+                                    if (err) throw err;
+                                    console.log('successfully deleted ' + imagePath);
                                 });
                                 response.json({image: imagePath, message: 'Votre photo a bien été supprimée'});
                             }).catch((deleteRes) => {
@@ -588,8 +592,46 @@ class Routes{
                     response.json({errors: "Une erreur s'est produite: " + result});
                 });
 
-
-            } else {
+            } else if (request.body.submit === 'addTag') {
+                if (request.body.tag) {
+                        checkDb.getTags(request.session.user.id).then((result) => {
+                            if (result) {
+                                if (result.length >= 6){
+                                    response.json({errors: "Vous avez atteint le nombre maximum de tags autorisé"});
+                                } else {
+                                    var flag = false;
+                                    for (var i = 0; i < result.length; i++) {
+                                        if (result[i].tag === request.body.tag) {
+                                            flag = true;
+                                        }
+                                    }
+                                    if (flag === true) {
+                                        response.json({errors: "Vous possédez déjà un tag similaire"});
+                                    } else {
+                                        checkDb.insertTag(request.session.user.id, request.body.tag).then((resTag) => {
+                                            response.json({message: "Tag added"});
+                                        }).catch((resTag) => {
+                                            response.json({errors: "Une erreur s'est produite: " + resTag});
+                                        })
+                                    }
+                                }
+                            }
+                        }).catch((result) => {
+                            response.json({errors: "Une erreur s'est produite: " + result});
+                        });
+                }
+            } else if(request.body.submit === 'deleteTag') {
+                if (request.body.tag) {
+                    checkDb.deleteTag(request.session.user.id, request.body.tag).then((resTag) => {
+                        console.log('then', resTag);
+                        response.json({message: "Tag deleted"});
+                    }).catch((resTag) => {
+                        console.log('catch', resTag);
+                        response.json({errors: "Une erreur s'est produite: " + resTag});
+                    })
+                }
+            }
+            else {
                 fs.readdir('public/uploads/', (err, items) => {
                     var i = 0;
                     while (items[i] && items[i].split('-')[0] == request.session.user.id) {
@@ -671,74 +713,80 @@ class Routes{
 					var locMin = locFilter.substring(0, locFilter.indexOf(","));
                     var locMax = locFilter.substring(locFilter.indexOf(",")+1);
                     filter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + "\" AND `popularity` BETWEEN " + popMin + " AND " + popMax;
-				}
-				checkDb.setOrientation(request.session.user.id).then((orientation) => {
-                    checkDb.getAllUsers(orientation, filter, sort).then((users) => {
-                        if (!request.query.index) {
-							checkDb.getLikes(request.session.user.id).then((likes) => {
-								response.render('pages/search', {
-									users: users,
-									index: 0,
-                                    likes: likes,
-                                    ageMin: ageMin,
-                                    ageMax: ageMax,
-                                    popMin: popMin,
-                                    popMax: popMax,
-                                    locMin: locMin,
-                                    locMax: locMax,
-								});
-							}).catch((likes) => {
-								response.render('pages/search', {
-									users: users,
-									index: 0,
-                                    likes: likes,
-                                    ageMin: ageMin,
-                                    ageMax: ageMax,
-                                    popMin: popMin,
-                                    popMax: popMax,
-                                    locMin: locMin,
-                                    locMax: locMax,
-								});
-							});
-						} else {
-                            // console.log("--2--");
-                            // console.log(request.query.index)
-							if (request.query.index < users.length){
-								checkDb.getLikes(request.session.user.id).then((likes) => {
-                                    response.render('pages/search', {
-										users: users,
-										index: request.query.index,
-                                        likes: likes,
-                                        ageMin: ageMin,
-                                        ageMax: ageMax,
-                                        popMin: popMin,
-                                        popMax: popMax,
-                                        locMin: locMin,
-                                        locMax: locMax,
-									});
-								}).catch((likes) => {
-									response.render('pages/search', {
-										users: users,
-										index: request.query.index,
-                                        likes: likes,
-                                        ageMin: ageMin,
-                                        ageMax: ageMax,
-                                        popMin: popMin,
-                                        popMax: popMax,
-                                        locMin: locMin,
-                                        locMax: locMax,
-									});
-								});
-							} else {
-								response.end();
-							}
-						}
-					}).catch((users) => {
-						return response.render('index');
-					});
-				}).catch((orientation) => {
-					return response.render('index');
-				});					
+				}   
+                checkDb.profilCompleted(request.session.user.id).then((result) => {
+                            				checkDb.setOrientation(request.session.user.id).then((orientation) => {
+                                                checkDb.getAllUsers(orientation, filter, sort).then((users) => {
+                                                    if (!request.query.index) {
+                            							checkDb.getLikes(request.session.user.id).then((likes) => {
+                            								response.render('pages/search', {
+                            									users: users,
+                            									index: 0,
+                                                                likes: likes,
+                                                                ageMin: ageMin,
+                                                                ageMax: ageMax,
+                                                                popMin: popMin,
+                                                                popMax: popMax,
+                                                                locMin: locMin,
+                                                                locMax: locMax,
+                            								});
+                            							}).catch((likes) => {
+                            								response.render('pages/search', {
+                            									users: users,
+                            									index: 0,
+                                                                likes: likes,
+                                                                ageMin: ageMin,
+                                                                ageMax: ageMax,
+                                                                popMin: popMin,
+                                                                popMax: popMax,
+                                                                locMin: locMin,
+                                                                locMax: locMax,
+                            								});
+                            							});
+                            						} else {
+                                                        // console.log("--2--");
+                                                        // console.log(request.query.index)
+                            							if (request.query.index < users.length){
+                            								checkDb.getLikes(request.session.user.id).then((likes) => {
+                                                                response.render('pages/search', {
+                            										users: users,
+                            										index: request.query.index,
+                                                                    likes: likes,
+                                                                    ageMin: ageMin,
+                                                                    ageMax: ageMax,
+                                                                    popMin: popMin,
+                                                                    popMax: popMax,
+                                                                    locMin: locMin,
+                                                                    locMax: locMax,
+                            									});
+                            								}).catch((likes) => {
+                            									response.render('pages/search', {
+                            										users: users,
+                            										index: request.query.index,
+                                                                    likes: likes,
+                                                                    ageMin: ageMin,
+                                                                    ageMax: ageMax,
+                                                                    popMin: popMin,
+                                                                    popMax: popMax,
+                                                                    locMin: locMin,
+                                                                    locMax: locMax,
+                            									});
+                            								});
+                            							} else {
+                            								response.end();
+                            							}
+                            						}
+                            					}).catch((users) => {
+                            						return response.render('index');
+                            					});
+                            				}).catch((orientation) => {
+                            					return response.render('index');
+                            				});
+                }).catch((result) => {
+                    console.log('catch', result);
+                    request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
+                    response.redirect('/')
+                });
 			}
         }).post('/search', async(request, response) => {
             if (!request.session.user) {
@@ -756,28 +804,85 @@ class Routes{
 				}
 			}
 		});
+		
+		/* Routes for search by username */
 
-		/* Routes for TestTags */
-        this.app.get('/tags', (request, response) => {
-            if (!request.session.user) {
-                return response.render('index');
-            }
-            checkDb.getUser(request.session.user.username).then((user) => {
-                checkDb.getTags(request.session.user.id).then((tags) => {
-                    response.render('pages/testTags', {
-                        user: user,
-                        usertags: tags,
-                            });
-                }).catch((tags) => {
-                    response.render('pages/testTags', {
-                        user: user,
-                        usertags: tags,
-                    });
-                });
-            }).catch((user) => {
-                response.render('index');
+        this.app.post('/usersearch', async (request, response) => {
+            const query = request.body.q;
+            checkDb.query("SELECT id, username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
+                var res = '<li class="searchLi">No data found !</li>';
+                if (result === [] || result === {} || result === null || result == "") {
+                    response.json({res});
+                } else {
+                    res = [];
+                    for (var i = 0; i < result.length; i++) {
+                        res.push('<li class="searchLi">' + result[i].username + '</li>');
+                    }
+                    response.json({res: res, userdata: result});
+                }
+
+            }).catch((result) => {
+                console.log('result catch: ', result);
             });
-        })
+        });
+
+        this.app.get('/user/:id', async (request, response) => {
+
+            checkDb.profilCompleted(request.session.user.id).then((result) => {
+                const sql = 'SELECT * FROM matcha.users WHERE id = ?';
+                checkDb.query(sql, [request.params.id]).then((result) => {
+                    if (result == "") {
+                        request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
+                        response.redirect('/');
+                    } else {
+                        checkDb.getTags(request.params.id).then((tags) => {
+                            checkDb.getPhotos(request.params.id).then((photos) => {
+                                userData.userAge(result[0].birth).then((age) => {
+                                    response.render('pages/user', {
+                                        user: result,
+                                        userage: age,
+                                        usertags: tags,
+                                        userphotos: photos
+                                    });
+                                }).catch((age) => {
+                                    console.log('age CATCH: ', age);
+                                    response.render('pages/user', {
+                                        user: result,
+                                        usertags: tags,
+                                        userage: null,
+                                        userphotos: photos
+                                    });
+                                });
+                            }).catch((photos) => {
+                                response.render('pages/user', {
+                                    user: result,
+                                    usertags: tags,
+                                    userage: null,
+                                    userphotos: null
+                                });
+                            });
+                        }).catch((tags) => {
+                            response.render('pages/user', {
+                                user: result,
+                                usertags: tags,
+                                userage: null,
+                                userphotos: photos
+                            });
+                        });
+                    }
+
+                }).catch((result) => {
+                    console.log('catch', result);
+                });
+
+            }).catch((result) => {
+                console.log('catch', result);
+                request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
+                response.redirect('/')
+            });
+
+
+        });
 
     }
 
