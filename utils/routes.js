@@ -50,7 +50,6 @@ class Routes{
 
     appRoutes(){
         this.app.get('/', async (request,response) => {
-            console.log("Je suis dans INDEX");
             if (!request.session.user) {
                 response.status(200).render('index');
             } else {
@@ -342,6 +341,7 @@ class Routes{
 
         this.app.route('/profil').get((request, response) => {
             if (!request.session.user) {
+                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
 			}
 			checkDb.getUser(request.session.user.username).then((user) => {
@@ -691,6 +691,7 @@ class Routes{
 
         this.app.get('/search', (request, response) => {
 			if (!request.session.user) {
+                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
 			} else {
                 if (request.query.sort != undefined){
@@ -790,6 +791,7 @@ class Routes{
 			}
         }).post('/search', async(request, response) => {
             if (!request.session.user) {
+                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
 			} else {
                 var data = request.body.id_liked;
@@ -828,25 +830,51 @@ class Routes{
         });
 
         this.app.get('/user/:id', async (request, response) => {
-
-            checkDb.profilCompleted(request.session.user.id).then((result) => {
-                const sql = 'SELECT * FROM matcha.users WHERE id = ?';
-                checkDb.query(sql, [request.params.id]).then((result) => {
-                    if (result == "") {
-                        request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
-                        response.redirect('/');
+            if (!request.session.user) {
+                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+                response.status(200).render('index');
+            } else {
+                checkDb.profilCompleted(request.session.user.id).then((result) => {
+                    console.log('params', typeof request.params.id)
+                    console.log('session', typeof request.session.user.id)
+                    if (request.params.id == request.session.user.id) {
+                        //console.log('same profil');
+                        response.redirect('/profil');
                     } else {
-                        checkDb.getTags(request.params.id).then((tags) => {
-                            checkDb.getPhotos(request.params.id).then((photos) => {
-                                userData.userAge(result[0].birth).then((age) => {
-                                    response.render('pages/user', {
-                                        user: result,
-                                        userage: age,
-                                        usertags: tags,
-                                        userphotos: photos
+                        console.log('params else', request.params);
+                        const sql = 'SELECT * FROM matcha.users WHERE id = ?';
+                        checkDb.query(sql, [request.params.id]).then((result) => {
+                            if (result == "") {
+                                request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
+                                response.redirect('/');
+                            } else {
+                                checkDb.getTags(request.params.id).then((tags) => {
+                                    checkDb.getPhotos(request.params.id).then((photos) => {
+                                        userData.userAge(result[0].birth).then((age) => {
+                                            response.render('pages/user', {
+                                                user: result,
+                                                userage: age,
+                                                usertags: tags,
+                                                userphotos: photos
+                                            });
+                                        }).catch((age) => {
+                                            console.log('age CATCH: ', age);
+                                            response.render('pages/user', {
+                                                user: result,
+                                                usertags: tags,
+                                                userage: null,
+                                                userphotos: photos
+                                            });
+                                        });
+                                    }).catch((photos) => {
+                                        response.render('pages/user', {
+                                            user: result,
+                                            usertags: tags,
+                                            userage: null,
+                                            userphotos: null
+                                        });
                                     });
-                                }).catch((age) => {
-                                    console.log('age CATCH: ', age);
+                                }).catch((tags) => {
                                     response.render('pages/user', {
                                         user: result,
                                         usertags: tags,
@@ -854,34 +882,19 @@ class Routes{
                                         userphotos: photos
                                     });
                                 });
-                            }).catch((photos) => {
-                                response.render('pages/user', {
-                                    user: result,
-                                    usertags: tags,
-                                    userage: null,
-                                    userphotos: null
-                                });
-                            });
-                        }).catch((tags) => {
-                            response.render('pages/user', {
-                                user: result,
-                                usertags: tags,
-                                userage: null,
-                                userphotos: photos
-                            });
+                            }
+
+                        }).catch((result) => {
+                            console.log('catch', result);
                         });
                     }
 
                 }).catch((result) => {
                     console.log('catch', result);
+                    request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
+                    response.redirect('/')
                 });
-
-            }).catch((result) => {
-                console.log('catch', result);
-                request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
-                response.redirect('/')
-            });
-
+            }
 
         });
 
