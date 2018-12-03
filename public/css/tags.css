@@ -1,0 +1,19 @@
+#tags{
+    float:left;
+    padding:4px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+#tags .hashtag {
+    margin: 0 0 0 6px;
+}
+
+#tags input{
+    background:#eee;
+    border:0;
+    margin:4px;
+    padding:7px;
+    width:auto;
+}

@@ -9,7 +9,8 @@ var cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 const expressMessages = require('express-messages');
 
-const routes = require('./utils/routes');
+const routes    = require('./utils/routes');
+const login     = require('./utils/login');
 
 class Server{
 
@@ -41,6 +42,9 @@ class Server{
             response.locals.messages = expressMessages(request, response);
             next();
         });
+
+        this.app.use('/login', login);
+
 
         this.app.set('views', './views');
         this.app.set('view engine', 'ejs');

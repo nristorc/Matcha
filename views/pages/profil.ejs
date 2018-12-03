@@ -35,10 +35,10 @@
 						<div class="form-group">
 							<label for="sexOrientation" class="col-form-label">Votre Orientation Sexuelle</label>
 							<select name="orientation" class="form-control" id="sexOrientation">
-								<option value="Hétérosexuel">Hétérosexuel</option>
-                                <option value="Homosexuel">Homosexuel</option>
-                                <option value="Bisexuel" selected>Bisexuel</option>
-                                <option value="Homosexuel">Pansexuel</option>
+                                <option value="Bisexuel"<% if (user[0].orientation === 'Bisexuel') {%> selected <%}%>>Bisexuel</option>
+                                <option value="Hétérosexuel"<% if (user[0].orientation === 'Hétérosexuel') {%> selected <%}%>>Hétérosexuel</option>
+                                <option value="Homosexuel"<% if (user[0].orientation === 'Homosexuel') {%> selected <%}%>>Homosexuel</option>
+                                <option value="Pansexuel"<% if (user[0].orientation === 'Pansexuel') {%> selected <%}%>>Pansexuel</option>
 							</select>
 						</div>
 						<div class="form-group">
@@ -57,7 +57,7 @@
 <% } %>
 
 <div class="media">
-    <img src="<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
+    <img src="/<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
     <div class="media-body">
 		<button type="button" class="btn btn-primary popularity">
 			Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
@@ -72,7 +72,7 @@
 		<h2 class="mt-0" id="userDetails"><%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>
 
 
-		<!-- Modal Parameters-->
+		<!-- Modal Parameters -->
 		<div class="modal fade" id="accountParam" tabindex="-1" role="dialog" aria-labelledby="accountParametersModification" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
@@ -155,9 +155,9 @@
                             <div class="form-group">
                                 <label for="editOrientation" class="col-form-label">Votre Orientation Sexuelle</label>
                                 <select name="editOrientation" class="form-control" id="editOrientation">
+                                    <option value="Bisexuel"<% if (user[0].orientation === 'Bisexuel') {%> selected <%}%>>Bisexuel</option>
                                     <option value="Hétérosexuel"<% if (user[0].orientation === 'Hétérosexuel') {%> selected <%}%>>Hétérosexuel</option>
                                     <option value="Homosexuel"<% if (user[0].orientation === 'Homosexuel') {%> selected <%}%>>Homosexuel</option>
-                                    <option value="Bisexuel"<% if (user[0].orientation === 'Bisexuel') {%> selected <%}%>>Bisexuel</option>
                                     <option value="Pansexuel"<% if (user[0].orientation === 'Pansexuel') {%> selected <%}%>>Pansexuel</option>
                                 </select>
                             </div>
@@ -212,13 +212,16 @@
 			<% } %>
 		</div>
 
-		<% if (usertags != "") { 
-			for (var i=0; i<usertags.length; i++){ %>
-				<a class="btn btn-primary hashtag" href="#" role="button">#<%=usertags[i]['tag']%></a>
-		<% }} %>
+        <div id="tags">
+            <% if (usertags != "") {
+            for (var i=0; i<usertags.length; i++){ %>
+            <a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#<%=usertags[i]['tag']%></a>
+            <% }} %>
+            <input type="text" placeholder="Ajouter un Tag" id="addTag"/>
+        </div>
 	</div>
 </div>
-
+<br>
 <div class="row" id="rowPic" style="justify-content: left; margin-left: 4%;">
 
     <% if (userphotos !== []) {
@@ -244,10 +247,41 @@
 
 <script>
 
+    function deleteTag(tag) {
+        const delTag = tag.innerHTML.substring(1);
+
+        var formData = {
+            'tag': delTag,
+            'submit': 'deleteTag'
+        }
+
+        $.ajax({
+            type		: 'POST',
+            url		: '/profil',
+            data		: formData,
+            dataType	: 'json',
+            encode		: true
+        })
+            .done(function (data) {
+                console.log('delete Pic data: ', data);
+                if (data.errors) {
+                    if (document.getElementById('messages')) {
+                        const flash = document.getElementsByClassName('alert');
+                        flash[0].className = 'alert alert-warning alert-dismissible';
+                        flash[0].innerHTML = data.errors;
+                    } else {
+                        $('#container').prepend('<div id="messages"></div>');
+                        $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                    }
+                } else if (data.message) {
+                        tag.remove();
+                        $('#addTag').show();
+                }
+            });
+    }
+
     function deletePic(image) {
-        event.preventDefault();
         const srcImg = image.previousElementSibling.children[0];
-        //console.log('image ajax : ', image.parentElement);
 
         var formData = {
             'image': srcImg.src,
@@ -347,6 +381,10 @@
 
         $(document).ready(function() {
 
+            if ($(".hashtag").length === 6) {
+                $("#addTag").hide();
+            }
+
             for (var i = 0; i < document.getElementsByClassName('img-thumbnail carroussel').length; i++){
                 if (document.getElementsByClassName('img-thumbnail carroussel')[i].src === document.getElementById('avatarPic').src) {
                     document.getElementsByClassName('img-thumbnail carroussel')[i].style = 'border: solid rgb(225, 0, 100) thick';
@@ -440,9 +478,12 @@
                                 birthdate.innerHTML = age + ' ans';
 
                                 if (document.getElementById('messages')) {
-                                    const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
+                                    console.log('il y a un message')
+                                    const flash = document.getElementsByClassName('alert');
+                                    flash[0].className = 'alert alert-dark alert-dismissible';
                                     flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
                                 } else {
+                                    console.log('pas de message');
                                     $('#container').prepend('<div id="messages"></div>');
                                     $('#messages').append('<div class="alert alert-dark alert-dismissible">Votre profil RoooCool a été créé avec succès</div>')
                                 }
@@ -456,6 +497,14 @@
 
                                 document.getElementById("editDescription").value = data.user.description;
                                 document.getElementById("editDescription").innerHTML = document.getElementById("editDescription").value;
+
+
+                                //Update dans profil de Orientation + Genre
+                                document.getElementById('editOrientation').value = data.user.orientation;
+                                console.log(document.getElementById('editOrientation').value);
+
+                                document.getElementById('editGender').value = data.user.gender;
+                                console.log(document.getElementById('editOrientation').value);
 
                             }
                         }
@@ -650,6 +699,80 @@
                 event.preventDefault();
             });
 
+            $('#addTag').on('keydown', (e) => {
+                var k = e.which || e.key
+                if(/^(9)$/.test(k)) {
+                    $(this).value = ""
+                    //console.log("Tabulation catch:" + k)
+                    e.preventDefault()
+                }
+                if(/^(188|13)$/.test(k)) {
+                    //console.log("Submit form:"+ $(this))
+                    validFormTag();
+                }
+            })
+
+            const validFormTag = () => {
+                //console.log($("#addTag")[0].value);
+                if ($('.hashtag').length < 6) {
+                    //console.log("Submit call")
+
+                    var inputTag = $('#addTag')[0]
+                    var addedTag = $("#addTag")[0].value;
+                    var match = new RegExp('^[a-zA-Z]+$');
+
+                    if (match.test(addedTag) === true) {
+                        const formData = {
+                            'tag': addedTag,
+                            'submit': 'addTag'
+                        };
+
+                        $.ajax({
+                            type		: 'POST',
+                            url		: '/profil',
+                            data		: formData,
+                            dataType	: 'json',
+                            encode		: true
+                        })
+                            .done((data) => {
+                                if (data.errors) {
+                                    if (document.getElementById('messages')) {
+                                        const flash = document.getElementsByClassName('alert');
+                                        // console.log('flash', flash);
+                                        flash[0].className = 'alert alert-warning alert-dismissible';
+                                        flash[0].innerHTML = data.errors;
+                                    } else {
+                                        $('#container').prepend('<div id="messages"></div>');
+                                        $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                                    }
+                                } else {
+                                    if (document.getElementById('messages')) {
+                                        $('#messages').remove();
+                                    }
+                                    // console.log("Je dois ajouter un tag")
+                                    // console.log(addedTag)
+                                    if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag +'</a>');
+                                    inputTag.value = ""
+                                    inputTag.focus();
+                                }
+                                if ($(".hashtag").length === 6) {
+                                    $("#addTag").hide();
+                                }
+                            });
+                    } else {
+                        if (document.getElementById('messages')) {
+                            const flash = document.getElementsByClassName('alert');
+                            // console.log('flash', flash);
+                            flash[0].className = 'alert alert-warning alert-dismissible';
+                            flash[0].innerHTML = "Mauvais format de tag";
+                        } else {
+                            $('#container').prepend('<div id="messages"></div>');
+                            $('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag JQUERY</div>')
+                        }
+                    }
+
+                }
+            }
         });
 	});
 </script>

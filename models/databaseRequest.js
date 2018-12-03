@@ -104,7 +104,22 @@ class DatabaseRequest {
     }
 
     async checkResetToken(params){
-        return await this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]);
+        try {
+            return new Promise((resolve, reject) => {
+
+                this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]).then((result) => {
+                    if (result && result[0] && result[0].count === 1) {
+                        // this.query("UPDATE matcha.users SET `resetToken` = null, `reset_at` = null WHERE users.resetToken = ?", [params]);
+                        resolve('Reset effectué');
+                    } else {
+                        reject('Probleme');
+                    }
+                });
+            });
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 
     async checkEmail(params){
@@ -201,7 +216,7 @@ class DatabaseRequest {
                     from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>', // sender address
                     to: params['email'], // list of receivers
                     subject: 'Confirm your Registration to Matcha website', // Subject line
-                    text: 'Hello world?', // plain text body
+                    // text: 'Hello world?', // plain text body
                     html: compiledTemplate.render({username: params['username'], registerToken: registerToken}) // render template
                 };
 
@@ -227,12 +242,8 @@ class DatabaseRequest {
                     function (error, results, fields) { if (error) throw error; });
 
                 //Sending emails
-                const output = `
-                    <p>You ask for a reset of your Password :-)</p>
-                    
-                    <h3>Clink of this link to RESET</h3>
-                    <p><a href="http://localhost:3000/verify/reset/${resetToken}">Reset</a></p>
-                    `;
+                const template = fs.readFileSync('views/pages/resetPasswordEmail.ejs', 'utf-8');
+                const compiledTemplate = hogan.compile(template);
 
                 let transporter = nodemailer.createTransport({
                     host: 'smtp.gmail.com',
@@ -247,13 +258,13 @@ class DatabaseRequest {
                     }
                 });
 
-                let mailOptions = {
-                    from: '"RoooCool Team" <nina.ristorcelli@gmail.com>', // sender address
-                    to: params, // list of receivers
-                    subject: 'Reset your password of your Rooocool account', // Subject line
-                    text: 'Hello world?', // plain text body
-                    html: output // html body
-                };
+            let mailOptions = {
+                from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>', // sender address
+                to: params, // list of receivers
+                subject: 'Réinitialisation de votre mot de passe RoooCool', // Subject line
+                //text: 'Hello world?', // plain text body
+                html: compiledTemplate.render({resetToken: resetToken})
+            };
 
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
@@ -261,7 +272,7 @@ class DatabaseRequest {
                     }
                     console.log('Message sent: %s', info.messageId);
                 });
-            return true;
+                return true;
         } catch (error){
             console.log(error);
             return false;
@@ -287,9 +298,19 @@ class DatabaseRequest {
         return await this.query(sql, [id, path]);
     }
 
+    async insertTag(id, tag) {
+        const sql = "INSERT INTO matcha.tags (user_id, tag) VALUES (?, ?)";
+        return await this.query(sql, [id, tag]);
+    }
+
     async deletePhoto(id, path) {
         const sql = "DELETE FROM matcha.photos WHERE user_id = ? AND photo = ?";
         return await this.query(sql, [id, path]);
+    }
+
+    async deleteTag(id, tag) {
+        const sql = "DELETE FROM matcha.tags WHERE user_id = ? AND tag = ?";
+        return await this.query(sql, [id, tag]);
     }
 
     async checkProfilPic(params) {
@@ -316,7 +337,7 @@ class DatabaseRequest {
     async getUser(params){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE username = ?";
+                const sql = "SELECT * FROM matcha.users WHERE username = ?";
                 this.query(sql, params).then((user) => {
                     if (user){
                         resolve(user);
@@ -331,13 +352,22 @@ class DatabaseRequest {
         }
     }
 
-    async getAllUsers(filter, sort){
+    async getAllUsers(orientation, filter, sort){
         try {
             return new Promise((resolve, reject) => {
-                if (sort){
-                    var sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'"+filter+sort;
+                if (orientation && sort && filter){
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter+sort;
+					// console.log("--1--", sql);
+                } else if (orientation && sort){
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+sort;
+					// console.log("--2--", sql);
+                } else if (orientation && filter){
+					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter;
+					// console.log("--3--", sql);
                 } else {
-                    var sql = "SELECT *, DATE_FORMAT(birth, '%d/%m/%Y') AS birth FROM matcha.users WHERE registerToken = 'NULL'"+filter;
+                    // var secretSauce =  " ORDER by `popularity` DESC, `username` DESC";
+                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation; //+secretSauce;
+					// console.log("--4--", sql);
                 }
                 this.query(sql).then((users) => {
                     if (users){
@@ -352,7 +382,7 @@ class DatabaseRequest {
             return false;
         }
     }
-
+  
     async setOrientation(params){
 		try {
             return new Promise((resolve, reject) => {
@@ -461,10 +491,8 @@ class DatabaseRequest {
                 const sql = "SELECT * FROM matcha.photos WHERE user_id = ? ORDER BY id DESC";
                 this.query(sql, params).then((photos) => {
                     if (photos){
-                        // console.log(tags);
                         resolve(photos);
                     } else {
-                        // console.log(tags);
                         reject(photos);
                     }
                 });
@@ -492,6 +520,108 @@ class DatabaseRequest {
             return false;
         }
     }
+
+    async updatePop(user_id, flag){ 
+		// Flag 1 : like
+		// Flag 2 : unlike
+		// Flag 3 : block
+		// Flag 4 : report
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT `popularity` FROM matcha.users WHERE `id` = ?", [user_id]).then((score) => {
+					var newpop = score[0].popularity;
+					if (flag == 1) {
+						if (newpop < 50 && newpop > -50) {
+							newpop += 10;
+						} else if (newpop < 80 && newpop > -80) {
+							newpop += 5;
+						} else if (newpop < 99 && newpop >= -100) {
+							newpop += 2;
+						}
+					} else if (flag == 2) {
+						if (newpop < 50 && newpop > -50) {
+							newpop -= 10;
+						} else if (newpop < 80 && newpop > -80) {
+							newpop -= 5;
+						} else if (newpop <= 100 && newpop > -99) {
+							newpop -= 2;
+						}
+					} else if (flag == 3){
+						if (newpop >= -85){
+							newpop -= 15;
+						}
+					} else if (flag == 4){
+						if (newpop >= -50){
+							newpop -= 50;
+						}
+					}
+					this.query("UPDATE matcha.users SET `popularity`= ? WHERE `id` = ?", [newpop, user_id]).then(() => {
+						resolve(score);
+					}).catch(() => {
+						reject(score);
+					});
+			}).catch((score) => {
+				reject(score);
+			});
+		});
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+	}
+
+    async updateLikes(user_id, id, bool){
+		this.query("SELECT `user_id` FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
+			if (exist == ""){
+				if (bool == 1){
+					this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
+						this.updatePop(id, 1);
+						return true;
+					}).catch(() => {
+						return false;
+					});
+				} else if (bool == -1) {
+					return false;
+				}
+			} else {
+				if (bool == 1){
+					return false;
+				} else if (bool == -1) {
+					this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
+						this.updatePop(id, 2);
+						return true;
+					}).catch(() => {
+						return false;
+					});
+				}
+			}
+		}).catch(()=> {
+			return(false);
+		});
+    }
+
+    async profilCompleted(id) {
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT birth, gender, orientation, description FROM matcha.users WHERE `id` = ?", [id]).then((result) => {
+                    if (result) {
+                        const userInfo = result[0];
+                        if (!userInfo.birth || !userInfo.gender || !userInfo.orientation || !userInfo.description) {
+                            reject('pas complet');
+                        }
+                        resolve('complet');
+                    }
+                }).catch((result) => {
+                    console.log('catch', result);
+                })
+            });
+        }
+         catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
 }
 
 module.exports = DatabaseRequest;
