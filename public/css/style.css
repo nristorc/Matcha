@@ -15,13 +15,17 @@ body {
     /* display: flex; */
     -ms-flex-align: center;
     align-items: center;
-    /* padding-top: 40px; */
+    padding-top: 40px;
     padding-bottom: 40px;
-    background-color: rgba(255, 100, 100, 0.2);
+    background-color: rgb(254, 224, 224);
 }
 
 .container {
     padding-top: 40px;
+}
+
+.navbar-custom {
+	background:rgb(254, 224, 224);
 }
 
 .nav {
@@ -192,174 +196,20 @@ button:focus {
     cursor: auto;
 }
 
-/* Search Page */
-
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-	background-color: rgb(238, 162, 162);
-	margin-bottom: 20px;	
-}
-
-.nav-pills .nav-link {
-	margin-bottom: 20px;
-}
-
-a {
-	color: rgba(0,0,0,.5);
-}
-
-a:hover {
-	color: rgba(0,0,0,.8);
-}
-
-.popularity-search-1 {
-    background-color:  rgb(238, 162, 162);
-    border:none;
-    cursor: default;
-    display: flex;
-    position: absolute;
-	margin-top: -10px;
-	margin-left: 60px;
-}
-
-.popularity-search-1:hover {
-    background-color:  rgb(238, 162, 162);
+.popularity:active {
+    background-color: rgb(255, 0, 100) !important;
     border:none;
     cursor: auto;
+}
+
+.search-acc {
+    text-align: center;
+    justify-content: space-evenly;
     display: flex;
-    position : right;
 }
 
-.popularity-search-2 {
-    background-color: rgb(250, 94, 154);
-    border:none;
-    cursor: default;
-    display: flex;
-    position: absolute;
-	margin-top: -10px;
-	margin-left: 60px;
-
-}
-
-.popularity-search-2:hover {
-    background-color: rgb(250, 94, 154);
-    border:none;
-    cursor: auto;
-    display: flex;
-    position : right;
-}
-
-.popularity-search-3 {
-    background-color: rgb(255, 0, 100);
-    border:none;
-    cursor: default;
-    display: flex;
-    position: absolute;
-	margin-top: -10px;
-	margin-left: 60px;
-}
-
-.popularity-search-3:hover {
-    background-color: rgb(255, 0, 100);
-    border:none;
-    cursor: auto;
-    display: flex;
-    position : right;
-}
-
-.popularity-search-4 {
-    background-color:  rgb(179, 179, 179);
-    border:none;
-    cursor: default;
-    display: flex;
-    position: absolute;
-	margin-top: -10px;
-	margin-left: 60px;
-}
-
-.popularity-search-4:hover {
-    background-color:  rgb(179, 179, 179);
-    border:none;
-    cursor: auto;
-    display: flex;
-    position : right;
-}
-
-.popularity-search-5 {
-    background-color: rgb(132, 132, 132);
-    border:none;
-    cursor: default;
-    display: flex;
-    position: absolute;
-	margin-top: -10px;
-	margin-left: 60px;
-
-}
-
-.popularity-search-5:hover {
-    background-color: rgb(132, 132, 132);
-    border:none;
-    cursor: auto;
-    display: flex;
-    position : right;
-}
-
-.popularity-search-6 {
-    background-color: rgb(99, 99, 99);
-    border:none;
-    cursor: default;
-    display: flex;
-    position: absolute;
-	margin-top: -10px;
-	margin-left: 60px;
-}
-
-.popularity-search-6:hover {
-    background-color: rgb(99, 99, 99);
-    border:none;
-    cursor: auto;
-    display: flex;
-    position : right;
-}
-
-.liked {
-    border:none;
-    display: flex;
-    position: absolute;
-    /* margin: 215px 0 0 40px; */
-    font-size: 1.5rem;
-    color : rgb(254, 224, 224);
-}
-
-.matched {
-    border:none;
-    display: flex;
-    position: absolute;
-    /* margin: 215px 0 0 40px; */
-    font-size: 1.5rem;
-    color : rgb(255, 0, 100);
-}
-.search-pic {
-    display: flex;
-	position: relative;
-	width:100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.containerPic {
-	height: 200px;
-	width: 200px;
-}
-
-.img-pop {
-    display: flex;
-    justify-content : center
-}
-
-.search-col {
-    padding: 30px;
-}
-
-.picto {
-    
+.slider-search {
+    display:flex;
+    justify-content: space-evenly;
+    flex-direction: column;
 }

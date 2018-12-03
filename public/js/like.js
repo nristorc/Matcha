@@ -1,7 +1,8 @@
 function like(id){
     event.preventDefault();
+    var unlike = id.replace("ok", "un");
     document.getElementById(id).style.display = "none";
-    document.getElementById("un"+id).style.display = "flex";
+    document.getElementById(unlike).style.display = "flex";
     var data = {
         id_liked	: id,
     }
@@ -16,10 +17,9 @@ function like(id){
 
 function unlike(id){
     event.preventDefault();
-    var display = id.substring(2)
-    console.log(display);
+    var like = id.replace("un", "ok");
     document.getElementById(id).style.display = "none";
-    document.getElementById(display).style.display = "flex";
+    document.getElementById(like).style.display = "flex";
     var data = {
         id_liked	: id,
     }

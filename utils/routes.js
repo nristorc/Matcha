@@ -9,6 +9,9 @@ let validation = new registerValidation();
 const userDatabase =require('../models/userData');
 const userData = new userDatabase();
 
+const resultSort =require('../models/resultSort');
+const resSort = new resultSort();
+
 const multer = require('multer');
 const path = require('path');
 
@@ -690,66 +693,109 @@ class Routes{
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
+                if (request.query.sort != undefined){
+                    var sort = resSort.sort(request.query.sort);
+                }
+                var filter = request.query.filter;
+                if (filter != undefined){                    
+                    var ageFilter = filter.substring(3, filter.indexOf("pop"));
+					var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
+					var locFilter = filter.substring(filter.indexOf("loc") + 3);
+                    var ageMin = ageFilter.substring(0, ageFilter.indexOf(","));
+                    var ageMax = ageFilter.substring(ageFilter.indexOf(",")+1);
+                    if (ageMin == ageMax){
+                        ageMin++;
+                    }
+                    var dateMin = userData.ageConvert(ageMin);
+                    var dateMax = userData.ageConvert(ageMax);       
+					var popMin = popFilter.substring(0, popFilter.indexOf(","));
+					var popMax = popFilter.substring(popFilter.indexOf(",")+1);
+					var locMin = locFilter.substring(0, locFilter.indexOf(","));
+                    var locMax = locFilter.substring(locFilter.indexOf(",")+1);
+                    filter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + "\" AND `popularity` BETWEEN " + popMin + " AND " + popMax;
+				}   
                 checkDb.profilCompleted(request.session.user.id).then((result) => {
-                    checkDb.setOrientation(request.session.user.id).then((orientation) => {
-                        checkDb.getAllUsers(orientation, request.query.sort).then((users) => {
-                            if (!request.query.index) {
-                                checkDb.getLikes(request.session.user.id).then((likes) => {
-                                    response.render('pages/search', {
-                                        users: users,
-                                        index: 0,
-                                        likes: likes
-                                    });
-                                }).catch((likes) => {
-                                    response.render('pages/search', {
-                                        users: users,
-                                        index: 0,
-                                        likes: likes,
-                                    });
-                                });
-                            } else {
-                                if (request.query.index < users.length){
-                                    checkDb.getLikes(request.session.user.id).then((likes) => {
-                                        response.render('pages/search', {
-                                            users: users,
-                                            index: request.query.index,
-                                            likes: likes
-                                        });
-                                    }).catch((likes) => {
-                                        response.render('pages/search', {
-                                            users: users,
-                                            index: request.query.index,
-                                            likes: likes,
-                                        });
-                                    });
-                                } else {
-                                    response.end();
-                                }
-                            }
-                        }).catch((users) => {
-                            return response.render('index');
-                        });
-                    }).catch((orientation) => {
-                        return response.render('index');
-                    });
+                            				checkDb.setOrientation(request.session.user.id).then((orientation) => {
+                                                checkDb.getAllUsers(orientation, filter, sort).then((users) => {
+                                                    if (!request.query.index) {
+                            							checkDb.getLikes(request.session.user.id).then((likes) => {
+                            								response.render('pages/search', {
+                            									users: users,
+                            									index: 0,
+                                                                likes: likes,
+                                                                ageMin: ageMin,
+                                                                ageMax: ageMax,
+                                                                popMin: popMin,
+                                                                popMax: popMax,
+                                                                locMin: locMin,
+                                                                locMax: locMax,
+                            								});
+                            							}).catch((likes) => {
+                            								response.render('pages/search', {
+                            									users: users,
+                            									index: 0,
+                                                                likes: likes,
+                                                                ageMin: ageMin,
+                                                                ageMax: ageMax,
+                                                                popMin: popMin,
+                                                                popMax: popMax,
+                                                                locMin: locMin,
+                                                                locMax: locMax,
+                            								});
+                            							});
+                            						} else {
+                                                        // console.log("--2--");
+                                                        // console.log(request.query.index)
+                            							if (request.query.index < users.length){
+                            								checkDb.getLikes(request.session.user.id).then((likes) => {
+                                                                response.render('pages/search', {
+                            										users: users,
+                            										index: request.query.index,
+                                                                    likes: likes,
+                                                                    ageMin: ageMin,
+                                                                    ageMax: ageMax,
+                                                                    popMin: popMin,
+                                                                    popMax: popMax,
+                                                                    locMin: locMin,
+                                                                    locMax: locMax,
+                            									});
+                            								}).catch((likes) => {
+                            									response.render('pages/search', {
+                            										users: users,
+                            										index: request.query.index,
+                                                                    likes: likes,
+                                                                    ageMin: ageMin,
+                                                                    ageMax: ageMax,
+                                                                    popMin: popMin,
+                                                                    popMax: popMax,
+                                                                    locMin: locMin,
+                                                                    locMax: locMax,
+                            									});
+                            								});
+                            							} else {
+                            								response.end();
+                            							}
+                            						}
+                            					}).catch((users) => {
+                            						return response.render('index');
+                            					});
+                            				}).catch((orientation) => {
+                            					return response.render('index');
+                            				});
                 }).catch((result) => {
                     console.log('catch', result);
                     request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
                     response.redirect('/')
                 });
-                // console.log(request.query.sort);
 			}
         }).post('/search', async(request, response) => {
             if (!request.session.user) {
                 return response.render('index');
 			} else {
                 var data = request.body.id_liked;
-				var likeAction = data.substring(0, data.length - 2);
-                var userLiked =  data.substring(data.length - 1);
-                console.log("userliked =", userLiked);
-                // console.log(likeAction);
-				if (likeAction == "likeSearch"){
-                    // console.log("on rentre la");
+				var likeAction = data.substring(0, 12);
+                var userLiked =  data.substring(13, data.length);
+				if (likeAction == "oklikeSearch"){
 					checkDb.updateLikes(request.session.user.id, userLiked, 1).then((update) => {
 					});
 				} else if (likeAction == "unlikeSearch"){

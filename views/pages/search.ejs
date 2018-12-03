@@ -1,43 +1,99 @@
 <% if(!index) {%>
 	<%- include('../partial/head')%>
 	<%- include('../partial/header')%>
-
-<!-- Filters -->
-
-<p>Filtres :</p>
-
-<!-- <div>
-  <input type="range" id="age-range" name="volume"
-         min="0" max="10">
-  <label for="volume">Age</label>
-</div>
-
-<div>
-  <input type="range" id="pop-range" name="cowbell" 
-         min="0" max="100" step="10">
-  <label for="cowbell">Popularité</label>
-</div> -->
-
-<!-- Sort -->
-
-<form action="/search" method="get">
-	<ul class="nav nav-pills">
-		<li class="nav-item dropdown">
-			<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
-			<div class="dropdown-menu">
-				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by `birth`">
-				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by loc">
-				<input type="submit" class="dropdown-item" name="sort" value=" ORDER by `popularity`">
+	
+	<!-- Search navbar -->
+	
+	<nav class="navbar fixed-top search-nav">
+		
+		<!-- Sort -->
+		
+		<form action="/search" method="get">
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<label class="input-group-text" for="inputGroupSelect01">Trier par</label>
+				</div>
+				<select class="custom-select" name="sort" id="inputSort">
+					<option selected></option>
+					<option value="ageAsc">Age croissant</option>
+					<option value="ageDesc">Age décroissant</option>
+					<option value="loc">Localisation la plus proche</option>
+					<option value="popAsc">Popularité croissant</option>
+					<option value="popDesc">Popularité décroissant</option>
+				</select>
 			</div>
-		</li>
-	</ul>
-</form>
+		</form>
+		
+		<!-- Filters -->
+		<% 
+		if (!ageMin){
+			ageMin = 18;
+		}
+		if (!ageMax){
+			ageMax = 99;
+		}
+		if (!popMin){
+			popMin = -100;
+		}
+		if (!popMax){
+			popMax = 100;
+		}
+		if (!locMin){
+			locMin = 1;
+		}
+		if (!locMax){
+			locMax = 50;
+		}
+		%>
+		<div class="accordion" id="accordionExample">
+			<button class="btn btn-link forgot-password collapsed" type="button" data-toggle="collapse" data-target="#collapse" aria-expanded="false" aria-controls="collapse">
+				Recherche avancée
+			</button>
+		</div>
+		<div id="collapse" class="collapse" data-parent="#accordionExample">
+			<div class="card-body search-acc">
+				<form action="/search" method="get">
+					Age :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">18 ans</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="slideAge" type="text" class="span2" value="" data-slider-min="18" data-slider-max="99" data-slider-step="1" data-slider-value="[<%=ageMin%>,<%=ageMax%>]"data-slider-handle="round"/>
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">99+</div>
+					</div>
+					
+					Popularité :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">-100%</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[<%=popMin%>,<%=popMax%>]" data-slider-handle="round"/>	
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">100%</div>
+					</div>
+					
+					Localisation :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">1km</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="slideLoc" type="text" class="span2" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="[<%=locMin%>,<%=locMax%>]" data-slider-handle="round"/>
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">50km+</div>
+					</div>
+
+				<!-- Tags module nina de profil ? ou de barre de recherche -->
+
+
+					<button type="button" class="btn btn-primary filter-search" id="inputFilter">Rechercher</button>
+				</form>
+			</div>
+		</div>	
+</nav>
+
 
 <%}%>
 
 <!-- Results -->
-
-<div class="scroll">
+<div class="scroll" id="scroll">
 	<% var x = index;
 	var i = 0;
 	while (i < 6){ 
@@ -73,7 +129,7 @@
 					<i class="fas fa-thumbs-up liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i>
 				</div>
 
-				<span><i class="far fa-thumbs-up picto" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
+				<span><i class="far fa-thumbs-up picto" id="oklikeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
 				<span><i class="fas fa-thumbs-up picto" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)">Unlike</i></span>
 
 				<h5><%=users[x]['username']%></h5>
@@ -97,11 +153,6 @@
 					<% } %>
 				</h6>
 
-				<!-- <form id="likes-report">
-					<button type="submit" value="like<%=users[x]['id']%>" style="background:none; border:none"><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;"></i></button>
-					<button type="submit" value="unlike<%=users[x]['id']%>" style="background:none; border:none" id="button"><i class="fas fa-thumbs-up" id="likedSearch-<%=users[x]['id']%>" style="text-align: center; display: none;"></i></button>
-				</form> -->
-
 <!-- Like and match check -->
 
 			<% var a = 0;
@@ -120,7 +171,7 @@
 				<script>
 					// getscript
 					document.getElementById("matched<%=users[x]['id']%>").style.display = "flex";
-					document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "none";
+					document.getElementById("oklikeSearch-<%=users[x]['id']%>").style.display = "none";
 					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
 				</script>
 			<% } else if (like === 1 && liked === 0){ %>
@@ -129,7 +180,7 @@
 				</script>
 			<% } else if (liked === 1 && like === 0) { %>
 				<script>
-					document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "none";
+					document.getElementById("oklikeSearch-<%=users[x]['id']%>").style.display = "none";
 					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
 				</script>
 			<% }
@@ -145,6 +196,7 @@
 
 </div>
 
+
 <!-- Loading animation -->
 
 <% if (index == 0){ %>
@@ -155,7 +207,6 @@
 <!-- Scripts -->
 
 <script src="./public/js/scroll.js"></script>
-<!-- <script src="./public/js/sort.js"></script> -->
 <script src="./public/js/like.js"></script>
 
 <% } %>

@@ -28,6 +28,11 @@ class User{
         }
     }
 
-}
+    ageConvert(params) {
+             var today = new Date();
+                var date = today.getFullYear() - params + "-" + today.getMonth() + "-" + today.getDate();
+                return(date);
+            }
+		}
 
 module.exports = User;
