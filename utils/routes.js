@@ -810,17 +810,18 @@ class Routes{
         this.app.post('/usersearch', async (request, response) => {
             const query = request.body.q;
             checkDb.query("SELECT id, username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
-                var res = '<li class="searchLi">No data found !</li>';
-                if (result === [] || result === {} || result === null || result == "") {
-                    response.json({res});
-                } else {
-                    res = [];
+                // var res = '<li class="searchLi">No data found !</li>';
+                // if (result === [] || result === {} || result === null || result == "") {
+                //     response.json({res});
+                // } else {
+                if (result) {
+                    var res = [];
                     for (var i = 0; i < result.length; i++) {
                         res.push('<li class="searchLi">' + result[i].username + '</li>');
                     }
                     response.json({res: res, userdata: result});
                 }
-
+                // }
             }).catch((result) => {
                 console.log('result catch: ', result);
             });

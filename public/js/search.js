@@ -32,7 +32,15 @@ function search() {
             })
                 .done(function (data) {
 
-                    if ($('#response').length === 0) {
+
+                    console.log('data', data)
+                    console.log('length', $('#response').length);
+
+                    if (data.res == ''){
+                        console.log('pas de match')
+                    }
+
+                    if ($('#response').length === 0 && data.res != '') {
                         const ul = document.createElement('ul');
                         $('#divSearch').append(ul);
                         ul.setAttribute('id', 'response');
@@ -43,10 +51,10 @@ function search() {
                     $(document).on('click', 'li', function(){
 
                         var username = $(this).text();
-                        if (username === 'No data found !') {
-                            $('#response').html("");
-                            $('ul').remove();
-                        } else {
+                        // if (username === 'No data found !') {
+                        //     $('#response').html("");
+                        //     $('ul').remove();
+                        // } else {
                             console.log('data', data.userdata);
                             $('#searchBox').val(username);
 
@@ -66,14 +74,14 @@ function search() {
 
                                 button.onclick = (elem) => {
                                     console.log('userdata', data.userdata.length)
-                                    // for (var i = 0; i < data.userdata.length; i++) {
-                                    //     if ($('#searchBox').val() === data.userdata[i].username) {
-                                    //         $(location).attr('href', '/user/' + data.userdata[i].id);
-                                    //     }
-                                    // }
+                                    for (var i = 0; i < data.userdata.length; i++) {
+                                        if ($('#searchBox').val() === data.userdata[i].username) {
+                                            $(location).attr('href', '/user/' + data.userdata[i].id);
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        // }
                     });
 
                 });
