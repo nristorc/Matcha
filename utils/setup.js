@@ -36,7 +36,7 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
 	"`reset_at` DATETIME NULL," +
 	"`birth` DATE DEFAULT NULL," +
     "`gender` VARCHAR (20) DEFAULT NULL," +
-    "`orientation` VARCHAR (20) DEFAULT NULL," +
+    "`orientation` VARCHAR (20) DEFAULT 'Bisexuel'," +
     "`description` LONGTEXT DEFAULT NULL," +
     "`popularity` INT(11) DEFAULT 0," +
     "`profil` VARCHAR(255) DEFAULT 'public/img/avatarDefault.png'," +
@@ -57,7 +57,8 @@ const sql_photos = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.photos_table +
 const sql_likes = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.likes_table +
 	"(`id` INT(9) NOT NULL AUTO_INCREMENT," +
 	"`user_id` INT(11) NOT NULL," +
-    "`user_liked` INT(11) NOT NULL," +
+    "`user_liked` INT(11) DEFAULT NULL," +
+    "`user_disliked` INT(11) DEFAULT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql_user, (err, result) => {
