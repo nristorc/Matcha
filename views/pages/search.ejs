@@ -1,24 +1,99 @@
 <% if(!index) {%>
 	<%- include('../partial/head')%>
 	<%- include('../partial/header')%>
+	
+	<!-- Search navbar -->
+	
+	<nav class="navbar fixed-top search-nav">
+		
+		<!-- Sort -->
+		
+		<form action="/search" method="get">
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<label class="input-group-text" for="inputGroupSelect01">Trier par</label>
+				</div>
+				<select class="custom-select" name="sort" id="inputSort">
+					<option selected></option>
+					<option value="ageAsc">Age croissant</option>
+					<option value="ageDesc">Age décroissant</option>
+					<option value="loc">Localisation la plus proche</option>
+					<option value="popAsc">Popularité croissant</option>
+					<option value="popDesc">Popularité décroissant</option>
+				</select>
+			</div>
+		</form>
+		
+		<!-- Filters -->
+		<% 
+		if (!ageMin){
+			ageMin = 18;
+		}
+		if (!ageMax){
+			ageMax = 99;
+		}
+		if (!popMin){
+			popMin = -100;
+		}
+		if (!popMax){
+			popMax = 100;
+		}
+		if (!locMin){
+			locMin = 1;
+		}
+		if (!locMax){
+			locMax = 50;
+		}
+		%>
+		<div class="accordion" id="accordionExample">
+			<button class="btn btn-link forgot-password collapsed" type="button" data-toggle="collapse" data-target="#collapse" aria-expanded="false" aria-controls="collapse">
+				Recherche avancée
+			</button>
+		</div>
+		<div id="collapse" class="collapse" data-parent="#accordionExample">
+			<div class="card-body search-acc">
+				<form action="/search" method="get">
+					Age :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">18 ans</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="slideAge" type="text" class="span2" value="" data-slider-min="18" data-slider-max="99" data-slider-step="1" data-slider-value="[<%=ageMin%>,<%=ageMax%>]"data-slider-handle="round"/>
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">99+</div>
+					</div>
+					
+					Popularité :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">-100%</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[<%=popMin%>,<%=popMax%>]" data-slider-handle="round"/>	
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">100%</div>
+					</div>
+					
+					Localisation :
+					<div class="d-flex bd-highlight">
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">1km</div>
+						<div class="p-2 flex-fill bd-highlight">
+							<input id="slideLoc" type="text" class="span2" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="[<%=locMin%>,<%=locMax%>]" data-slider-handle="round"/>
+						</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">50km+</div>
+					</div>
 
-<!-- Filters -->
+				<!-- Tags module nina de profil ? ou de barre de recherche -->
 
-	<ul class="nav nav-pills">
-		<li class="nav-item dropdown">
-		  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Trier par</a>
-		  <div class="dropdown-menu">
-			<a class="dropdown-item" id="sort-age">Age</a>
-			<a class="dropdown-item" id="sort-loc">Localisation</a>
-			<a class="dropdown-item" id="sort-pop">Popularite</a>
-		</li>
-	  </ul>
+
+					<button type="button" class="btn btn-primary filter-search" id="inputFilter">Rechercher</button>
+				</form>
+			</div>
+		</div>	
+</nav>
+
 
 <%}%>
 
 <!-- Results -->
-
-<div class="scroll">
+<div class="scroll" id="scroll">
 	<% var x = index;
 	var i = 0;
 	while (i < 6){ 
@@ -28,17 +103,34 @@
 		<div class="col-sm search-col">
 			<% if (users[x]){%>
 				<div class="img-pop">
-					<img src="https://i.pinimg.com/originals/ee/12/72/ee1272ce146c4c5c5e5c30163a20302d.jpg" alt="Stephanie De Monaco" class="rounded profile-pic search-pic">
-					<%if (users[x]['popularity'] < 50){ %>
-						<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
-					<% } else if (users[x]['popularity'] < 85) { %>
-						<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
-					<% } else { %>
-						<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
-					<%}%>
+					<div class="containerPic">
+						<img src="<%=users[x]['profil']%>" title="<%=users[x]['username']%>" alt="<%=users[x]['username']%>" class="profile-pic search-pic">
+					</div>
+					<% if (users[x]['popularity'] >= 0){
+						if (users[x]['popularity'] < 50){ %>
+							<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
+						<% } else if (users[x]['popularity'] < 85) { %>
+							<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
+						<% } else { %>
+							<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
+						<%}
+					} else {
+						if (users[x]['popularity'] > -50){ %>
+							<button type="button" class="btn btn-primary popularity-search-4"><%=users[x]['popularity']%>%</button>
+						<% } else if (users[x]['popularity'] > -85) { %>
+							<button type="button" class="btn btn-primary popularity-search-5"><%=users[x]['popularity']%>%</button>
+						<% } else { %>
+							<button type="button" class="btn btn-primary popularity-search-6"><%=users[x]['popularity']%>%</button>
+						<%}
+					}
+			
+					%>
 					<i class="fas fa-heart matched" id="matched<%=users[x]['id']%>" title="c'est un match !" style="display:none"></i>
 					<i class="fas fa-thumbs-up liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i>
 				</div>
+
+				<span><i class="far fa-thumbs-up picto" id="oklikeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
+				<span><i class="fas fa-thumbs-up picto" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)">Unlike</i></span>
 
 				<h5><%=users[x]['username']%></h5>
 				<h6>
@@ -61,16 +153,6 @@
 					<% } %>
 				</h6>
 
-				<!-- <form id="likes-report">
-					<button type="submit" value="like<%=users[x]['id']%>" style="background:none; border:none"><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;"></i></button>
-					<button type="submit" value="unlike<%=users[x]['id']%>" style="background:none; border:none" id="button"><i class="fas fa-thumbs-up" id="likedSearch-<%=users[x]['id']%>" style="text-align: center; display: none;"></i></button>
-				</form> -->
-
-
-					<span><i class="far fa-thumbs-up" id="likeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)"></i></span>
-					<span><i class="fas fa-thumbs-up" id="likedSearch-<%=users[x]['id']%>" style="text-align: center; display: none;"></i></span>
-
-
 <!-- Like and match check -->
 
 			<% var a = 0;
@@ -87,7 +169,10 @@
 			}
 			if (like === 1 && liked === 1){ %>
 				<script>
+					// getscript
 					document.getElementById("matched<%=users[x]['id']%>").style.display = "flex";
+					document.getElementById("oklikeSearch-<%=users[x]['id']%>").style.display = "none";
+					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
 				</script>
 			<% } else if (like === 1 && liked === 0){ %>
 				<script>
@@ -95,8 +180,8 @@
 				</script>
 			<% } else if (liked === 1 && like === 0) { %>
 				<script>
-					document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "none";
-					document.getElementById("likedSearch-<%=users[x]['id']%>").style.display = "flex";
+					document.getElementById("oklikeSearch-<%=users[x]['id']%>").style.display = "none";
+					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
 				</script>
 			<% }
 		} %>
@@ -111,6 +196,7 @@
 
 </div>
 
+
 <!-- Loading animation -->
 
 <% if (index == 0){ %>
@@ -121,44 +207,7 @@
 <!-- Scripts -->
 
 <script src="./public/js/scroll.js"></script>
-<script src="./public/js/sort.js"></script>
-<script>
-	
-		function like(id){
-			event.preventDefault();
-			console.log(id);
-			var data = {
-				id_liked	: id,
-			}
-			$.ajax({
-				type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-				url         : '/search', // the url where we want to POST
-				data		: data, // our data object
-				dataType    : 'json', // what type of data do we expect back from the server
-				encode		: true
-			})
-		}
-
-
-		// $('form[id=likes-report]').submit(function(event) {
-		// 	// const x = document.getElementsByClassName("fa-thumbs-up").value;
-		// 	const x = document.getElementById("button").value; 
-		// 	console.log(x);
-		// 	// console.log("likeSearch-<%=users[x]['id']%>");
-		// 	document.getElementById("likeSearch-<%=users[x]['id']%>").style.display = "flex";
-		// 	document.getElementById("likedSearch-<%=users[x]['id']%>").style.display = "none";
-		// 	var formData = {
-		// 				'submit' : $('button:submit').val()}
-		// 	console.log(formData);
-		// 	$.ajax({
-		// 		type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-		// 		url         : '/search', // the url where we want to POST
-		// 		data		: formData, // our data object
-		// 		dataType    : 'json', // what type of data do we expect back from the server
-		// 		encode		: true
-		// 	})
-		// });
-</script>
+<script src="./public/js/like.js"></script>
 
 <% } %>
 

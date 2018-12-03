@@ -7,7 +7,7 @@ class User{
         try {
             return new Promise((resolve, reject) => {
 				var dob = params;
-				if (dob != null) {
+				if (dob !== null) {
 				    var year = dob.getFullYear();
 					var month = dob.getMonth();
 					var day = dob.getDate();
@@ -28,6 +28,11 @@ class User{
         }
     }
 
-}
+    ageConvert(params) {
+             var today = new Date();
+                var date = today.getFullYear() - params + "-" + today.getMonth() + "-" + today.getDate();
+                return(date);
+            }
+		}
 
 module.exports = User;
