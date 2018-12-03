@@ -35,4 +35,8 @@ class User{
             }
 		}
 
+    // getLocation(){
+        // https://www.alsacreations.com/tuto/lire/926-geolocalisation-geolocation-html5.html        
+    // }
+
 module.exports = User;

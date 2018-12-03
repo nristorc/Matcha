@@ -51,6 +51,10 @@ class Routes{
     appRoutes(){
         this.app.get('/', async (request,response) => {
             console.log("Je suis dans INDEX");
+
+            var ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress || request.socket.remoteAddress || (request.connection.socket ? request.connection.socket.remoteAddress : null);
+            console.log("adresse IP: ", ip);
+
             if (!request.session.user) {
                 response.status(200).render('index');
             } else {
@@ -690,6 +694,12 @@ class Routes{
 		/* Routes for search */
 
         this.app.get('/search', (request, response) => {
+            // console.log("adresse IP: ", request.connection.remoteAddress);
+            var ip = request.headers['x-forwarded-for'] || 
+            request.connection.remoteAddress || 
+            request.socket.remoteAddress ||
+            (request.connection.socket ? request.connection.socket.remoteAddress : null);
+            console.log("adresse IP: ", ip);
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
@@ -804,7 +814,7 @@ class Routes{
 				}
 			}
 		});
-		
+      
 		/* Routes for search by username */
 
         this.app.post('/usersearch', async (request, response) => {

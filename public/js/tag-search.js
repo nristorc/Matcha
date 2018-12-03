@@ -1,14 +1,4 @@
-function openSearch() {
-    const input = document.createElement('input');
-    $('.navbar-nav').append(input);
-    input.setAttribute('type', 'text');
-    input.setAttribute('id', 'searchBox');
-    input.setAttribute('placeholder', 'Recherche par username');
-    input.setAttribute('onfocus', 'search()');
-    $('#searchIcon').hide();
-}
-
-function search() {
+function searchTag() {
     if ($('#divSearch').length === 0) {
         const div = document.createElement('div');
         $('.navbar-nav').append(div);
@@ -17,7 +7,7 @@ function search() {
 
     $(document).on('keyup', function () {
         $('#accessProfil').remove();
-        const query = $('#searchBox').val();
+        const query = $('#searchTag').val();
         if (query.length > 1) {
             var formData = {
                 'search': 1,
@@ -56,7 +46,7 @@ function search() {
                         //     $('ul').remove();
                         // } else {
                             console.log('data', data.userdata);
-                            $('#searchBox').val(username);
+                            $('#searchTag').val(username);
 
                             $('#response').html("");
                             $('ul').remove();
@@ -75,7 +65,7 @@ function search() {
                                 button.onclick = (elem) => {
                                     console.log('userdata', data.userdata.length)
                                     for (var i = 0; i < data.userdata.length; i++) {
-                                        if ($('#searchBox').val() === data.userdata[i].username) {
+                                        if ($('#searchTag').val() === data.userdata[i].username) {
                                             $(location).attr('href', '/user/' + data.userdata[i].id);
                                         }
                                     }
