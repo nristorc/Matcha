@@ -10,5 +10,6 @@ module.exports = {
     'user_table': 'users',
     'tags_table': 'tags',
     'photos_table': 'photos',
-    'likes_table' : 'likes'
+    'likes_table' : 'likes',
+    'visits_table' : 'visits'
 };

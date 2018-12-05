@@ -834,6 +834,12 @@ class Routes{
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 response.status(200).render('index');
             } else {
+
+                // Historique: je visite le profil de quelqu'un
+
+
+                //Historique: Quelqu'un a visité mon profil
+
                 checkDb.profilCompleted(request.session.user.id).then((result) => {
                     console.log('params', typeof request.params.id)
                     console.log('session', typeof request.session.user.id)
@@ -896,6 +902,15 @@ class Routes{
                 });
             }
 
+        });
+
+        /* Routes for Historique */
+        this.app.get('/history', async (request, response) => {
+            if (!request.session.user) {
+                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+                return response.render('index');
+            }
+            response.render('pages/history')
         });
 
     }

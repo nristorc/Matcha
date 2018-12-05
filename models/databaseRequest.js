@@ -521,6 +521,40 @@ class DatabaseRequest {
         }
     }
 
+    async getMatches(user_id){
+        try{
+            return new Promise ((resolve, reject) => {
+                this.getLikes(user_id).then((likes) => {
+                    var i = 0;
+                    var x = 0;
+                    var z = 0;
+                    var matches = {};
+                    while (likes[i]){
+                        if (likes[i].user_liked == user_id){
+                            while (likes[z]){
+                                if (likes[i].user_id == likes[z].user_liked){
+                                    matches[x] = likes[i].user_id;
+                                    x++;
+                                }
+                                z++;
+                            }
+                            z = 0;
+                        }
+                        i++;
+                    }
+                    // console.log("1", matches);
+                    resolve(matches);
+                }).catch((error) => {
+                    console.log(error);
+                    return false;
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async updatePop(user_id, flag){ 
 		// Flag 1 : like
 		// Flag 2 : unlike
