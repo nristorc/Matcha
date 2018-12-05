@@ -63,8 +63,9 @@ const sql_likes = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.likes_table +
 
 const sql_visits = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.visits_table +
     "(`id` INT(9) NOT NULL AUTO_INCREMENT," +
-    "`user_id` INT(11) NOT NULL," +
-    "`user_visited` INT(11) DEFAULT NULL," +
+    "`visitor_id` INT(11) NOT NULL," +
+    "`visited_id` INT(11) DEFAULT NULL," +
+    "`visited_at` DATETIME NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql_user, (err, result) => {

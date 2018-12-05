@@ -76,33 +76,16 @@
     <a class="btn hashtag" style="margin-bottom: 10px;" data-toggle="collapse" href="#dropdownVisitThem"  aria-expanded="false" aria-controls="dropdownVisitThem">Vous avez visité leur profil <i class="fas fa-arrow-circle-down"></i></a>
     <div class="collapse" id="dropdownVisitThem">
         <table class="table" style="text-align: center">
-            <thead class="thead-light">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
-            </tr>
-            </thead>
             <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>Larry</td>
-                <td>the Bird</td>
-                <td>@twitter</td>
-            </tr>
+                <%for (var i = 0; i < myVisits.length; i++) {%>
+                <tr>
+                    <td style="vertical-align: middle"><i class="fas fa-eye"></i></td>
+                <td style="vertical-align: middle">Vous avez visité le profil de <a href="user/<%=myVisits[i].visited_id%>"><%=myVisits[i].username%></a></td>
+                    <td style="vertical-align: middle"><img src="<%=myVisits[i].profil%>" style="max-height: 50px; max-width: 50px"></td>
+                <td style="vertical-align: middle">le <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
+                        <%=myVisits[i].visited_at.toLocaleDateString('fr-FR', options)%></td>
+                </tr>
+                <%}%>
             </tbody>
         </table>
     </div>

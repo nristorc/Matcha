@@ -834,37 +834,49 @@ class Routes{
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 response.status(200).render('index');
             } else {
-
-                // Historique: je visite le profil de quelqu'un
-
-
-                //Historique: Quelqu'un a visité mon profil
-
                 checkDb.profilCompleted(request.session.user.id).then((result) => {
-                    console.log('params', typeof request.params.id)
-                    console.log('session', typeof request.session.user.id)
                     if (request.params.id == request.session.user.id) {
                         //console.log('same profil');
                         response.redirect('/profil');
                     } else {
-                        console.log('params else', request.params);
-                        const sql = 'SELECT * FROM matcha.users WHERE id = ?';
-                        checkDb.query(sql, [request.params.id]).then((result) => {
-                            if (result == "") {
-                                request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
-                                response.redirect('/');
-                            } else {
-                                checkDb.getTags(request.params.id).then((tags) => {
-                                    checkDb.getPhotos(request.params.id).then((photos) => {
-                                        userData.userAge(result[0].birth).then((age) => {
-                                            response.render('pages/user', {
-                                                user: result,
-                                                userage: age,
-                                                usertags: tags,
-                                                userphotos: photos
+
+                        const visits = 'INSERT INTO matcha.visits SET visitor_id = ?, visited_id = ?, visited_at = NOW()';
+                        checkDb.query(visits, [request.session.user.id, parseInt(request.params.id, 10)]).then((result) => {
+                            console.log('then', result);
+                            if (result) {
+                                const sql = 'SELECT * FROM matcha.users WHERE id = ?';
+                                checkDb.query(sql, [request.params.id]).then((result) => {
+                                    if (result == "") {
+                                        request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
+                                        response.redirect('/');
+                                    } else {
+                                        checkDb.getTags(request.params.id).then((tags) => {
+                                            checkDb.getPhotos(request.params.id).then((photos) => {
+                                                userData.userAge(result[0].birth).then((age) => {
+                                                    response.render('pages/user', {
+                                                        user: result,
+                                                        userage: age,
+                                                        usertags: tags,
+                                                        userphotos: photos
+                                                    });
+                                                }).catch((age) => {
+                                                    console.log('age CATCH: ', age);
+                                                    response.render('pages/user', {
+                                                        user: result,
+                                                        usertags: tags,
+                                                        userage: null,
+                                                        userphotos: photos
+                                                    });
+                                                });
+                                            }).catch((photos) => {
+                                                response.render('pages/user', {
+                                                    user: result,
+                                                    usertags: tags,
+                                                    userage: null,
+                                                    userphotos: null
+                                                });
                                             });
-                                        }).catch((age) => {
-                                            console.log('age CATCH: ', age);
+                                        }).catch((tags) => {
                                             response.render('pages/user', {
                                                 user: result,
                                                 usertags: tags,
@@ -872,24 +884,12 @@ class Routes{
                                                 userphotos: photos
                                             });
                                         });
-                                    }).catch((photos) => {
-                                        response.render('pages/user', {
-                                            user: result,
-                                            usertags: tags,
-                                            userage: null,
-                                            userphotos: null
-                                        });
-                                    });
-                                }).catch((tags) => {
-                                    response.render('pages/user', {
-                                        user: result,
-                                        usertags: tags,
-                                        userage: null,
-                                        userphotos: photos
-                                    });
+                                    }
+
+                                }).catch((result) => {
+                                    console.log('catch', result);
                                 });
                             }
-
                         }).catch((result) => {
                             console.log('catch', result);
                         });
@@ -910,7 +910,31 @@ class Routes{
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
             }
-            response.render('pages/history')
+            // Je visite la page d'un utilisateur
+            const iVisited = 'SELECT `username`, `profil`,`visited_id`, `visited_at` FROM matcha.users INNER JOIN matcha.visits ON users.id = visits.visited_id WHERE visitor_id = ? ORDER BY `visited_at` DESC';
+
+            // SELECT id, prenom, nom, date_achat, num_facture, prix_total
+            // FROM utilisateur
+            // INNER JOIN commande ON utilisateur.id = commande.utilisateur_id
+
+            checkDb.query(iVisited, [request.session.user.id]).then((result1) => {
+                if (result) {
+                    const theyVisited = 'SELECT `username`, `profil`,`visitor_id`, `visited_at` FROM matcha.users INNER JOIN matcha.visits ON users.id = visits.visitor_id WHERE visited_id = ? ORDER BY `visited_at` DESC';
+                    // var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+                    // console.log('result date', result[3].visited_at.toLocaleDateString('fr-FR', options));
+                    checkDb.query(theyVisited, [request.session.user.id]).then((result2) => {
+                        if (result2) {
+                            console.log('result2', result2)
+                            // response.render('pages/history', {myVisits: result1, theirVisits: result2});
+                        }
+                    }).catch((result2) => {
+                        console.log('history catch', result2);
+                    });
+                }
+            }).catch((result1) => {
+                console.log('history catch', result1);
+            });
+
         });
 
     }
