@@ -706,27 +706,53 @@ class Routes{
                 if (request.query.sort != undefined){
                     var sort = resSort.sort(request.query.sort);
                 }
+                var dateMin = 0
+                var dateMax = 0
                 var filter = request.query.filter;
-                if (filter != undefined){                    
-                    var ageFilter = filter.substring(3, filter.indexOf("pop"));
-					var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
-					var locFilter = filter.substring(filter.indexOf("loc") + 3);
-                    var ageMin = ageFilter.substring(0, ageFilter.indexOf(","));
-                    var ageMax = ageFilter.substring(ageFilter.indexOf(",")+1);
-                    if (ageMin == ageMax){
-                        ageMin++;
-                    }
-                    var dateMin = userData.ageConvert(ageMin);
-                    var dateMax = userData.ageConvert(ageMax);       
-					var popMin = popFilter.substring(0, popFilter.indexOf(","));
-					var popMax = popFilter.substring(popFilter.indexOf(",")+1);
-					var locMin = locFilter.substring(0, locFilter.indexOf(","));
-                    var locMax = locFilter.substring(locFilter.indexOf(",")+1);
-                    filter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + "\" AND `popularity` BETWEEN " + popMin + " AND " + popMax;
-                }
+                console.log(`01: date min has been initialised`)
+                console.log(request.query);
+                // if (filter != undefined){
+                //     var ageFilter = filter.substring(3, filter.indexOf("pop"));
+				// 	var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
+                //     var locFilter = filter.substring(filter.indexOf("loc") + 3, filter.indexOf("tag"));
+                //     var tagFilter = filter.substring(filter.indexOf("tag") + 3);
+                //     console.log("tags:", tagFilter);
+                //     var ageMin = ageFilter.substring(0, ageFilter.indexOf(","));
+                //     var ageMax = ageFilter.substring(ageFilter.indexOf(",")+1);
+                //     if (ageMin == ageMax){
+                //         ageMin++;
+                //     }
+                //     console.log(`01: date min is ${dateMin}`)
+                //     userData.ageConvert(ageMin).then((dateMini) => {
+                //         dateMin = dateMini;
+                //         console.log(`01.1: date min is ${dateMin}`)
+                //         // userData.ageConvert(ageMax).then((dateMaxi) =>)
+                //     }).catch(() => {
+                //         dateMin = dateMini;
+                //         console.log(`01.2: date min is ${dateMin}`)
+                //     });
+                //     userData.ageConvert(ageMax).then((dateMaxi) => {
+                //         dateMax = 0;
+                //         // userData.ageConvert(ageMax).then((dateMaxi) =>)
+                //     }).catch(() => {
+                //         dateMax = 0;
+                //     });
+                    
+                //     // var dateMin = userData.ageConvert(ageMin);
+                //     // var dateMax = userData.ageConvert(ageMax);       
+
+                //     var popMin = popFilter.substring(0, popFilter.indexOf(","));
+				// 	var popMax = popFilter.substring(popFilter.indexOf(",")+1);
+				// 	var locMin = locFilter.substring(0, locFilter.indexOf(","));
+                //     var locMax = locFilter.substring(locFilter.indexOf(",")+1);
+                //     filter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + 
+                //     "\" AND `popularity` BETWEEN " + popMin + " AND " + popMax;
+                //     // + " INNER JOIN matcha.tags ON (`users`.`id` = `tags`.`user_id` AND `tags`.`tag` = \""+ tagFilter + "\")";
+                // }
+                console.log(`02: date min is now ${dateMin}`)
                 checkDb.profilCompleted(request.session.user.id).then((result) => {
                     checkDb.setOrientation(request.session.user.id).then((orientation) => {
-                        checkDb.getAllUsers(orientation, filter, sort).then((users) => {
+                        checkDb.getAllUsers(orientation, filter, sort, " INNER JOIN matcha.tags ON (`users`.`id` = `tags`.`user_id` AND `tags`.`tag` = \"coul\") ").then((users) => {
                             if (!request.query.index) {
                                 checkDb.getLikes(request.session.user.id).then((likes) => {
                                     response.render('pages/search', {

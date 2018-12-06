@@ -1,8 +1,9 @@
-function searchTag() {
-    if ($('#divSearch').length === 0) {
+function tagSearch() {
+    // console.log("je test");
+    if ($('#divTagSearch').length === 0) {
         const div = document.createElement('div');
         $('.navbar-nav').append(div);
-        div.id = 'divSearch';
+        div.id = 'divTagSearch';
     }
 
     $(document).on('keyup', function () {
@@ -32,7 +33,7 @@ function searchTag() {
 
                     if ($('#response').length === 0 && data.res != '') {
                         const ul = document.createElement('ul');
-                        $('#divSearch').append(ul);
+                        $('#divTagSearch').append(ul);
                         ul.setAttribute('id', 'response');
                         ul.setAttribute('style', 'position: absolute;');
                     }
@@ -41,10 +42,6 @@ function searchTag() {
                     $(document).on('click', 'li', function(){
 
                         var username = $(this).text();
-                        // if (username === 'No data found !') {
-                        //     $('#response').html("");
-                        //     $('ul').remove();
-                        // } else {
                             console.log('data', data.userdata);
                             $('#searchTag').val(username);
 
@@ -57,7 +54,7 @@ function searchTag() {
 
 
                                 const button = document.createElement('button');
-                                $('#divSearch').append(button);
+                                $('#divTagSearch').append(button);
                                 button.setAttribute('id', 'accessProfil');
                                 button.setAttribute('class', 'btn btn-alert login-btn');
                                 button.innerHTML = 'Accéder au profil';

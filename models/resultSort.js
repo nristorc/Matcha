@@ -17,6 +17,14 @@ class Sort{
         }
         return(params)
     }
+
+    tagSearch(params){
+        var tags = [];
+        if (params){
+            // var str = 
+            tags.push()
+        }
+    }
     
 }
 
