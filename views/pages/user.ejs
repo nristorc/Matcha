@@ -6,9 +6,12 @@
 <div class="media">
     <img src="/<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
     <div class="media-body">
-        <button type="button" class="btn btn-primary popularity">
-            Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
-        </button>
+        <div style="display: flex">
+            <button type="button" class="btn btn-primary popularity">
+                Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
+            </button>
+            <span><i class="far fa-thumbs-up" style="font-size: xx-large; margin-left: 10px"></i></span>
+        </div>
         <h2 class="mt-0" id="userDetails"><%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>
 
         <div class="row">

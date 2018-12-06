@@ -58,7 +58,7 @@ const sql_likes = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.likes_table +
 	"(`id` INT(9) NOT NULL AUTO_INCREMENT," +
 	"`user_id` INT(11) NOT NULL," +
     "`user_liked` INT(11) DEFAULT NULL," +
-    "`user_disliked` INT(11) DEFAULT NULL," +
+    "`liked_at` DATETIME NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 const sql_visits = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.visits_table +

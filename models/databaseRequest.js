@@ -528,7 +528,7 @@ class DatabaseRequest {
                     var i = 0;
                     var x = 0;
                     var z = 0;
-                    var matches = {};
+                    var matches = [];
                     while (likes[i]){
                         if (likes[i].user_liked == user_id){
                             while (likes[z]){
@@ -542,7 +542,6 @@ class DatabaseRequest {
                         }
                         i++;
                     }
-                    // console.log("1", matches);
                     resolve(matches);
                 }).catch((error) => {
                     console.log(error);
@@ -608,7 +607,7 @@ class DatabaseRequest {
 		this.query("SELECT `user_id` FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
 			if (exist == ""){
 				if (bool == 1){
-					this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`) VALUES (?, ?)", [user_id, id]).then(() => {
+					this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`, `liked_at`) VALUES (?, ?, NOW())", [user_id, id]).then(() => {
 						this.updatePop(id, 1);
 						return true;
 					}).catch(() => {

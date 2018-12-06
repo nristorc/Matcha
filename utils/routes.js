@@ -829,20 +829,18 @@ class Routes{
             });
         });
 
-        this.app.get('/user/:id', async (request, response) => {
+        this.app.route('/user/:id')
+            .get(async (request, response) => {
             if (!request.session.user) {
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 response.status(200).render('index');
             } else {
                 checkDb.profilCompleted(request.session.user.id).then((result) => {
                     if (request.params.id == request.session.user.id) {
-                        //console.log('same profil');
                         response.redirect('/profil');
                     } else {
-
                         const visits = 'INSERT INTO matcha.visits SET visitor_id = ?, visited_id = ?, visited_at = NOW()';
                         checkDb.query(visits, [request.session.user.id, parseInt(request.params.id, 10)]).then((result) => {
-                            console.log('then', result);
                             if (result) {
                                 const sql = 'SELECT * FROM matcha.users WHERE id = ?';
                                 checkDb.query(sql, [request.params.id]).then((result) => {
@@ -853,11 +851,17 @@ class Routes{
                                         checkDb.getTags(request.params.id).then((tags) => {
                                             checkDb.getPhotos(request.params.id).then((photos) => {
                                                 userData.userAge(result[0].birth).then((age) => {
-                                                    response.render('pages/user', {
-                                                        user: result,
-                                                        userage: age,
-                                                        usertags: tags,
-                                                        userphotos: photos
+                                                    checkDb.getLikes(request.session.user.id).then((result) => {
+                                                        if (result) {
+                                                            for (var i = 0; i < result.length; i++) {
+                                                                if (result[i].user_liked == request.params.id) {
+
+                                                                }
+                                                            }
+                                                        }
+                                                        console.log('likes list', result);
+                                                    }).catch((result) => {
+                                                        console.log('likes list CATCH', result);
                                                     });
                                                 }).catch((age) => {
                                                     console.log('age CATCH: ', age);
@@ -902,7 +906,10 @@ class Routes{
                 });
             }
 
-        });
+        })
+            .post(async (request, response) => {
+                console.log('Je suis dans USER POST');
+            });
 
         /* Routes for Historique */
         this.app.get('/history', async (request, response) => {
@@ -910,29 +917,64 @@ class Routes{
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
             }
-            // Je visite la page d'un utilisateur
+
+            //J'ai visité le profil d'un utilisateur
             const iVisited = 'SELECT `username`, `profil`,`visited_id`, `visited_at` FROM matcha.users INNER JOIN matcha.visits ON users.id = visits.visited_id WHERE visitor_id = ? ORDER BY `visited_at` DESC';
-
-            // SELECT id, prenom, nom, date_achat, num_facture, prix_total
-            // FROM utilisateur
-            // INNER JOIN commande ON utilisateur.id = commande.utilisateur_id
-
             checkDb.query(iVisited, [request.session.user.id]).then((result1) => {
-                if (result) {
+                if (result1) {
+
+                    //Un utilisateur a visité mon profil
                     const theyVisited = 'SELECT `username`, `profil`,`visitor_id`, `visited_at` FROM matcha.users INNER JOIN matcha.visits ON users.id = visits.visitor_id WHERE visited_id = ? ORDER BY `visited_at` DESC';
-                    // var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-                    // console.log('result date', result[3].visited_at.toLocaleDateString('fr-FR', options));
                     checkDb.query(theyVisited, [request.session.user.id]).then((result2) => {
                         if (result2) {
-                            console.log('result2', result2)
-                            // response.render('pages/history', {myVisits: result1, theirVisits: result2});
+
+                            //J'ai liké un utilisateur
+                            const iLiked = 'SELECT `username`, `profil`,`user_liked`, `liked_at` FROM matcha.users INNER JOIN matcha.likes ON users.id = likes.user_liked WHERE user_id = ?';
+                            checkDb.query(iLiked, [request.session.user.id]).then((result3) => {
+
+                                // Un utilisateur m'a liké
+                                const theyLiked = 'SELECT `username`, `profil`,`user_id`, `liked_at` FROM matcha.users INNER JOIN matcha.likes ON users.id = likes.user_id WHERE user_liked = ?';
+                                checkDb.query(theyLiked, [request.session.user.id]).then((result4) => {
+
+                                    //Mes Matchs
+                                    checkDb.getMatches(request.session.user.id).then((tab) => {
+                                        if (tab != "") {
+                                            const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
+                                            const sql = 'SELECT `id`, `username`, `profil` FROM matcha.users WHERE ' + sqlCondition + ';';
+                                            // console.log(`SqlCondition is : ${sqlCondition} and sql is ${sql}`);
+                                            let push = [];
+                                            checkDb.query(sql, tab)
+                                                .then((res) => {
+                                                    // console.log('results from query are : ', res);
+                                                    push = res;
+                                                    // console.log('push is : ', push);
+                                                    response.render('pages/history', {myVisits: result1, theirVisits: result2, myLikes: result3, theirLikes: result4, myMatches: push});
+                                                })
+                                                .catch((err) => {
+                                                    console.log(`An error occured: ${err}`);
+                                                });
+                                        }
+                                        else {
+                                            response.render('pages/history', {myVisits: result1, theirVisits: result2, myLikes: result3, theirLikes: result4, myMatchesMsg: 'Vous ne possédez aucun match'});
+                                        }
+                                    }).catch((tab) => {
+                                        console.log('history match CATCH: ', tab);
+                                    });
+
+                                }).catch((result4) => {
+                                    console.log('history catch they Liked', result4);
+                                });
+
+                            }).catch((result3) => {
+                                console.log('history catch i Liked', result3);
+                            });
                         }
                     }).catch((result2) => {
-                        console.log('history catch', result2);
+                        console.log('history catch they Visited', result2);
                     });
                 }
             }).catch((result1) => {
-                console.log('history catch', result1);
+                console.log('history catch I visited', result1);
             });
 
         });
