@@ -851,33 +851,110 @@ class Routes{
                                         checkDb.getTags(request.params.id).then((tags) => {
                                             checkDb.getPhotos(request.params.id).then((photos) => {
                                                 userData.userAge(result[0].birth).then((age) => {
-                                                    checkDb.getLikes(request.session.user.id).then((result) => {
-                                                        if (result) {
-                                                            for (var i = 0; i < result.length; i++) {
-                                                                if (result[i].user_liked == request.params.id) {
-
+                                                    checkDb.getLikes(request.session.user.id).then((liked) => {
+                                                        checkDb.getMatches(request.session.user.id).then((matches) => {
+                                                            console.log('matches', matches);
+                                                            if (photos == '') {
+                                                                if (matches == ''){
+                                                                    response.render('pages/user', {
+                                                                        user: result,
+                                                                        userage: age,
+                                                                        usertags: tags,
+                                                                        userphotos: photos,
+                                                                        likes: null,
+                                                                        matches: null
+                                                                    });
+                                                                } else {
+                                                                    response.render('pages/user', {
+                                                                        user: result,
+                                                                        userage: age,
+                                                                        usertags: tags,
+                                                                        userphotos: photos,
+                                                                        likes: null,
+                                                                        matches: matches
+                                                                    });
+                                                                }
+                                                            } else {
+                                                                if (matches == ''){
+                                                                    response.render('pages/user', {
+                                                                        user: result,
+                                                                        userage: age,
+                                                                        usertags: tags,
+                                                                        userphotos: photos,
+                                                                        likes: liked,
+                                                                        matches: null
+                                                                    });
+                                                                } else {
+                                                                    console.log('il y a des photos et des likes')
+                                                                    response.render('pages/user', {
+                                                                        user: result,
+                                                                        userage: age,
+                                                                        usertags: tags,
+                                                                        userphotos: photos,
+                                                                        likes: liked,
+                                                                        matches: matches
+                                                                    });
                                                                 }
                                                             }
-                                                        }
-                                                        console.log('likes list', result);
-                                                    }).catch((result) => {
-                                                        console.log('likes list CATCH', result);
+
+                                                        }).catch((matches) => {
+                                                            console.log('catch matches', matches);
+                                                        });
+                                                        // if (liked && photos == '') {
+                                                        //     response.render('pages/user', {
+                                                        //         user: result,
+                                                        //         userage: age,
+                                                        //         usertags: tags,
+                                                        //         userphotos: photos,
+                                                        //         likes: null,
+                                                        //         matches: matches
+                                                        //     });
+                                                        // } else {
+                                                        //     checkDb.getMatches(request.session.user.id).then((matches) => {
+                                                        //         if (matches && matches != '') {
+                                                        //             response.render('pages/user', {
+                                                        //                 user: result,
+                                                        //                 userage: age,
+                                                        //                 usertags: tags,
+                                                        //                 userphotos: photos,
+                                                        //                 likes: liked,
+                                                        //                 matches: matches
+                                                        //             });
+                                                        //         } else {
+                                                        //             response.render('pages/user', {
+                                                        //                 user: result,
+                                                        //                 userage: age,
+                                                        //                 usertags: tags,
+                                                        //                 userphotos: photos,
+                                                        //                 likes: liked,
+                                                        //                 matches: null
+                                                        //             });
+                                                        //         }
+                                                        //     }).catch((matches) => {
+                                                        //         console.log('catch matches', matches);
+                                                        //     })
+                                                        // }
+                                                    }).catch((liked) => {
+                                                        console.log('likes list CATCH', liked);
                                                     });
                                                 }).catch((age) => {
+                                                    // console.log('photo', photo)
                                                     console.log('age CATCH: ', age);
                                                     response.render('pages/user', {
                                                         user: result,
                                                         usertags: tags,
                                                         userage: null,
-                                                        userphotos: photos
+                                                        userphotos: photos,
                                                     });
                                                 });
                                             }).catch((photos) => {
+                                                // console.log('photo', photo)
                                                 response.render('pages/user', {
                                                     user: result,
                                                     usertags: tags,
                                                     userage: null,
-                                                    userphotos: null
+                                                    userphotos: null,
+                                                    likes: null
                                                 });
                                             });
                                         }).catch((tags) => {
@@ -908,7 +985,25 @@ class Routes{
 
         })
             .post(async (request, response) => {
-                console.log('Je suis dans USER POST');
+                if (request.body.submit === 'iLiked') {
+                    console.log('user_id', request.session.user.id);
+                    console.log('id', parseInt(request.body.userId));
+                    checkDb.updateLikes(request.session.user.id, parseInt(request.body.userId), 1).then(() => {
+                        checkDb.getMatches(request.session.user.id).then((myMatches) => {
+                            response.json({flag: '1', getMatches: myMatches});
+                        }).catch((myMatches) => {
+                            console.log('err occured: ', myMatches);
+                        })
+                    }).catch(() => {
+                        response.json({flag: '0'});
+                    })
+                } else if (request.body.submit === 'iUnliked') {
+                    checkDb.updateLikes(request.session.user.id, parseInt(request.body.userId), -1).then(() => {
+                        response.json({flag: '1'});
+                    }).catch(() => {
+                        response.json({flag: '0'});
+                    })
+                }
             });
 
         /* Routes for Historique */

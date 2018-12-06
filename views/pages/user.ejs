@@ -10,7 +10,32 @@
             <button type="button" class="btn btn-primary popularity">
                 Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
             </button>
-            <span><i class="far fa-thumbs-up" style="font-size: xx-large; margin-left: 10px"></i></span>
+
+            <%if (likes !== null) {%>
+                <%var found = 0%>
+                <% for (var x = 0; x < likes.length; x++)  {%>
+                    <% if (likes[x].user_liked === user[0].id) {%>
+                        <%found = 1;%>
+                    <%} else{ %>
+                        <%found = 0;%>
+                <%}}%>
+                <%if (found === 1) {%>
+                    <span><i class="fas fa-thumbs-up" style="color: dodgerblue; font-size: xx-large; margin-left: 10px" onclick="iUnlike(<%=user[0].id%>)"></i></span>
+                <%} else if(found === 0) {%>
+                    <span><i class="far fa-thumbs-up" style="font-size: xx-large; margin-left: 10px" onclick="iLike(<%=user[0].id%>)"></i></span>
+            <%}}%>
+
+            <%if (matches !== null) {%>
+                <%var found2 = 0%>
+                <% for (var y = 0; y < matches.length; y++)  {%>
+                    <% if (matches[y] === user[0].id) {%>
+                    <%console.log('match ejs')%>
+                    <%found2 = 1;%>
+                <%}}%>
+                <%if (found2 === 1) {%>
+                    <span><i class="fas fa-heartbeat" style="color: red; font-size: xx-large; margin-left: 10px"></i></span>
+            <%}}%>
+
         </div>
         <h2 class="mt-0" id="userDetails"><%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>
 
@@ -71,3 +96,63 @@
 </div>
 
 <% include ../partial/footer.ejs%>
+
+<script>
+
+    function iLike(userId) {
+        const formData = {
+            'userId': userId,
+            'submit': 'iLiked'
+        }
+
+        $.ajax({
+            type		: 'POST',
+            url         : '/user/' + userId,
+            data		: formData,
+            dataType	: 'json',
+            encode		: true
+        })
+            .done(function(data) {
+                console.log('data like: ', data);
+                if (data.flag === '1') {
+                    $('.fa-thumbs-up').attr('class', 'fas fa-thumbs-up');
+                    $('.fa-thumbs-up').attr('style', 'color: dodgerblue; font-size: xx-large; margin-left: 10px');
+                    $('.fa-thumbs-up').attr('onclick', 'iUnlike(<%=user[0].id%>)');
+                }
+                if (data.getMatches) {
+                    for (var i = 0; i < data.getMatches.length; i++) {
+                        if (data.getMatches[i] === userId) {
+                            <!--$('.fa-thumbs-up').attr('class', 'far fa-thumbs-up');-->
+                            <!--$('.fa-thumbs-up').attr('style', 'font-size: xx-large; margin-left: 10px');-->
+                        }
+                    }
+                }
+            })
+
+    }
+
+    function iUnlike(userId) {
+        const formData = {
+            'userId': userId,
+            'submit': 'iUnliked'
+        }
+
+        $.ajax({
+            type		: 'POST',
+            url         : '/user/' + userId,
+            data		: formData,
+            dataType	: 'json',
+            encode		: true
+        })
+            .done(function(data) {
+                console.log('data unlike: ', data);
+                if (data.flag === '1') {
+                    $('.fa-thumbs-up').attr('class', 'far fa-thumbs-up');
+                    $('.fa-thumbs-up').attr('style', 'font-size: xx-large; margin-left: 10px');
+                    $('.fa-thumbs-up').attr('onclick', 'iLike(<%=user[0].id%>)');
+                }
+            })
+
+    }
+
+</script>

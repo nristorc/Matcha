@@ -604,33 +604,49 @@ class DatabaseRequest {
 	}
 
     async updateLikes(user_id, id, bool){
-		this.query("SELECT `user_id` FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
-			if (exist == ""){
-				if (bool == 1){
-					this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`, `liked_at`) VALUES (?, ?, NOW())", [user_id, id]).then(() => {
-						this.updatePop(id, 1);
-						return true;
-					}).catch(() => {
-						return false;
-					});
-				} else if (bool == -1) {
-					return false;
-				}
-			} else {
-				if (bool == 1){
-					return false;
-				} else if (bool == -1) {
-					this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
-						this.updatePop(id, 2);
-						return true;
-					}).catch(() => {
-						return false;
-					});
-				}
-			}
-		}).catch(()=> {
-			return(false);
-		});
+        try {
+            return new Promise((resolve, reject) => {
+                console.log("j'arrive")
+                this.query("SELECT `user_id` FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
+                    console.log("1- je checke si like deja existant")
+                    if (exist == ""){
+                        console.log("2- je checke si c'est bien un ajout")
+                        if (bool == 1){
+                            this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`, `liked_at`) VALUES (?, ?, NOW())", [user_id, id]).then(() => {
+                                console.log("3- j'ai update la db")
+                                this.updatePop(id, 1).then(() => {
+                                    console.log("4- j'update la popularite")
+                                    resolve();
+                                }).catch((err) => {
+                                    console.log(err);
+                                });
+                            }).catch(() => {
+                                reject();
+                            });
+                        } else if (bool == -1) {
+                            reject();
+                        }
+                    } else {
+                        if (bool == 1){
+                            reject();
+                        } else if (bool == -1) {
+                            this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
+                                this.updatePop(id, 2);
+                                resolve();
+                            }).catch(() => {
+                                reject();
+                            });
+                        }
+                    }
+                }).catch((exist)=> {
+                    console.log('catch existe', exist)
+                    return(false);
+                });
+            })
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
     }
 
     async profilCompleted(id) {
