@@ -14,12 +14,12 @@
 					<label class="input-group-text" for="inputGroupSelect01">Trier par</label>
 				</div>
 				<select class="custom-select" name="sort" id="inputSort">
-					<option selected></option>
-					<option value="ageAsc">Age croissant</option>
-					<option value="ageDesc">Age décroissant</option>
-					<option value="loc">Localisation la plus proche</option>
-					<option value="popAsc">Popularité croissant</option>
-					<option value="popDesc">Popularité décroissant</option>
+					<option></option>
+					<option value="ageAsc" <% if (sort === "ageAsc") {%> selected <%}%>>Age croissant</option>
+					<option value="ageDesc" <% if (sort === "ageDesc") {%> selected <%}%>>Age décroissant</option>
+					<option value="loc" <% if (sort === "loc") {%> selected <%}%>>Localisation la plus proche</option>
+					<option value="popAsc" <% if (sort === "popAsc") {%> selected <%}%>>Popularité croissant</option>
+					<option value="popDesc" <% if (sort === "popDesc") {%> selected <%}%>>Popularité décroissant</option>
 				</select>
 			</div>
 		</form>
@@ -66,7 +66,7 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">-100%</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[<%=popMin%>,<%=popMax%>]" data-slider-handle="round"/>	
+							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[<%=popMin%>,<%=popMax%>]" data-slider-handle="round"/>
 						</div>
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">100%</div>
 					</div>
@@ -80,13 +80,14 @@
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">50km+</div>
 					</div>
 
-				<!-- Tags module nina de profil ? ou de barre de recherche -->
+				<!-- Tags module -->
 				<div class="d-flex bd-highlight">
 					<!-- <div id="tags"> -->
 						<!-- <a class="btn btn-primary hashtag" href="#" role="button" style="display:none;" onclick="deleteTag(this)">#</a> -->
 						<!-- <div id="divSearch"></div> -->
-						<input class="nav-item nav-link" type="text" id="searchTag" placeholder="Ajouter un Tag" onfocus="searchTag()">
+						<!-- <input class="nav-item nav-link" type="text" id="searchTag" placeholder="Ajouter un Tag" onfocus="searchTag()"> -->
 						<!-- <input type="text" placeholder="Ajouter un Tag" id="addTag" onfocus="search()"/> -->
+					<input type="text" id="searchTag" placeholder="Recherche par tags"> <!-- onfocus="searchTag()"-->
 					<!-- </div> -->
 				</div>
 					<button type="button" class="btn btn-primary filter-search" id="inputFilter">Rechercher</button>
@@ -95,123 +96,10 @@
 		</div>	
 </nav>
 
-<script type="text/javascript" src="./public/js/tags-search.js"></script>
+<script type="text/javascript" src="./public/js/tag-search.js"></script>
 
 
-<script>
-	function deleteTag(tag) {
-        const delTag = tag.innerHTML.substring(1);
 
-        var formData = {
-            'tag': delTag,
-            'submit': 'deleteTag'
-        }
-
-        $.ajax({
-            type		: 'POST',
-            url		: '/profil',
-            data		: formData,
-            dataType	: 'json',
-            encode		: true
-        })
-            .done(function (data) {
-                console.log('delete Pic data: ', data);
-                if (data.errors) {
-                    if (document.getElementById('messages')) {
-                        const flash = document.getElementsByClassName('alert');
-                        flash[0].className = 'alert alert-warning alert-dismissible';
-                        flash[0].innerHTML = data.errors;
-                    } else {
-                        $('#container').prepend('<div id="messages"></div>');
-                        $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
-                    }
-                } else if (data.message) {
-                        tag.remove();
-                        $('#addTag').show();
-                }
-            });
-    }
-
-$(function () {
-
-	$(document).ready(function() {
-		$('#addTag').on('keydown', (e) => {
-			var k = e.which || e.key
-			if(/^(9)$/.test(k)) {
-				$(this).value = ""
-				//console.log("Tabulation catch:" + k)
-				e.preventDefault()
-			}
-			if(/^(188|13)$/.test(k)) {
-				//console.log("Submit form:"+ $(this))
-				validFormTag();
-			}
-		})
-
-		const validFormTag = () => {
-			//console.log($("#addTag")[0].value);
-			if ($('.hashtag').length < 6) {
-				//console.log("Submit call")
-
-				var inputTag = $('#addTag')[0]
-				var addedTag = $("#addTag")[0].value;
-				var match = new RegExp('^[a-zA-Z]+$');
-
-				if (match.test(addedTag) === true) {
-					const formData = {
-						'tag': addedTag,
-						'submit': 'addTag'
-					};
-
-					$.ajax({
-						type		: 'POST',
-						url		: '/profil',
-						data		: formData,
-						dataType	: 'json',
-						encode		: true
-					})
-						.done((data) => {
-							if (data.errors) {
-								if (document.getElementById('messages')) {
-									const flash = document.getElementsByClassName('alert');
-									// console.log('flash', flash);
-									flash[0].className = 'alert alert-warning alert-dismissible';
-									flash[0].innerHTML = data.errors;
-								} else {
-									$('#container').prepend('<div id="messages"></div>');
-									$('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
-								}
-							} else {
-								if (document.getElementById('messages')) {
-									$('#messages').remove();
-								}
-								// console.log("Je dois ajouter un tag")
-								// console.log(addedTag)
-								if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag +'</a>');
-								inputTag.value = ""
-								inputTag.focus();
-							}
-							if ($(".hashtag").length === 6) {
-								$("#addTag").hide();
-							}
-						});
-				} else {
-					if (document.getElementById('messages')) {
-						const flash = document.getElementsByClassName('alert');
-						// console.log('flash', flash);
-						flash[0].className = 'alert alert-warning alert-dismissible';
-						flash[0].innerHTML = "Mauvais format de tag";
-					} else {
-						$('#container').prepend('<div id="messages"></div>');
-						$('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag JQUERY</div>')
-					}
-				}
-
-			}
-		}
-	});
-});
-</script>
 
 <%}%>
 

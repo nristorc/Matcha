@@ -723,75 +723,79 @@ class Routes{
 					var locMin = locFilter.substring(0, locFilter.indexOf(","));
                     var locMax = locFilter.substring(locFilter.indexOf(",")+1);
                     filter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + "\" AND `popularity` BETWEEN " + popMin + " AND " + popMax;
-				}   
+                }
                 checkDb.profilCompleted(request.session.user.id).then((result) => {
-                            				checkDb.setOrientation(request.session.user.id).then((orientation) => {
-                                                checkDb.getAllUsers(orientation, filter, sort).then((users) => {
-                                                    if (!request.query.index) {
-                            							checkDb.getLikes(request.session.user.id).then((likes) => {
-                            								response.render('pages/search', {
-                            									users: users,
-                            									index: 0,
-                                                                likes: likes,
-                                                                ageMin: ageMin,
-                                                                ageMax: ageMax,
-                                                                popMin: popMin,
-                                                                popMax: popMax,
-                                                                locMin: locMin,
-                                                                locMax: locMax,
-                            								});
-                            							}).catch((likes) => {
-                            								response.render('pages/search', {
-                            									users: users,
-                            									index: 0,
-                                                                likes: likes,
-                                                                ageMin: ageMin,
-                                                                ageMax: ageMax,
-                                                                popMin: popMin,
-                                                                popMax: popMax,
-                                                                locMin: locMin,
-                                                                locMax: locMax,
-                            								});
-                            							});
-                            						} else {
-                                                        // console.log("--2--");
-                                                        // console.log(request.query.index)
-                            							if (request.query.index < users.length){
-                            								checkDb.getLikes(request.session.user.id).then((likes) => {
-                                                                response.render('pages/search', {
-                            										users: users,
-                            										index: request.query.index,
-                                                                    likes: likes,
-                                                                    ageMin: ageMin,
-                                                                    ageMax: ageMax,
-                                                                    popMin: popMin,
-                                                                    popMax: popMax,
-                                                                    locMin: locMin,
-                                                                    locMax: locMax,
-                            									});
-                            								}).catch((likes) => {
-                            									response.render('pages/search', {
-                            										users: users,
-                            										index: request.query.index,
-                                                                    likes: likes,
-                                                                    ageMin: ageMin,
-                                                                    ageMax: ageMax,
-                                                                    popMin: popMin,
-                                                                    popMax: popMax,
-                                                                    locMin: locMin,
-                                                                    locMax: locMax,
-                            									});
-                            								});
-                            							} else {
-                            								response.end();
-                            							}
-                            						}
-                            					}).catch((users) => {
-                            						return response.render('index');
-                            					});
-                            				}).catch((orientation) => {
-                            					return response.render('index');
-                            				});
+                    checkDb.setOrientation(request.session.user.id).then((orientation) => {
+                        checkDb.getAllUsers(orientation, filter, sort).then((users) => {
+                            if (!request.query.index) {
+                                checkDb.getLikes(request.session.user.id).then((likes) => {
+                                    response.render('pages/search', {
+                                        users: users,
+                                        index: 0,
+                                        likes: likes,
+                                        ageMin: ageMin,
+                                        ageMax: ageMax,
+                                        popMin: popMin,
+                                        popMax: popMax,
+                                        locMin: locMin,
+                                        locMax: locMax,
+                                        sort: request.query.sort,
+                                    });
+                                }).catch((likes) => {
+                                    response.render('pages/search', {
+                                        users: users,
+                                        index: 0,
+                                        likes: likes,
+                                        ageMin: ageMin,
+                                        ageMax: ageMax,
+                                        popMin: popMin,
+                                        popMax: popMax,
+                                        locMin: locMin,
+                                        locMax: locMax,
+                                        sort: request.query.sort,
+                                    });
+                                });
+                            } else {
+                                // console.log("--2--");
+                                // console.log(request.query.index)
+                                if (request.query.index < users.length){
+                                    checkDb.getLikes(request.session.user.id).then((likes) => {
+                                        response.render('pages/search', {
+                                            users: users,
+                                            index: request.query.index,
+                                            likes: likes,
+                                            ageMin: ageMin,
+                                            ageMax: ageMax,
+                                            popMin: popMin,
+                                            popMax: popMax,
+                                            locMin: locMin,
+                                            locMax: locMax,
+                                            sort: request.query.sort,
+                                        });
+                                    }).catch((likes) => {
+                                        response.render('pages/search', {
+                                            users: users,
+                                            index: request.query.index,
+                                            likes: likes,
+                                            ageMin: ageMin,
+                                            ageMax: ageMax,
+                                            popMin: popMin,
+                                            popMax: popMax,
+                                            locMin: locMin,
+                                            locMax: locMax,
+                                            sort: request.query.sort,
+                                        });
+                                    });
+                                } else {
+                                    response.end();
+                                }
+                            }
+                        }).catch((users) => {
+                            return response.render('index');
+                        });
+                    }).catch((orientation) => {
+                        return response.render('index');
+                    });
                 }).catch((result) => {
                     console.log('catch', result);
                     request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
@@ -801,7 +805,7 @@ class Routes{
         }).post('/search', async(request, response) => {
             if (!request.session.user) {
                 return response.render('index');
-			} else {
+			} else if (request.body.id_liked){
                 var data = request.body.id_liked;
 				var likeAction = data.substring(0, 12);
                 var userLiked =  data.substring(13, data.length);

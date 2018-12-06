@@ -10,24 +10,21 @@ var valSlideLoc = slideLoc.slider('getValue');
 
 $('#slideAge').change((event) => {
     valSlideAge = slideAge.slider('getValue');
-    console.log("age : ", valSlideAge);
 });
 
 $('#slidePop').change((event) => {
     valSlidePop = slidePop.slider('getValue');
-	console.log("pop : ", valSlidePop);
 });
 
 $('#slideLoc').change((event) => {
     valSlideLoc = slideLoc.slider('getValue');
-	console.log("loc : ", valSlideLoc);
 });
 
 const   requestNextPage = () => {
     $.ajax({
         method: "GET",
         data: {
-            index:i  
+            index:i,
         },
         url: window.location.pathname + window.location.search,
         success: function(html) {
@@ -56,18 +53,21 @@ $(function () {
                 i=i+6;
             }
         });
+
         $('#inputSort').change((event) => {
 			if (window.location.search && window.location.search.substring(1, 5) == "sort"){
-				$(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
+                $(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
 			} else if (window.location.search && window.location.search.substring(1, 7) == "filter"){
-				if (window.location.search.indexOf("&sort") != -1){
-					$(location).attr("href", window.location.pathname + window.location.search.substring(0, window.location.search.indexOf("&sort")) + "&sort=" + $('#inputSort').val());
+                if (window.location.search.indexOf("&sort") != -1){
+                    $(location).attr("href", window.location.pathname + window.location.search.substring(0, window.location.search.indexOf("&sort")) + "&sort=" + $('#inputSort').val());
 				} else {
-					$(location).attr("href", window.location.pathname +  window.location.search + "&sort=" + $('#inputSort').val());
+                    $(location).attr("href", window.location.pathname +  window.location.search + "&sort=" + $('#inputSort').val());
 				}
 			} else {
-				$(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
-			}
+                $(location).attr("href", window.location.pathname + "?sort=" + $('#inputSort').val());
+            }
+
+            
         })
 
         $('#inputFilter').click((event) => {
