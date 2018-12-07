@@ -14,6 +14,8 @@
             <%var found = 0%>
             <%var found2 = 0%>
             <%var found3 = 0%>
+            <%var found4 = 0%>
+            <%var found5 = 0%>
             <%if (likes !== null) {%>
                 <% for (var x = 0; x < likes.length; x++)  {%>
                     <% if (likes[x].user_liked === user[0].id) {%>
@@ -102,8 +104,30 @@
 
 </div>
 <div id="issues">
-    <p>Reporter comme Faux Compte <span><i class="fas fa-thumbs-down" style="font-size: x-large"></i></span></p>
-    <p>Bloquer cet utilisateur <span><i class="fas fa-angry" style="font-size: x-large"></i></span></p>
+
+    <%if (reports !== null) {%>
+        <% for (var r = 0; r < reports.length; r++)  {%>
+            <% if (reports[r].reported_id === user[0].id && reports[r].flag === 1) {%>
+            <%found4 = 1;%>
+        <%}}%>
+        <%if (found4 === 1) {%>
+            <p id="fake"><strong>It's a FAKE !</strong> <span><i class="fas fa-thumbs-down" style="font-size: x-large; color: red;"></i></span></p>
+            <%} else if(found4 === 0) {%>
+            <p id="notFake" onclick="reportFake(<%=user[0].id%>)">Reporter comme Faux Compte <span><i class="fas fa-thumbs-down" style="font-size: x-large"></i></span></p>
+    <%}}%>
+
+        <%if (reports !== null) {%>
+            <% for (var s = 0; s < reports.length; s++)  {%>
+                <% if (reports[s].reported_id === user[0].id && reports[s].flag === 2) {%>
+                <%found5 = 1;%>
+            <%}}%>
+            <%if (found5 === 1) {%>
+                <p onclick="unBlock(<%=user[0].id%>)">Vous avez bloqué cet utilisateur... <span><i class="fas fa-angry" style="font-size: x-large; color: red"></i></span></p>
+            <%} else if(found4 === 0) {%>
+                <p onclick="reportBlock(<%=user[0].id%>)">Bloquer cet utilisateur <span><i class="fas fa-angry" style="font-size: x-large"></i></span></p>
+        <%}}%>
+
+
 </div>
 
 <% include ../partial/footer.ejs%>
@@ -140,7 +164,7 @@
                         }
                     }
                 }
-            })
+            });
 
     }
 
@@ -173,8 +197,29 @@
                         }
                     }
                 }
-            })
+            });
 
+    }
+
+    function reportFake(userId) {
+        const formData = {
+            'userId': userId,
+            'submit': 'iReport'
+        }
+        $.ajax({
+            type		: 'POST',
+            url         : '/user/' + userId,
+            data		: formData,
+            dataType	: 'json',
+            encode		: true
+        })
+            .done(function(data) {
+                // if (data && data.flag === 'reported updated') {
+                //     $('.fa-thumbs-down').attr('style', 'font-size: x-large; color: red;');
+                //     $('p#fake').innerHTML = "<strong>It's a FAKE</strong>";
+                //     $('#fake').removeAttr('onclick');
+                // }
+            });
     }
 
 </script>

@@ -68,6 +68,15 @@ const sql_visits = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.visits_table +
     "`visited_at` DATETIME NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
+const sql_reports = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.reports_table +
+    "(`id` INT(9) NOT NULL AUTO_INCREMENT," +
+    "`report_id` INT(11) DEFAULT NULL," +
+    "`reported_id` INT(11) DEFAULT NULL," +
+    "`reported_at` DATETIME NULL," +
+    // Flag: 1 = fake; 2 = block
+    "`flag` TINYINT NOT NULL," +
+    "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+
 connection.query(sql_user, (err, result) => {
     if (err) {
         console.error('error creating table: ' + err.stack);
@@ -105,7 +114,15 @@ connection.query(sql_visits, (err, result) => {
         console.error('error creating table: ' + err.stack);
         return
     }
-    console.log("Table " + configDatabase.photos_table + " created");
+    console.log("Table " + configDatabase.visits_table + " created");
+});
+
+connection.query(sql_reports, (err, result) => {
+    if (err) {
+        console.error('error creating table: ' + err.stack);
+        return
+    }
+    console.log("Table " + configDatabase.reports_table + " created");
 });
 
 connection.end();

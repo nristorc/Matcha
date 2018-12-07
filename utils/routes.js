@@ -853,50 +853,56 @@ class Routes{
                                                 userData.userAge(result[0].birth).then((age) => {
                                                     checkDb.getLikes(request.session.user.id).then((liked) => {
                                                         checkDb.getMatches(request.session.user.id).then((matches) => {
-                                                            console.log('matches', matches);
-                                                            if (photos == '') {
-                                                                if (matches == ''){
-                                                                    response.render('pages/user', {
-                                                                        user: result,
-                                                                        userage: age,
-                                                                        usertags: tags,
-                                                                        userphotos: photos,
-                                                                        likes: null,
-                                                                        matches: null
-                                                                    });
+                                                            checkDb.getMyReports(request.session.user.id).then((reports) => {
+                                                                if (photos == '') {
+                                                                    if (matches == ''){
+                                                                        response.render('pages/user', {
+                                                                            user: result,
+                                                                            userage: age,
+                                                                            usertags: tags,
+                                                                            userphotos: photos,
+                                                                            likes: null,
+                                                                            matches: null,
+                                                                            reports: reports
+                                                                        });
+                                                                    } else {
+                                                                        response.render('pages/user', {
+                                                                            user: result,
+                                                                            userage: age,
+                                                                            usertags: tags,
+                                                                            userphotos: photos,
+                                                                            likes: null,
+                                                                            matches: matches,
+                                                                            reports: reports
+                                                                        });
+                                                                    }
                                                                 } else {
-                                                                    response.render('pages/user', {
-                                                                        user: result,
-                                                                        userage: age,
-                                                                        usertags: tags,
-                                                                        userphotos: photos,
-                                                                        likes: null,
-                                                                        matches: matches
-                                                                    });
+                                                                    if (matches == ''){
+                                                                        response.render('pages/user', {
+                                                                            user: result,
+                                                                            userage: age,
+                                                                            usertags: tags,
+                                                                            userphotos: photos,
+                                                                            likes: liked,
+                                                                            matches: null,
+                                                                            reports: reports
+                                                                        });
+                                                                    } else {
+                                                                        console.log('il y a des photos et des likes')
+                                                                        response.render('pages/user', {
+                                                                            user: result,
+                                                                            userage: age,
+                                                                            usertags: tags,
+                                                                            userphotos: photos,
+                                                                            likes: liked,
+                                                                            matches: matches,
+                                                                            reports: reports
+                                                                        });
+                                                                    }
                                                                 }
-                                                            } else {
-                                                                if (matches == ''){
-                                                                    response.render('pages/user', {
-                                                                        user: result,
-                                                                        userage: age,
-                                                                        usertags: tags,
-                                                                        userphotos: photos,
-                                                                        likes: liked,
-                                                                        matches: null
-                                                                    });
-                                                                } else {
-                                                                    console.log('il y a des photos et des likes')
-                                                                    response.render('pages/user', {
-                                                                        user: result,
-                                                                        userage: age,
-                                                                        usertags: tags,
-                                                                        userphotos: photos,
-                                                                        likes: liked,
-                                                                        matches: matches
-                                                                    });
-                                                                }
-                                                            }
-
+                                                            }).catch((reports) => {
+                                                                console.log('reports catch', reports)
+                                                            });
                                                         }).catch((matches) => {
                                                             console.log('catch matches', matches);
                                                         });
@@ -964,12 +970,18 @@ class Routes{
                 } else if (request.body.submit === 'iUnliked') {
                     checkDb.updateLikes(request.session.user.id, parseInt(request.body.userId), -1).then(() => {
                         checkDb.getLikes(request.session.user.id).then((liked) => {
-                            // console.log('liked', liked);
                             response.json({flag: '1', theyLikedMe: liked});
                         });
                     }).catch(() => {
                         response.json({flag: '0'});
                     })
+                } else if (request.body.submit === 'iReport') {
+                    checkDb.updateReports(request.session.user.id, parseInt(request.body.userId), 1).then(() => {
+                        response.json({flag: 'reported updated'});
+                    }).catch((result) => {
+                        console.log('an error occured: ', result);
+                        // response.json({flag: '0'});
+                    });
                 }
             });
 

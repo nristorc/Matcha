@@ -226,6 +226,7 @@ button:focus {
     margin: 0;
     padding: 0;
     width: 100%;
+    cursor: pointer;
 }
 
 #issues span {

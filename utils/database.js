@@ -11,5 +11,6 @@ module.exports = {
     'tags_table': 'tags',
     'photos_table': 'photos',
     'likes_table' : 'likes',
-    'visits_table' : 'visits'
+    'visits_table' : 'visits',
+    'reports_table' : 'reports'
 };

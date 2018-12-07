@@ -521,6 +521,24 @@ class DatabaseRequest {
         }
     }
 
+    async getMyReports(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.reports WHERE report_id = ?";
+                this.query(sql, [params, params]).then((reports) => {
+                    if (reports){
+                        resolve(reports);
+                    } else {
+                        reject(reports);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async getMatches(user_id){
         try{
             return new Promise ((resolve, reject) => {
@@ -632,6 +650,47 @@ class DatabaseRequest {
                         } else if (bool == -1) {
                             this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
                                 this.updatePop(id, 2);
+                                resolve();
+                            }).catch(() => {
+                                reject();
+                            });
+                        }
+                    }
+                }).catch((exist)=> {
+                    console.log('catch existe', exist)
+                    return(false);
+                });
+            })
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+
+    async updateReports(id, reported, flag){
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT `report_id` FROM matcha.reports WHERE `report_id` = ? AND reported_id = ?", [id, reported]).then((exist) => {
+                    if (exist == ""){
+                        if (flag == 1){
+                            this.query("INSERT INTO matcha.reports(`report_id`, `reported_id`, `reported_at`, `flag`) VALUES (?, ?, NOW(), ?)", [id, reported, flag]).then(() => {
+                                this.updatePop(reported, 4).then(() => {
+                                    resolve();
+                                }).catch((err) => {
+                                    console.log(err);
+                                });
+                            }).catch(() => {
+                                reject();
+                            });
+                        } else if (flag == 2) {
+                            reject();
+                        }
+                    } else {
+                        if (flag == 1){
+                            reject();
+                        } else if (flag == 2) {
+                            this.query("INSERT INTO matcha.reports(`report_id`, `reported_id`, `reported_at`, `flag`) VALUES (?, ?, NOW(), ?)", [id, reported, flag]).then(() => {
+                                this.updatePop(id, 3);
                                 resolve();
                             }).catch(() => {
                                 reject();
