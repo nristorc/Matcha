@@ -900,40 +900,6 @@ class Routes{
                                                         }).catch((matches) => {
                                                             console.log('catch matches', matches);
                                                         });
-                                                        // if (liked && photos == '') {
-                                                        //     response.render('pages/user', {
-                                                        //         user: result,
-                                                        //         userage: age,
-                                                        //         usertags: tags,
-                                                        //         userphotos: photos,
-                                                        //         likes: null,
-                                                        //         matches: matches
-                                                        //     });
-                                                        // } else {
-                                                        //     checkDb.getMatches(request.session.user.id).then((matches) => {
-                                                        //         if (matches && matches != '') {
-                                                        //             response.render('pages/user', {
-                                                        //                 user: result,
-                                                        //                 userage: age,
-                                                        //                 usertags: tags,
-                                                        //                 userphotos: photos,
-                                                        //                 likes: liked,
-                                                        //                 matches: matches
-                                                        //             });
-                                                        //         } else {
-                                                        //             response.render('pages/user', {
-                                                        //                 user: result,
-                                                        //                 userage: age,
-                                                        //                 usertags: tags,
-                                                        //                 userphotos: photos,
-                                                        //                 likes: liked,
-                                                        //                 matches: null
-                                                        //             });
-                                                        //         }
-                                                        //     }).catch((matches) => {
-                                                        //         console.log('catch matches', matches);
-                                                        //     })
-                                                        // }
                                                     }).catch((liked) => {
                                                         console.log('likes list CATCH', liked);
                                                     });
@@ -986,8 +952,6 @@ class Routes{
         })
             .post(async (request, response) => {
                 if (request.body.submit === 'iLiked') {
-                    console.log('user_id', request.session.user.id);
-                    console.log('id', parseInt(request.body.userId));
                     checkDb.updateLikes(request.session.user.id, parseInt(request.body.userId), 1).then(() => {
                         checkDb.getMatches(request.session.user.id).then((myMatches) => {
                             response.json({flag: '1', getMatches: myMatches});
@@ -999,7 +963,10 @@ class Routes{
                     })
                 } else if (request.body.submit === 'iUnliked') {
                     checkDb.updateLikes(request.session.user.id, parseInt(request.body.userId), -1).then(() => {
-                        response.json({flag: '1'});
+                        checkDb.getLikes(request.session.user.id).then((liked) => {
+                            // console.log('liked', liked);
+                            response.json({flag: '1', theyLikedMe: liked});
+                        });
                     }).catch(() => {
                         response.json({flag: '0'});
                     })

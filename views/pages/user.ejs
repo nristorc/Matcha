@@ -6,18 +6,18 @@
 <div class="media">
     <img src="/<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
     <div class="media-body">
-        <div style="display: flex">
+        <div style="display: flex" id="likeAndMatch">
             <button type="button" class="btn btn-primary popularity">
                 Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
             </button>
 
+            <%var found = 0%>
+            <%var found2 = 0%>
+            <%var found3 = 0%>
             <%if (likes !== null) {%>
-                <%var found = 0%>
                 <% for (var x = 0; x < likes.length; x++)  {%>
                     <% if (likes[x].user_liked === user[0].id) {%>
                         <%found = 1;%>
-                    <%} else{ %>
-                        <%found = 0;%>
                 <%}}%>
                 <%if (found === 1) {%>
                     <span><i class="fas fa-thumbs-up" style="color: dodgerblue; font-size: xx-large; margin-left: 10px" onclick="iUnlike(<%=user[0].id%>)"></i></span>
@@ -26,14 +26,21 @@
             <%}}%>
 
             <%if (matches !== null) {%>
-                <%var found2 = 0%>
                 <% for (var y = 0; y < matches.length; y++)  {%>
                     <% if (matches[y] === user[0].id) {%>
-                    <%console.log('match ejs')%>
-                    <%found2 = 1;%>
+                        <%found2 = 1;%>
                 <%}}%>
                 <%if (found2 === 1) {%>
                     <span><i class="fas fa-heartbeat" style="color: red; font-size: xx-large; margin-left: 10px"></i></span>
+            <%}}%>
+
+            <%if (likes !== null && found2 === 0) {%>
+                <% for (var z = 0; z < likes.length; z++)  {%>
+                    <% if (likes[z].user_id === user[0].id) {%>
+                    <%found3 = 1;%>
+                <%}}%>
+                <%if (found3 === 1) {%>
+                    <span><i class="far fa-smile-wink" style="color: rgb(255, 0, 100); font-size: xx-large; margin-left: 10px"></i></span>
             <%}}%>
 
         </div>
@@ -94,6 +101,10 @@
     <% }} %>
 
 </div>
+<div id="issues">
+    <p>Reporter comme Faux Compte <span><i class="fas fa-thumbs-down" style="font-size: x-large"></i></span></p>
+    <p>Bloquer cet utilisateur <span><i class="fas fa-angry" style="font-size: x-large"></i></span></p>
+</div>
 
 <% include ../partial/footer.ejs%>
 
@@ -122,8 +133,10 @@
                 if (data.getMatches) {
                     for (var i = 0; i < data.getMatches.length; i++) {
                         if (data.getMatches[i] === userId) {
-                            <!--$('.fa-thumbs-up').attr('class', 'far fa-thumbs-up');-->
-                            <!--$('.fa-thumbs-up').attr('style', 'font-size: xx-large; margin-left: 10px');-->
+                            $('#likeAndMatch').append('<span><i class="fas fa-heartbeat" style="color: red; font-size: xx-large; margin-left: 10px"></i></span>');
+                            if ($('.fa-smile-wink')) {
+                                $('.fa-smile-wink').remove();
+                            }
                         }
                     }
                 }
@@ -150,6 +163,15 @@
                     $('.fa-thumbs-up').attr('class', 'far fa-thumbs-up');
                     $('.fa-thumbs-up').attr('style', 'font-size: xx-large; margin-left: 10px');
                     $('.fa-thumbs-up').attr('onclick', 'iLike(<%=user[0].id%>)');
+
+                    if ($('.fa-heartbeat')) {
+                        $('.fa-heartbeat').remove();
+                    }
+                    for (var a = 0; a < data.theyLikedMe.length; a++){
+                        if (data.theyLikedMe && data.theyLikedMe[a].user_id === userId) {
+                            $('.fa-thumbs-up').append('<span><i class="far fa-smile-wink" style="color: rgb(255, 0, 100); font-size: xx-large; margin-left: 10px"></i></span>');
+                        }
+                    }
                 }
             })
 
