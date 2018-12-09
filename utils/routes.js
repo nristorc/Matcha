@@ -704,17 +704,17 @@ class Routes{
 		/* Routes for search */
 
         this.app.get('/search', (request, response) => {
-            // console.log("adresse IP: ", request.connection.remoteAddress);
             var ip = request.headers['x-forwarded-for'] || 
             request.connection.remoteAddress || 
             request.socket.remoteAddress ||
             (request.connection.socket ? request.connection.socket.remoteAddress : null);
             console.log("adresse IP: ", ip);
+
 			if (!request.session.user) {
                 return response.render('index');
 			} else {
-				if (filter != undefined){
-					var filter = request.query.filter;
+				if (request.query.filter != undefined){
+                    var filter = request.query.filter;
 					var ageFilter = filter.substring(3, filter.indexOf("pop"));
 					var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
 					var locFilter = filter.substring(filter.indexOf("loc") + 3, filter.indexOf("tag"));
@@ -728,19 +728,13 @@ class Routes{
 					var locMin = locFilter.substring(0, locFilter.indexOf(","));
 					var locMax = locFilter.substring(locFilter.indexOf(",")+1);
 				}
-				// console.log(request.session.user.id);
 				checkDb.profilCompleted(request.session.user.id).then((result) => {
-					// console.log("ok");
 					resSort.searchParamsCheck(request.query.filter, request.query.sort).then((searchPref) => {
-						// console.log("je suis dans searchParamsCheck");
-						// console.log("request.query.filter: ", request.query.filter);
-						// console.log("request.query.sort: ", request.query.sort);
-						// console.log("et voila le resultat: ", searchPref);
 						checkDb.setOrientation(request.session.user.id).then((orientation) => {
 							checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag']).then((users) => {
 								if (!request.query.index) {
 									checkDb.getLikes(request.session.user.id).then((likes) => {
-										response.render('pages/search', {
+                                        response.render('pages/search', {
 											users: users,
 											index: 0,
 											likes: likes,
@@ -767,11 +761,9 @@ class Routes{
 										});
 									});
 								} else {
-									// console.log("--2--");
-									// console.log(request.query.index)
 									if (request.query.index < users.length){
 										checkDb.getLikes(request.session.user.id).then((likes) => {
-											response.render('pages/search', {
+                                            response.render('pages/search', {
 												users: users,
 												index: request.query.index,
 												likes: likes,

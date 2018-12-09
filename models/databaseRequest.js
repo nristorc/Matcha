@@ -361,23 +361,23 @@ class DatabaseRequest {
                 // console.log("sort : ", sort);
                 // console.log("tags : ", tags);
                 if (orientation && sort && filter && tags){
-					var sql = "SELECT * FROM matcha.users" + tags + "AND registerToken = 'NULL'"+orientation+filter+sort;
+					var sql = "SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`"+sort;
 					console.log("--1--", sql);
                 } else if (orientation && sort && filter){
-					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter+sort;
+					var sql = "SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`"+sort;
 					console.log("--1bis--", sql);
                 } else if (orientation && sort){
-					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+sort;
+					var sql = "SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL'"+orientation+" GROUP BY `users`.`id`"+sort;;
 					console.log("--2--", sql);
                 } else if (orientation && filter && tags){
-					var sql = "SELECT * FROM matcha.users" + tags + "AND registerToken = 'NULL'"+orientation+filter;
+					var sql = "SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`";;
                     console.log("--3--", sql);
                 } else if (orientation && filter){
-					var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter;
+					var sql = "SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`";;
 					console.log("--5--", sql);
                 } else {
-                    // var secretSauce =  " ORDER by `popularity` DESC, `username` DESC";
-                    var sql = "SELECT * FROM matcha.users WHERE registerToken = 'NULL'"+orientation; //+secretSauce;
+                    var secretSauce =  " ORDER by `popularity` DESC, `username` DESC";
+                    var sql = "SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL'"+orientation+" GROUP BY `users`.`id`"+secretSauce;
 					console.log("--4--", sql);
                 }
                 this.query(sql).then((users) => {
@@ -393,6 +393,12 @@ class DatabaseRequest {
             return false;
         }
     }
+
+    // SELECT `users`.* FROM matcha.users 
+    // INNER JOIN matcha.tags 
+    // ON `users`.`id` = `tags`.`user_id` 
+    // WHERE (`tags`.`tag` = "coul" OR `tags`.`tag` = "patate") AND registerToken = 'NULL' 
+    // GROUP BY `users`.`id`
   
     async setOrientation(params){
 		try {
