@@ -977,10 +977,13 @@ class Routes{
                     })
                 } else if (request.body.submit === 'iReport') {
                     checkDb.updateReports(request.session.user.id, parseInt(request.body.userId), 1).then(() => {
-                        response.json({flag: 'reported updated'});
+                        checkDb.emailReport(request.session.user.id, request.body.userId).then(() => {
+                            response.json({flag: 'reported updated'});
+                        }).catch((result) => {
+                            console.log('An error occured: ', result);
+                        });
                     }).catch((result) => {
                         console.log('an error occured: ', result);
-                        // response.json({flag: '0'});
                     });
                 }
             });

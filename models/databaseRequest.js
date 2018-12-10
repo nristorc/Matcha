@@ -730,6 +730,58 @@ class DatabaseRequest {
         }
     }
 
+    async emailReport (reportUser, reportedUser) {
+        try {
+            this.query("SELECT id, username FROM matcha.users WHERE id = ? OR id = ?",
+                [reportUser, reportedUser]).then((result) => {
+                    if (result && result[0] != '' && result[1] != '') {
+                        const template = fs.readFileSync('views/pages/reportEmail.ejs', 'utf-8');
+                        const compiledTemplate = hogan.compile(template);
+
+                        let transporter = nodemailer.createTransport({
+                            host: 'smtp.gmail.com',
+                            port: 587,
+                            secure: false, // true for 465, false for other ports
+                            auth: {
+                                user: 'nina.ristorcelli@gmail.com', // generated ethereal user
+                                pass: 'wasfvdajlwqpgjfo'  // generated ethereal password
+                            },
+                            tls:{
+                                rejectUnauthorized:false
+                            }
+                        });
+
+                        if (result[0].id === reportUser) {
+                            var mailOptions = {
+                                from: '"Reporting a User" <nina.ristorcelli@gmail.com>', // sender address
+                                to: 'nina.ristorcelli@gmail.com', // list of receivers
+                                subject: 'Un faux compte a été détecté', // Subject line
+                                html: compiledTemplate.render({reportUser: result[0].username, reportedUser: result[1].username, clickLink: result[1].id})
+                            };
+                        } else if (result[1].id === reportUser) {
+                            var mailOptions = {
+                                from: '"Reporting a User" <nina.ristorcelli@gmail.com>', // sender address
+                                to: 'nina.ristorcelli@gmail.com', // list of receivers
+                                subject: 'Un faux compte a été détecté', // Subject line
+                                html: compiledTemplate.render({reportUser: result[1].username, reportedUser: result[0].username, clickLink: result[0].id})
+                            };
+                        }
+
+                        transporter.sendMail(mailOptions, (error, info) => {
+                            if (error) {
+                                return console.log(error);
+                            }
+                            console.log('Message sent: %s', info.messageId);
+                        });
+                        return true;
+                    }
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
 }
 
 module.exports = DatabaseRequest;

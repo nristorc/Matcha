@@ -232,3 +232,7 @@ button:focus {
 #issues span {
     vertical-align: text-top;
 }
+
+#fake {
+    color: red;
+}
