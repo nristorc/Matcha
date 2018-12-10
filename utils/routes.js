@@ -729,74 +729,86 @@ class Routes{
 					resSort.searchParamsCheck(request.query.filter, request.query.sort).then((searchPref) => {
 						checkDb.setOrientation(request.session.user.id).then((orientation) => {
 							checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag']).then((users) => {
-								if (!request.query.index) {
-									checkDb.getLikes(request.session.user.id).then((likes) => {
-                                        response.render('pages/search', {
-											users: users,
-											index: 0,
-											likes: likes,
-											ageMin: ageMin,
-											ageMax: ageMax,
-											popMin: popMin,
-											popMax: popMax,
-											locMin: locMin,
-											locMax: locMax,
-											sort: request.query.sort,
-										});
-									}).catch((likes) => {
-										response.render('pages/search', {
-											users: users,
-											index: 0,
-											likes: likes,
-											ageMin: ageMin,
-											ageMax: ageMax,
-											popMin: popMin,
-											popMax: popMax,
-											locMin: locMin,
-											locMax: locMax,
-											sort: request.query.sort,
-										});
-									});
-								} else {
-									if (request.query.index < users.length){
-										checkDb.getLikes(request.session.user.id).then((likes) => {
+                                checkDb.getMyReports(request.session.user.id).then((reports) => {
+                                    if (!request.query.index) {
+                                        checkDb.getLikes(request.session.user.id).then((likes) => {
                                             response.render('pages/search', {
-												users: users,
-												index: request.query.index,
-												likes: likes,
-												ageMin: ageMin,
-												ageMax: ageMax,
-												popMin: popMin,
-												popMax: popMax,
-												locMin: locMin,
-												locMax: locMax,
-												sort: request.query.sort,
-											});
-										}).catch((likes) => {
-											response.render('pages/search', {
-												users: users,
-												index: request.query.index,
-												likes: likes,
-												ageMin: ageMin,
-												ageMax: ageMax,
-												popMin: popMin,
-												popMax: popMax,
-												locMin: locMin,
-												locMax: locMax,
-												sort: request.query.sort,
-											});
-										});
-									} else {
-										response.end();
-									}
-								}
+                                                users: users,
+                                                index: 0,
+                                                likes: likes,
+                                                ageMin: ageMin,
+                                                ageMax: ageMax,
+                                                popMin: popMin,
+                                                popMax: popMax,
+                                                locMin: locMin,
+                                                locMax: locMax,
+                                                sort: request.query.sort,
+                                                reports: reports,
+                                            });
+                                        }).catch((likes) => {
+                                            response.render('pages/search', {
+                                                users: users,
+                                                index: 0,
+                                                likes: likes,
+                                                ageMin: ageMin,
+                                                ageMax: ageMax,
+                                                popMin: popMin,
+                                                popMax: popMax,
+                                                locMin: locMin,
+                                                locMax: locMax,
+                                                sort: request.query.sort,
+                                                reports: reports,
+                                            });
+                                        });
+                                    } else {
+                                        if (request.query.index < users.length){
+                                            checkDb.getLikes(request.session.user.id).then((likes) => {
+                                                response.render('pages/search', {
+                                                    users: users,
+                                                    index: request.query.index,
+                                                    likes: likes,
+                                                    ageMin: ageMin,
+                                                    ageMax: ageMax,
+                                                    popMin: popMin,
+                                                    popMax: popMax,
+                                                    locMin: locMin,
+                                                    locMax: locMax,
+                                                    sort: request.query.sort,
+                                                    reports: reports,
+                                                });
+                                            }).catch((likes) => {
+                                                response.render('pages/search', {
+                                                    users: users,
+                                                    index: request.query.index,
+                                                    likes: likes,
+                                                    ageMin: ageMin,
+                                                    ageMax: ageMax,
+                                                    popMin: popMin,
+                                                    popMax: popMax,
+                                                    locMin: locMin,
+                                                    locMax: locMax,
+                                                    sort: request.query.sort,
+                                                    reports: reports,
+                                                });
+                                            });
+                                        } else {
+                                            response.end();
+                                        }
+                                    }
+                                }).catch((reports) => {
+                                    console.log("oups");
+                                    return response.render('index');
+                                });    
 							}).catch((users) => {
+                                console.log("oups 2");
 								return response.render('index');
 							});
 						}).catch((orientation) => {
-							return response.render('index');
+                            console.log("oups 3");
+                            return response.render('index');
 						});
 					}).catch((searchPref) => {
+                        console.log("oups 4");
 						response.render('index', {
 						});
 					});
@@ -805,33 +817,6 @@ class Routes{
 					request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
 					response.redirect('/')
 				});
-
-					// response.render('pages/search', {
-						// users: users,
-						// index: 0,
-						// likes: likes,
-						// ageMin: ageMin,
-						// ageMax: ageMax,
-						// popMin: popMin,
-						// popMax: popMax,
-						// locMin: locMin,
-						// locMax: locMax,
-						// sort: request.query.sort,
-					// });
-
-
-				
-                // if (request.query.sort != undefined){
-                //     var sort = resSort.sort(request.query.sort);
-                // }
-                // var dateMin = 0
-                // var dateMax = 0
-                // var filter = request.query.filter;
-                // console.log(`01: date min has been initialised`)
-                // console.log(request.query);
-				// console.log(`02: date min is now ${dateMin}`)
-				
-			
 			}
         }).post('/search', async(request, response) => {
             if (!request.session.user) {

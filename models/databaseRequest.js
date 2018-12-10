@@ -360,25 +360,26 @@ class DatabaseRequest {
                 // console.log("filter : ", filter);
                 // console.log("sort : ", sort);
                 // console.log("tags : ", tags);
+                var secretSauce =  "`popularity` DESC, `username` DESC";
+                var matching = ""
                 if (orientation && sort && filter && tags){
-					var sql = "SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`"+sort;
-					console.log("--1--", sql);
+					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users" + tags + "AND registerToken = 'NULL' "+orientation+filter+" GROUP BY `users`.`id`"+sort+", COUNT(`users`.`id`) DESC";
+					console.log("\n--1--\n", sql);
                 } else if (orientation && sort && filter){
-					var sql = "SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`"+sort;
-					console.log("--1bis--", sql);
+					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users WHERE registerToken = 'NULL' "+orientation+filter+" GROUP BY `users`.`id`"+sort;
+					console.log("\n--1bis--\n", sql);
                 } else if (orientation && sort){
-					var sql = "SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL'"+orientation+" GROUP BY `users`.`id`"+sort;;
-					console.log("--2--", sql);
+					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users WHERE registerToken = 'NULL' "+orientation+" GROUP BY `users`.`id`"+sort;;
+					console.log("\n--2--\n", sql);
                 } else if (orientation && filter && tags){
-					var sql = "SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`";;
-                    console.log("--3--", sql);
+					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users" + tags + "AND registerToken = 'NULL' "+orientation+filter+" GROUP BY `users`.`id` ORDER BY COUNT(`users`.`id`) DESC";;
+                    console.log("\n--3--\n", sql);
                 } else if (orientation && filter){
-					var sql = "SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`";;
-					console.log("--5--", sql);
+					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users WHERE registerToken = 'NULL' "+orientation+filter+" GROUP BY `users`.`id`";;
+					console.log("\n--5--\n", sql);
                 } else {
-                    var secretSauce =  " ORDER by `popularity` DESC, `username` DESC";
-                    var sql = "SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL'"+orientation+" GROUP BY `users`.`id`"+secretSauce;
-					console.log("--4--", sql);
+                    var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users WHERE registerToken = 'NULL' "+orientation+" GROUP BY `users`.`id` ORDER BY "+secretSauce;
+					console.log("--4--\n", sql);
                 }
                 this.query(sql).then((users) => {
                     if (users){
@@ -615,14 +616,16 @@ class DatabaseRequest {
 							newpop -= 2;
 						}
 					} else if (flag == 3){
-						if (newpop >= -85){
 							newpop -= 15;
-						}
 					} else if (flag == 4){
-						if (newpop >= -50){
 							newpop -= 50;
-						}
-					}
+                    }
+                    if (newpop < -100){
+                        newpop = -100;
+                    }
+                    if (newpop > 100){
+                        newpop = 100;
+                    }
 					this.query("UPDATE matcha.users SET `popularity`= ? WHERE `id` = ?", [newpop, user_id]).then(() => {
 						resolve(score);
 					}).catch(() => {
