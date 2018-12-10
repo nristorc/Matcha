@@ -14,12 +14,12 @@
 					<label class="input-group-text" for="inputGroupSelect01">Trier par</label>
 				</div>
 				<select class="custom-select" name="sort" id="inputSort">
-					<option selected></option>
-					<option value="ageAsc">Age croissant</option>
-					<option value="ageDesc">Age décroissant</option>
-					<option value="loc">Localisation la plus proche</option>
-					<option value="popAsc">Popularité croissant</option>
-					<option value="popDesc">Popularité décroissant</option>
+					<option></option>
+					<option value="ageAsc" <% if (sort === "ageAsc") {%> selected <%}%>>Age croissant</option>
+					<option value="ageDesc" <% if (sort === "ageDesc") {%> selected <%}%>>Age décroissant</option>
+					<option value="loc" <% if (sort === "loc") {%> selected <%}%>>Localisation la plus proche</option>
+					<option value="popAsc" <% if (sort === "popAsc") {%> selected <%}%>>Popularité croissant</option>
+					<option value="popDesc" <% if (sort === "popDesc") {%> selected <%}%>>Popularité décroissant</option>
 				</select>
 			</div>
 		</form>
@@ -66,7 +66,7 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">-100%</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[<%=popMin%>,<%=popMax%>]" data-slider-handle="round"/>	
+							<input id="slidePop" type="text" class="span2" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[<%=popMin%>,<%=popMax%>]" data-slider-handle="round"/>
 						</div>
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">100%</div>
 					</div>
@@ -80,14 +80,23 @@
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">50km+</div>
 					</div>
 
-				<!-- Tags module nina de profil ? ou de barre de recherche -->
-
-
+				<!-- Tags module -->
+				<div class="d-flex bd-highlight">
+					<!-- <div id="tags"> -->
+						<a class="btn btn-primary hashtag" href="#" role="button" style="display:none;" onclick="deleteTag(this)">#</a>
+						<div id="divTagSearch"></div>
+						<!-- <input class="nav-item nav-link" type="text" id="searchTag" placeholder="Ajouter un Tag" onfocus="searchTag()"> -->
+						<!-- <input type="text" placeholder="Ajouter un Tag" id="addTag" onfocus="search()"/> -->
+					<input type="text" id="searchTag" class="nav-item nav-link" placeholder="Recherche par tags" ><!-- onfocus="tagSearch()" -->
+					<!-- </div> -->
+				</div>
 					<button type="button" class="btn btn-primary filter-search" id="inputFilter">Rechercher</button>
 				</form>
 			</div>
 		</div>	
 </nav>
+
+
 
 
 <%}%>
@@ -96,7 +105,7 @@
 <div class="scroll" id="scroll">
 	<% var x = index;
 	var i = 0;
-	while (i < 6){ 
+	while (i < 6){
 		if (i===0 || i===3){ %>
 			<div class="row">
 		<%}%>
@@ -208,6 +217,7 @@
 
 <script src="./public/js/scroll.js"></script>
 <script src="./public/js/like.js"></script>
+<script src="./public/js/tag-search.js"></script>
 
 <% } %>
 

@@ -226,7 +226,7 @@ a:hover {
     z-index: 5;
 }
 
-#searchBox, #response {
+#searchBox, #response, #searchTag {
     width: 250px;
     outline: 0;
 }
