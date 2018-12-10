@@ -1029,6 +1029,18 @@ class Routes{
                     }).catch((result) => {
                         console.log('an error occured: ', result);
                     });
+                } else if (request.body.submit === 'iBlock') {
+                    checkDb.updateReports(request.session.user.id, parseInt(request.body.userId), 2).then(() => {
+                        response.json({flag: 'blocked'});
+                    }).catch((result) => {
+                        console.log('an error occured: ', result);
+                    });
+                } else if (request.body.submit === 'iUnblock') {
+                    checkDb.deleteReports(request.session.user.id, parseInt(request.body.userId)).then(() => {
+                        response.json({flag: 'unblocked'});
+                    }).catch((result) => {
+                        console.log('an error occured: ', result);
+                    });
                 }
             });
 

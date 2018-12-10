@@ -355,11 +355,6 @@ class DatabaseRequest {
     async getAllUsers(orientation, filter, sort, tags){
         try {
             return new Promise((resolve, reject) => {
-                // console.log("je suis dans getAllUsers");
-                // console.log("orientation : ", orientation);
-                // console.log("filter : ", filter);
-                // console.log("sort : ", sort);
-                // console.log("tags : ", tags);
                 if (orientation && sort && filter && tags){
 					var sql = "SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL'"+orientation+filter+" GROUP BY `users`.`id`"+sort;
 					console.log("--1--", sql);
@@ -393,12 +388,6 @@ class DatabaseRequest {
             return false;
         }
     }
-
-    // SELECT `users`.* FROM matcha.users 
-    // INNER JOIN matcha.tags 
-    // ON `users`.`id` = `tags`.`user_id` 
-    // WHERE (`tags`.`tag` = "coul" OR `tags`.`tag` = "patate") AND registerToken = 'NULL' 
-    // GROUP BY `users`.`id`
   
     async setOrientation(params){
 		try {
@@ -594,6 +583,7 @@ class DatabaseRequest {
 		// Flag 2 : unlike
 		// Flag 3 : block
 		// Flag 4 : report
+        // Flag 5 : unblock
         try {
             return new Promise((resolve, reject) => {
                 this.query("SELECT `popularity` FROM matcha.users WHERE `id` = ?", [user_id]).then((score) => {
@@ -614,15 +604,19 @@ class DatabaseRequest {
 						} else if (newpop <= 100 && newpop > -99) {
 							newpop -= 2;
 						}
-					} else if (flag == 3){
-						if (newpop >= -85){
-							newpop -= 15;
-						}
-					} else if (flag == 4){
-						if (newpop >= -50){
-							newpop -= 50;
-						}
-					}
+                    } else if (flag == 3){
+                        newpop -= 15;
+                    } else if (flag == 4){
+                        newpop -= 50;
+                    } else if (flag == 5){
+					    newpop += 15;
+                    }
+                    if (newpop < -100){
+                        newpop = -100;
+                    }
+                    if (newpop > 100){
+                        newpop = 100;
+                    }
 					this.query("UPDATE matcha.users SET `popularity`= ? WHERE `id` = ?", [newpop, user_id]).then(() => {
 						resolve(score);
 					}).catch(() => {
@@ -713,6 +707,34 @@ class DatabaseRequest {
                                 reject();
                             });
                         }
+                    }
+                }).catch((exist)=> {
+                    console.log('catch existe', exist)
+                    return(false);
+                });
+            })
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+
+    async deleteReports(id, unblocked){
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("SELECT `report_id` FROM matcha.reports WHERE `report_id` = ? AND reported_id = ?", [id, unblocked]).then((exist) => {
+                    if (exist != ""){
+                            this.query("DELETE FROM matcha.reports WHERE report_id = ? AND reported_id = ? AND flag = 2", [id, unblocked]).then(() => {
+                                this.updatePop(unblocked, 5).then(() => {
+                                    resolve();
+                                }).catch((err) => {
+                                    console.log(err);
+                                });
+                            }).catch(() => {
+                                reject();
+                            });
+                    } else {
+                        reject();
                     }
                 }).catch((exist)=> {
                     console.log('catch existe', exist)

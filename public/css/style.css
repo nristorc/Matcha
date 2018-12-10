@@ -226,13 +226,16 @@ button:focus {
     margin: 0;
     padding: 0;
     width: 100%;
-    cursor: pointer;
 }
 
 #issues span {
     vertical-align: text-top;
 }
 
-#fake {
+#fake, #block {
     color: red;
+}
+
+#notFake, #notBlock {
+    cursor: pointer;
 }
