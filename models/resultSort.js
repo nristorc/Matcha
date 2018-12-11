@@ -32,40 +32,6 @@ class Sort{
     //     });
 	// }
 
-		//  ---------- Requete fonctionnelle sans secret sauce ---------- 
-
-
-	// SELECT `users`.*, COUNT(`users`.`id`) 
-	// FROM matcha.users
-	// LEFT JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` 
-	// WHERE (`tags`.`tag` = "coul" OR `tags`.`tag` = "patate") 
-	// AND registerToken = 'NULL' AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) AND `users`.`id` !=1 AND `birth` BETWEEN "1919-11-10" AND "2000-11-10" AND `popularity` BETWEEN -100 AND 100 
-	// GROUP BY `users`.`id` 
-	// ORDER by `popularity` DESC, COUNT(`users`.`id`) DESC
-
-
-		//  ---------- Requete fonctionnelle avec tags mais pas groupee ---------- 
-
-	// SELECT * FROM (
-	// 	SELECT `users`.*
-	// 		FROM matcha.users
-	// 		INNER JOIN matcha.tags ON `id` = `tags`.`user_id` 
-	// 		WHERE `tags`.`tag` = "coul"
-	// 		AND registerToken = 'NULL' AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) AND `users`.`id` !=1 AND `birth` BETWEEN "1919-11-10" AND "2000-11-10" AND `popularity` BETWEEN -100 AND 100 
-	// 	UNION ALL
-	// 	SELECT `users`.*
-	// 		FROM matcha.users
-	// 		INNER JOIN matcha.tags ON `id` = `tags`.`user_id` 
-	// 		WHERE `tags`.`tag` = "patate"
-	// 		AND registerToken = 'NULL' AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) AND `users`.`id` !=1 AND `birth` BETWEEN "1919-11-10" AND "2000-11-10" AND `popularity` BETWEEN -100 AND 100
-	// 	UNION ALL
-	// 	SELECT `users`.*
-	// 		FROM matcha.users
-	// 		WHERE registerToken = 'NULL' AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) AND `users`.`id` !=1 AND `birth` BETWEEN "1919-11-10" AND "2000-11-10" AND `popularity` BETWEEN -100 AND 100
-	// 	) AS `tmp`
-	
-
-
     async searchParamsCheck(filter, sort){
 		// console.log("AAA filter", filter);
         return new Promise((resolve, reject) => {
@@ -75,15 +41,15 @@ class Sort{
 			var reqTag;
 			if (sort != undefined){
 				if (sort == "popAsc"){
-					reqSort = " ORDER by `popularity` ASC";
+					reqSort = "`popularity` ASC";
 			 	} else if (sort == "popDesc"){
-					reqSort = " ORDER by `popularity` DESC";
+					reqSort = "`popularity` DESC";
 				} else if (sort == "ageAsc"){
-					reqSort = " ORDER by `birth` ASC";
+					reqSort = "`birth` ASC";
 				} else if (sort == "ageDesc"){
-					reqSort = " ORDER by `birth` DESC";
+					reqSort = "`birth` DESC";
 				} else if (sort == "loc"){
-					reqSort = " ORDER by `birth` DESC";
+					reqSort = "`birth` DESC";
 				} else {
 					reqSort = "";
 				}
@@ -119,9 +85,9 @@ class Sort{
 					// console.log("tagFilter:", tagFilter);
 					for (var i=0; i < tagFilter.length; i++){
 						if (i == 0){
-							reqTag = reqTag.concat(" WHERE (`tags`.`tag` = \"" + tagFilter[i]) + "\"";
+							reqTag = reqTag.concat(" WHERE (`tags`.`tag` = \"" + tagFilter[i] + "\"");
 						} else {
-							reqTag = reqTag.concat(" OR `tags`.`tag` = \"" + tagFilter[i]) + "\"";
+							reqTag = reqTag.concat(" OR `tags`.`tag` = \"" + tagFilter[i] + "\"");
 						}
 						// console.log("reqTag",{i},":", reqTag);
 					}

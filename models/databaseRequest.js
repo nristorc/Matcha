@@ -352,35 +352,94 @@ class DatabaseRequest {
         }
     }
 
-    async getAllUsers(orientation, filter, sort, tags){
+    async getAllUsers(orientation, filter, sort, tags, user_tags){
         try {
             return new Promise((resolve, reject) => {
-                // console.log("je suis dans getAllUsers");
-                // console.log("orientation : ", orientation);
-                // console.log("filter : ", filter);
-                // console.log("sort : ", sort);
-                // console.log("tags : ", tags);
-                var secretSauce =  "`popularity` DESC, `username` DESC";
-                var matching = ""
-                if (orientation && sort && filter && tags){
-					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users" + tags + "AND registerToken = 'NULL' "+orientation+filter+" GROUP BY `users`.`id`"+sort+", COUNT(`users`.`id`) DESC";
-					console.log("\n--1--\n", sql);
-                } else if (orientation && sort && filter){
-					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users WHERE registerToken = 'NULL' "+orientation+filter+" GROUP BY `users`.`id`"+sort;
-					console.log("\n--1bis--\n", sql);
-                } else if (orientation && sort){
-					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users WHERE registerToken = 'NULL' "+orientation+" GROUP BY `users`.`id`"+sort;;
-					console.log("\n--2--\n", sql);
-                } else if (orientation && filter && tags){
-					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users" + tags + "AND registerToken = 'NULL' "+orientation+filter+" GROUP BY `users`.`id` ORDER BY COUNT(`users`.`id`) DESC";;
-                    console.log("\n--3--\n", sql);
-                } else if (orientation && filter){
-					var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users WHERE registerToken = 'NULL' "+orientation+filter+" GROUP BY `users`.`id`";;
-					console.log("\n--5--\n", sql);
-                } else {
-                    var sql = "SELECT `users`.*, COUNT(`users`.`id`) FROM matcha.users WHERE registerToken = 'NULL' "+orientation+" GROUP BY `users`.`id` ORDER BY "+secretSauce;
-					console.log("--4--\n", sql);
-                }
+				var sql;
+				var secretSauce =  ", `popularity` DESC"; //A COMPLETER
+				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil` ";
+		// ---------- structure de requete generique ----------
+
+					// SELECT *, COUNT(`tmp`.`id`) FROM (
+					//     SELECT `users`.*
+					//             FROM matcha.users
+					//             WHERE registerToken = 'NULL' 
+					//             AND // ORIENTATION
+					//             AND `users`.`id` != //ID USER 
+					//             AND // FILTER
+					//     UNION ALL
+					//     SELECT `users`.*
+					//         FROM matcha.users
+					//         INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` 
+					//         WHERE `tags`.`tag` = // (TAG 1 USER OR TAG 2 USER [..])
+					//         AND registerToken = 'NULL' 
+					//         AND //ORIENTATION 
+					//         AND `users`.`id` != //ID USER
+					//         AND //FILTER
+					// ) AS `tmp`
+					// GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`
+					// ORDER BY COUNT(`tmp`.`id`) DESC, //SORT THEN SECRET SAUCE
+
+		// -------------------------------------------------------
+			if (!tags){
+				sql = "SELECT *, COUNT(`tmp`.`id`) FROM (SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL' ";
+				if (orientation){
+					sql = sql.concat(orientation);
+					if (filter){
+						sql = sql.concat(filter);
+					}
+				}
+				sql = sql.concat(" UNION ALL SELECT `users`.* FROM `matcha`.`users` INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` WHERE ");
+				if (user_tags){
+					for (var i=0; i < user_tags.length; i++){
+						if (i == 0){
+							sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\"");
+						} else if (i < user_tags.length - 1){
+							sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\"");
+						} else {
+							sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\") AND ");
+						}
+					}
+				}
+				if (orientation){
+					sql = sql.concat("registerToken = 'NULL' " + orientation);
+					if (filter){
+						sql = sql.concat(filter);
+					}
+				}
+			}
+		// ---------- structure de requete avec tag ----------
+
+					// SELECT *, COUNT(`tmp`.`id`) FROM (
+					//     SELECT `users`.*
+					//         FROM matcha.users
+					//         INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` 
+					//         WHERE `tags`.`tag` = //TAG CHERCHÉ
+					//         AND registerToken = 'NULL' 
+					//         AND //ORIENTATION 
+					//         AND `users`.`id` != //ID USER
+					//         AND //FILTER
+					// ) AS `tmp`
+					// GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`
+					// ORDER BY COUNT(`tmp`.`id`) DESC, //SORT THEN SECRET SAUCE
+
+		// -------------------------------------------------------
+			else if (tags){
+				sql = "SELECT *, COUNT(`tmp`.`id`) FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
+				if (orientation){
+					sql = sql.concat(orientation);
+					if (filter){
+						sql = sql.concat(filter);
+					}
+				}
+			}
+			sql = sql.concat(" ) AS `tmp`" + groupBy + "ORDER BY ");
+			if (sort){
+				sql = sql.concat(sort + ", ");
+			}
+			sql = sql.concat("COUNT(`tmp`.`id`) DESC", secretSauce);
+
+			console.log("SQL = ", sql);
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);
@@ -394,13 +453,7 @@ class DatabaseRequest {
             return false;
         }
     }
-
-    // SELECT `users`.* FROM matcha.users 
-    // INNER JOIN matcha.tags 
-    // ON `users`.`id` = `tags`.`user_id` 
-    // WHERE (`tags`.`tag` = "coul" OR `tags`.`tag` = "patate") AND registerToken = 'NULL' 
-    // GROUP BY `users`.`id`
-  
+ 
     async setOrientation(params){
 		try {
             return new Promise((resolve, reject) => {

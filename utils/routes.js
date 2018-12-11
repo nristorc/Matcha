@@ -728,44 +728,14 @@ class Routes{
 				checkDb.profilCompleted(request.session.user.id).then((result) => {
 					resSort.searchParamsCheck(request.query.filter, request.query.sort).then((searchPref) => {
 						checkDb.setOrientation(request.session.user.id).then((orientation) => {
-							checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag']).then((users) => {
-                                checkDb.getMyReports(request.session.user.id).then((reports) => {
-                                    if (!request.query.index) {
-                                        checkDb.getLikes(request.session.user.id).then((likes) => {
-                                            response.render('pages/search', {
-                                                users: users,
-                                                index: 0,
-                                                likes: likes,
-                                                ageMin: ageMin,
-                                                ageMax: ageMax,
-                                                popMin: popMin,
-                                                popMax: popMax,
-                                                locMin: locMin,
-                                                locMax: locMax,
-                                                sort: request.query.sort,
-                                                reports: reports,
-                                            });
-                                        }).catch((likes) => {
-                                            response.render('pages/search', {
-                                                users: users,
-                                                index: 0,
-                                                likes: likes,
-                                                ageMin: ageMin,
-                                                ageMax: ageMax,
-                                                popMin: popMin,
-                                                popMax: popMax,
-                                                locMin: locMin,
-                                                locMax: locMax,
-                                                sort: request.query.sort,
-                                                reports: reports,
-                                            });
-                                        });
-                                    } else {
-                                        if (request.query.index < users.length){
+                            checkDb.getTags(request.session.user.id).then((user_tags) => {
+                                checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag'], user_tags).then((users) => {
+                                    checkDb.getMyReports(request.session.user.id).then((reports) => {
+                                        if (!request.query.index) {
                                             checkDb.getLikes(request.session.user.id).then((likes) => {
                                                 response.render('pages/search', {
                                                     users: users,
-                                                    index: request.query.index,
+                                                    index: 0,
                                                     likes: likes,
                                                     ageMin: ageMin,
                                                     ageMax: ageMax,
@@ -779,7 +749,7 @@ class Routes{
                                             }).catch((likes) => {
                                                 response.render('pages/search', {
                                                     users: users,
-                                                    index: request.query.index,
+                                                    index: 0,
                                                     likes: likes,
                                                     ageMin: ageMin,
                                                     ageMax: ageMax,
@@ -792,23 +762,58 @@ class Routes{
                                                 });
                                             });
                                         } else {
-                                            response.end();
+                                            if (request.query.index < users.length){
+                                                checkDb.getLikes(request.session.user.id).then((likes) => {
+                                                    response.render('pages/search', {
+                                                        users: users,
+                                                        index: request.query.index,
+                                                        likes: likes,
+                                                        ageMin: ageMin,
+                                                        ageMax: ageMax,
+                                                        popMin: popMin,
+                                                        popMax: popMax,
+                                                        locMin: locMin,
+                                                        locMax: locMax,
+                                                        sort: request.query.sort,
+                                                        reports: reports,
+                                                    });
+                                                }).catch((likes) => {
+                                                    response.render('pages/search', {
+                                                        users: users,
+                                                        index: request.query.index,
+                                                        likes: likes,
+                                                        ageMin: ageMin,
+                                                        ageMax: ageMax,
+                                                        popMin: popMin,
+                                                        popMax: popMax,
+                                                        locMin: locMin,
+                                                        locMax: locMax,
+                                                        sort: request.query.sort,
+                                                        reports: reports,
+                                                    });
+                                                });
+                                            } else {
+                                                response.end();
+                                            }
                                         }
-                                    }
-                                }).catch((reports) => {
-                                    console.log("oups");
+                                    }).catch((reports) => {
+                                        console.log("oups");
+                                        return response.render('index');
+                                    });    
+                                }).catch((users) => {
+                                    console.log("oups 2");
                                     return response.render('index');
-                                });    
-							}).catch((users) => {
-                                console.log("oups 2");
+                                });
+                            }).catch((user_tags) => {
+								console.log("oups 3");
 								return response.render('index');
 							});
 						}).catch((orientation) => {
-                            console.log("oups 3");
+                            console.log("oups 4");
                             return response.render('index');
 						});
 					}).catch((searchPref) => {
-                        console.log("oups 4");
+                        console.log("oups 5");
 						response.render('index', {
 						});
 					});
