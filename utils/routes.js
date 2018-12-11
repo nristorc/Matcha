@@ -706,6 +706,38 @@ class Routes{
             (request.connection.socket ? request.connection.socket.remoteAddress : null);
             console.log("adresse IP: ", ip);
 
+
+			// var ipLocation = require('ip-location')
+ 
+			// ipLocation('56.70.97.8', function (err, data) {
+			//   console.log(data)
+			// })
+			const ipstack = require('ipstack')
+			// http://api.ipstack.com/134.201.250.155 ? access_key = "31f49d56e09d0468b0ac0349dfdb75fe"
+			ipstack("35.180.139.188","31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
+				console.log(response)
+			});
+
+				/* res:
+			
+					{
+						as: 'AS11286 KeyBank National Association',
+						city: 'Cleveland',
+						country: 'United States',
+						countryCode: 'US',
+						isp: 'KeyBank National Association',
+						lat: 41.4875,
+						lon: -81.6724,
+						org: 'KeyBank National Association',
+						query: '156.77.54.32',
+						region: 'OH',
+						regionName: 'Ohio',
+						status: 'success',
+						timezone: 'America/New_York',
+						zip: '44115'
+					}	
+				*/
+
 			if (!request.session.user) {
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
@@ -801,19 +833,19 @@ class Routes{
                                         return response.render('index');
                                     });    
                                 }).catch((users) => {
-                                    console.log("oups 2");
+									console.log('catch', users);
                                     return response.render('index');
                                 });
                             }).catch((user_tags) => {
-								console.log("oups 3");
+								console.log('catch', user_tags);
 								return response.render('index');
 							});
 						}).catch((orientation) => {
-                            console.log("oups 4");
+							console.log('catch', orientation);
                             return response.render('index');
 						});
 					}).catch((searchPref) => {
-                        console.log("oups 5");
+						console.log('catch', searchPref);
 						response.render('index', {
 						});
 					});
