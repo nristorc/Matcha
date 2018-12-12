@@ -17,10 +17,22 @@ const path = require('path');
 
 const fs = require('fs');
 
+const jwt = require('jsonwebtoken');
+
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function (request, file, callback) {
-        callback(null, request.session.user.id + '-' + Date.now() + path.extname(file.originalname));
+        const token = request.cookies.token;
+        try {
+            const verify = jwt.verify(token, 'ratonlaveur');
+        } catch (e) {
+            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+            return response.render('index');
+        }
+        const decoded = jwt.verify(token, 'ratonlaveur', {
+            algorithms: ['HS256']
+        });
+        callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 
@@ -50,10 +62,19 @@ class Routes{
 
     appRoutes(){
         this.app.get('/', async (request,response) => {
-            if (!request.session.user) {
+            if (!request.cookies.token) {
                 response.status(200).render('index');
             } else {
-                console.log(request.session.user);
+                const token = request.cookies.token;
+                try {
+                    const verify = jwt.verify(token, 'ratonlaveur');
+                } catch (e) {
+                    request.flash('warning', "Une erreur s'est produite... merci de recommencer");
+                    return response.render('index');
+                }
+                const decoded = jwt.verify(token, 'ratonlaveur', {
+                    algorithms: ['HS256']
+                });
                 response.status(200).redirect('/profil');
             }
         });
@@ -117,7 +138,7 @@ class Routes{
         // });
 
         this.app.post('/register', async (request,response) => {
-            console.log("Je suis dans REGISTER");
+            // console.log("Je suis dans REGISTER");
             const registrationResponse = {};
             const data = {
                 lastname: request.body.lastname,
@@ -238,21 +259,40 @@ class Routes{
             const loginResponse = {};
             checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
                 if (result && result !== undefined) {
-                    const data = {
-                        username: result[0].username,
-                        password: result[0].password,
+
+                    const user = result[0];
+                    const secret = 'ratonlaveur';
+                    const jwtId = Math.random().toString(36).substring(7);
+                    var payload = {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        jwtId
                     };
-                    loginResponse.error = false;
-                    loginResponse.userId = result[0].id;
-                    loginResponse.type = 'dark';
-                    loginResponse.message = `User logged in.`;
-                    request.session.user = data;
-                    request.session.user.id = result[0].id;
-                    request.session.user.email = result[0].email;
-                    console.log('session : ', request.session.user);
-                    request.flash(loginResponse.type, loginResponse.message);
-                    response.status(200).redirect('/profil');
-                    console.log('response then: ', response.status);
+                    jwt.sign(payload, secret, {
+                        expiresIn: 3600000
+                    }, (err, token) => {
+                        if (err) {
+                            console.log('Error occurred while generating token');
+                            console.log(err);
+                            return false;
+                        } else {
+                            if (token != false) {
+                                response.cookie('token', token, {
+                                    maxAge: 360000,
+                                    httpOnly: true,
+                                    // secure: true
+                                });
+                                loginResponse.type = 'dark';
+                                loginResponse.message = `Vous êtes bien connecté à votre profil`;
+                                request.flash(loginResponse.type, loginResponse.message);
+                                response.status(200).redirect('/profil');
+                            } else {
+                                response.send("Could not create token");
+                                response.end();
+                            }
+                        }
+                    })
                 }
             }).catch((result) => {
                 console.log("Catch: ", result);
@@ -340,15 +380,20 @@ class Routes{
         /* Routes for Profil */
 
         this.app.route('/profil').get((request, response) => {
-            if (!request.session.user) {
+            const token = request.cookies.token;
+            try {
+                const verify = jwt.verify(token, 'ratonlaveur');
+            } catch (e) {
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
-			}
-			checkDb.getUser(request.session.user.username).then((user) => {
-				checkDb.getTags(request.session.user.id).then((tags) => {
-				    checkDb.getPhotos(request.session.user.id).then((photos) => {
+            }
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+			checkDb.getUser(decoded.username).then((user) => {
+				checkDb.getTags(decoded.id).then((tags) => {
+				    checkDb.getPhotos(decoded.id).then((photos) => {
                         userData.userAge(user[0]['birth']).then((age) => {
-                            // console.log('age THEN: ', age);
                             response.render('pages/profil', {
                                 user: user,
                                 userage: age,
@@ -384,7 +429,19 @@ class Routes{
             });
 
         }).post(async (request, response) => {
-            //console.log('general request', request.body);
+
+            const token = request.cookies.token;
+            try {
+                const verify = jwt.verify(token, 'ratonlaveur');
+            } catch (e) {
+                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+                return response.render('index');
+            }
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+
+
             if (request.body.submit === 'modifyParams') {
                 const data = {
                     firstname: request.body.firstname,
@@ -405,7 +462,7 @@ class Routes{
 
 
                 if (data.currentPassword !== '' || data.newPassword !== '' || data.confirmPassword !== '') {
-                    await checkDb.checkPassword(data, request.session.user.id).then((result) => {
+                    await checkDb.checkPassword(data, decoded.id).then((result) => {
                         if (result === true) {
                             validation.isConfirmed(data.newPassword, data.confirmPassword, "Nouveau mot de passe incorrect");
                         }
@@ -414,13 +471,13 @@ class Routes{
                     });
                 }
 
-                if (data.username !== request.session.user.username) {
+                if (data.username !== decoded.username) {
                     const resultUsername  = await checkDb.checkUsername(data.username);
                     if (resultUsername[0].count !== 0) {
                         validation.errors.push({errorMsg:'Identifiant deja pris'});
                     }
                 }
-                if (data.email !== request.session.user.email) {
+                if (data.email !== decoded.email) {
                     const resultEmail = await checkDb.checkEmail(data.email);
                     if (resultEmail[0].count !== 0) {
                         validation.errors.push({errorMsg:'Email deja pris'});
@@ -429,13 +486,11 @@ class Routes{
 
                 if (validation.errors.length === 0) {
                     if (data.newPassword !== '') {
-                        checkDb.updateInfoWithPass(data, request.session.user.id).then(() => {
-                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
-                                //console.log('result THEN :', result);
+                        checkDb.updateInfoWithPass(data, decoded.id).then(() => {
+                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [decoded.id]).then((result) => {
                                 response.json({user: result[0]});
-                                request.session.user.username = data.username;
-                                request.session.user.email = data.email;
-                                request.session.user.password = data.newPassword;
+                                decoded.username = data.username;
+                                decoded.email = data.email;
 
                             }).catch((result) => {
                                 console.log('result CATCH:',result);
@@ -444,12 +499,11 @@ class Routes{
                             console.log('result CATCH:',result);
                         });
                     } else if (data.newPassword === '') {
-                        checkDb.updateInfoWithoutPass(data, request.session.user.id).then(() => {
-                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                        checkDb.updateInfoWithoutPass(data, decoded.id).then(() => {
+                            checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [decoded.id]).then((result) => {
                                 response.json({user: result[0]});
-                                request.session.user.username = data.username;
-                                request.session.user.email = data.email;
-                                request.session.user.password = data.newPassword;
+                                decoded.username = data.username;
+                                decoded.email = data.email;
 
                             }).catch((result) => {
                                 console.log('result CATCH:',result);
@@ -480,10 +534,10 @@ class Routes{
                 if (validation.errors.length === 0) {
                     const sql = "UPDATE matcha.users SET `birth` = CASE WHEN ? = '' THEN NULL ELSE str_to_date(?, '%d/%m/%Y') END, `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
 
-                    checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
-                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                    checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, decoded.id]).then(() => {
+                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [decoded.id]).then((result) => {
                             response.json({user: result[0]});
-                            request.session.user.profil = data;
+                            // request.session.user.profil = data;
 
                         }).catch((result) => {
                             console.log('result CATCH:',result);
@@ -509,8 +563,8 @@ class Routes{
                 if (validation.errors.length === 0) {
                     const sql = "UPDATE matcha.users SET `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
 
-                    checkDb.query(sql, [data.gender, data.orientation, data.description, request.session.user.id]).then(() => {
-                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [request.session.user.id]).then((result) => {
+                    checkDb.query(sql, [data.gender, data.orientation, data.description, decoded.id]).then(() => {
+                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [decoded.id]).then((result) => {
                             response.json({user: result[0]});
 
                         }).catch((result) => {
@@ -525,13 +579,13 @@ class Routes{
                 }
             } else if (request.body.submit === 'updateProfilPic') {
 
-                checkDb.checkProfilPic(request.session.user.id).then((result) => {
+                checkDb.checkProfilPic(decoded.id).then((result) => {
                     const imagePath = request.body.image.substring(22);
                     if (result && result.picture) {
                         if (result.picture === imagePath) {
                             response.json({message: 'Cette photo est déja votre photo de profil'});
                         } else {
-                            checkDb.updateProfilPic(imagePath, request.session.user.id).then((result) => {
+                            checkDb.updateProfilPic(imagePath, decoded.id).then((result) => {
                                 if (result) {
                                     response.json({image: imagePath, message: 'Votre photo de profil a bien été mise à jour'});
                                 }
@@ -546,23 +600,17 @@ class Routes{
 
             } else if (request.body.submit === 'deletePic') {
 
-                //console.log('image node: ', request.body.image);
-
-                checkDb.checkProfilPic(request.session.user.id).then((result) => {
+                checkDb.checkProfilPic(decoded.id).then((result) => {
                     const imagePath = request.body.image.substring(22);
                     if (result && result.picture) {
                         if (result.picture === imagePath) {
-
-                            //console.log('image path profil', imagePath);
-                            checkDb.updateProfilPic('public/img/avatarDefault.png', request.session.user.id).then((result) => {
+                            checkDb.updateProfilPic('public/img/avatarDefault.png', decoded.id).then((result) => {
                                 if (result) {
-                                    checkDb.deletePhoto(request.session.user.id, imagePath).then((deleteRes) => {
-                                        //console.log('image path delete', imagePath);
+                                    checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
                                         fs.unlink(imagePath, (err) => {
                                             if (err) throw err;
                                             console.log('successfully deleted ' + imagePath);
                                         });
-                                        //console.log('image path response', imagePath);
                                         response.json({
                                             image: imagePath,
                                             message: 'Votre photo a bien été supprimée',
@@ -577,7 +625,7 @@ class Routes{
                             });
 
                         } else {
-                            checkDb.deletePhoto(request.session.user.id, imagePath).then((deleteRes) => {
+                            checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
                                 fs.unlink(imagePath, (err) => {
                                     if (err) throw err;
                                     console.log('successfully deleted ' + imagePath);
@@ -594,7 +642,7 @@ class Routes{
 
             } else if (request.body.submit === 'addTag') {
                 if (request.body.tag) {
-                        checkDb.getTags(request.session.user.id).then((result) => {
+                        checkDb.getTags(decoded.id).then((result) => {
                             if (result) {
                                 if (result.length >= 6){
                                     response.json({errors: "Vous avez atteint le nombre maximum de tags autorisé"});
@@ -608,7 +656,7 @@ class Routes{
                                     if (flag === true) {
                                         response.json({errors: "Vous possédez déjà un tag similaire"});
                                     } else {
-                                        checkDb.insertTag(request.session.user.id, request.body.tag).then((resTag) => {
+                                        checkDb.insertTag(decoded.id, request.body.tag).then((resTag) => {
                                             response.json({message: "Tag added"});
                                         }).catch((resTag) => {
                                             response.json({errors: "Une erreur s'est produite: " + resTag});
@@ -622,7 +670,7 @@ class Routes{
                 }
             } else if(request.body.submit === 'deleteTag') {
                 if (request.body.tag) {
-                    checkDb.deleteTag(request.session.user.id, request.body.tag).then((resTag) => {
+                    checkDb.deleteTag(decoded.id, request.body.tag).then((resTag) => {
                         console.log('then', resTag);
                         response.json({message: "Tag deleted"});
                     }).catch((resTag) => {
@@ -634,7 +682,7 @@ class Routes{
             else {
                 fs.readdir('public/uploads/', (err, items) => {
                     var i = 0;
-                    while (items[i] && items[i].split('-')[0] == request.session.user.id) {
+                    while (items[i] && items[i].split('-')[0] == decoded.id) {
                         i++;
                     }
                     if (i >= 5) {
@@ -648,26 +696,17 @@ class Routes{
                                     response.json({errors: 'No file selected !'});
                                 }
                                 else {
-                                    //console.log('request file path: ',request.file.path);
-                                    checkDb.insertPhoto(request.session.user.id, request.file.path).then((result) => {
-                                        //console.log('result THEN insert: ', result);
+                                    checkDb.insertPhoto(decoded.id, request.file.path).then((result) => {
                                         if (result) {
-                                            //console.log('1- nouvelle photo uploade');
-                                            checkDb.checkProfilPic(request.session.user.id).then((resultFlag) => {
-                                            //console.log('2- checkPic: ',result);
+                                            checkDb.checkProfilPic(decoded.id).then((resultFlag) => {
                                                 if (resultFlag && resultFlag.flag === 0) {
-                                                    //console.log('3- je vais updater la db');
-                                                    checkDb.updateProfilPic(request.file.path, request.session.user.id).then((result) => {
-                                                        //console.log('4- result update: ', result);
-                                                        //console.log("5- je renvoie a l'ajax // Db Update DONE");
+                                                    checkDb.updateProfilPic(request.file.path, decoded.id).then((result) => {
                                                         response.json({file: request.file.path, flag: resultFlag.flag});
                                                     }).catch((result) => {
                                                         console.log('result CATCH update: ', result);
                                                         response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb UPDATE"});
                                                     });
                                                 } else if (resultFlag && resultFlag.flag === 1) {
-                                                   // console.log("3bis- pas d'update de la DB profil");
-                                                    //console.log("5- je renvoie a l'ajax // Db Update NO");
                                                     response.json({file: request.file.path, flag: resultFlag.flag});
                                                 }
                                             }).catch((result) => {
@@ -696,6 +735,10 @@ class Routes{
 				console.log("tags" , res['tags']);
 			});
 		});
+
+        // this.app.use((err, request, response, next) => {
+        //     response.json(err);
+        // });
 		
 		/* Routes for search */
 
@@ -706,10 +749,17 @@ class Routes{
             (request.connection.socket ? request.connection.socket.remoteAddress : null);
             console.log("adresse IP: ", ip);
 
-			if (!request.session.user) {
+            const token = request.cookies.token;
+            try {
+                const verify = jwt.verify(token, 'ratonlaveur');
+            } catch (e) {
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
-			} else {
+            }
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+
 				if (request.query.filter != undefined){
                     var filter = request.query.filter;
 					var ageFilter = filter.substring(3, filter.indexOf("pop"));
@@ -725,12 +775,12 @@ class Routes{
 					var locMin = locFilter.substring(0, locFilter.indexOf(","));
 					var locMax = locFilter.substring(locFilter.indexOf(",")+1);
 				}
-				checkDb.profilCompleted(request.session.user.id).then((result) => {
+				checkDb.profilCompleted(decoded.id).then((result) => {
 					resSort.searchParamsCheck(request.query.filter, request.query.sort).then((searchPref) => {
-						checkDb.setOrientation(request.session.user.id).then((orientation) => {
+						checkDb.setOrientation(decoded.id).then((orientation) => {
 							checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag']).then((users) => {
 								if (!request.query.index) {
-									checkDb.getLikes(request.session.user.id).then((likes) => {
+									checkDb.getLikes(decoded.id).then((likes) => {
                                         response.render('pages/search', {
 											users: users,
 											index: 0,
@@ -759,7 +809,7 @@ class Routes{
 									});
 								} else {
 									if (request.query.index < users.length){
-										checkDb.getLikes(request.session.user.id).then((likes) => {
+										checkDb.getLikes(decoded.id).then((likes) => {
                                             response.render('pages/search', {
 												users: users,
 												index: request.query.index,
@@ -818,8 +868,6 @@ class Routes{
 						// locMax: locMax,
 						// sort: request.query.sort,
 					// });
-
-
 				
                 // if (request.query.sort != undefined){
                 //     var sort = resSort.sort(request.query.sort);
@@ -832,34 +880,50 @@ class Routes{
 				// console.log(`02: date min is now ${dateMin}`)
 				
 			
-			}
+
         }).post('/search', async(request, response) => {
-            if (!request.session.user) {
+
+            const token = request.cookies.token;
+            try {
+                const verify = jwt.verify(token, 'ratonlaveur');
+            } catch (e) {
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
-			} else if (request.body.id_liked){
+            }
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+            if (request.body.id_liked) {
                 var data = request.body.id_liked;
-				var likeAction = data.substring(0, 12);
-                var userLiked =  data.substring(13, data.length);
-				if (likeAction == "oklikeSearch"){
-					checkDb.updateLikes(request.session.user.id, userLiked, 1).then((update) => {
-					});
-				} else if (likeAction == "unlikeSearch"){
-					checkDb.updateLikes(request.session.user.id, userLiked, -1).then((update) => {
-					});
-				}
-			}
+                var likeAction = data.substring(0, 12);
+                var userLiked = data.substring(13, data.length);
+                if (likeAction == "oklikeSearch") {
+                    checkDb.updateLikes(decoded.id, userLiked, 1).then((update) => {
+                    });
+                } else if (likeAction == "unlikeSearch") {
+                    checkDb.updateLikes(decoded.id, userLiked, -1).then((update) => {
+                    });
+                }
+            }
 		});
       
 		/* Routes for search by username */
 
         this.app.post('/usersearch', async (request, response) => {
+
+            const token = request.cookies.token;
+            try {
+                const verify = jwt.verify(token, 'ratonlaveur');
+            } catch (e) {
+                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+                return response.render('index');
+            }
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+
             const query = request.body.q;
             checkDb.query("SELECT id, username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
-                // var res = '<li class="searchLi">No data found !</li>';
-                // if (result === [] || result === {} || result === null || result == "") {
-                //     response.json({res});
-                // } else {
                 if (result) {
                     var res = [];
                     for (var i = 0; i < result.length; i++) {
@@ -867,7 +931,6 @@ class Routes{
                     }
                     response.json({res: res, userdata: result});
                 }
-                // }
             }).catch((result) => {
                 console.log('result catch: ', result);
             });
@@ -875,16 +938,23 @@ class Routes{
 
         this.app.route('/user/:id')
             .get(async (request, response) => {
-            if (!request.session.user) {
-                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-                response.status(200).render('index');
-            } else {
-                checkDb.profilCompleted(request.session.user.id).then((result) => {
-                    if (request.params.id == request.session.user.id) {
+
+                const token = request.cookies.token;
+                try {
+                    const verify = jwt.verify(token, 'ratonlaveur');
+                } catch (e) {
+                    request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+                    return response.render('index');
+                }
+                const decoded = jwt.verify(token, 'ratonlaveur', {
+                    algorithms: ['HS256']
+                });
+                checkDb.profilCompleted(decoded.id).then((result) => {
+                    if (request.params.id == decoded.id) {
                         response.redirect('/profil');
                     } else {
                         const visits = 'INSERT INTO matcha.visits SET visitor_id = ?, visited_id = ?, visited_at = NOW()';
-                        checkDb.query(visits, [request.session.user.id, parseInt(request.params.id, 10)]).then((result) => {
+                        checkDb.query(visits, [decoded.id, parseInt(request.params.id, 10)]).then((result) => {
                             if (result) {
                                 const sql = 'SELECT * FROM matcha.users WHERE id = ?';
                                 checkDb.query(sql, [request.params.id]).then((result) => {
@@ -895,9 +965,9 @@ class Routes{
                                         checkDb.getTags(request.params.id).then((tags) => {
                                             checkDb.getPhotos(request.params.id).then((photos) => {
                                                 userData.userAge(result[0].birth).then((age) => {
-                                                    checkDb.getLikes(request.session.user.id).then((liked) => {
-                                                        checkDb.getMatches(request.session.user.id).then((matches) => {
-                                                            checkDb.getMyReports(request.session.user.id).then((reports) => {
+                                                    checkDb.getLikes(decoded.id).then((liked) => {
+                                                        checkDb.getMatches(decoded.id).then((matches) => {
+                                                            checkDb.getMyReports(decoded.id).then((reports) => {
                                                                 if (photos == '') {
                                                                     if (matches == ''){
                                                                         response.render('pages/user', {
@@ -954,7 +1024,6 @@ class Routes{
                                                         console.log('likes list CATCH', liked);
                                                     });
                                                 }).catch((age) => {
-                                                    // console.log('photo', photo)
                                                     console.log('age CATCH: ', age);
                                                     response.render('pages/user', {
                                                         user: result,
@@ -964,7 +1033,6 @@ class Routes{
                                                     });
                                                 });
                                             }).catch((photos) => {
-                                                // console.log('photo', photo)
                                                 response.render('pages/user', {
                                                     user: result,
                                                     usertags: tags,
@@ -997,13 +1065,23 @@ class Routes{
                     request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
                     response.redirect('/')
                 });
-            }
+
 
         })
             .post(async (request, response) => {
+                const token = request.cookies.token;
+                try {
+                    const verify = jwt.verify(token, 'ratonlaveur');
+                } catch (e) {
+                    request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+                    return response.render('index');
+                }
+                const decoded = jwt.verify(token, 'ratonlaveur', {
+                    algorithms: ['HS256']
+                });
                 if (request.body.submit === 'iLiked') {
-                    checkDb.updateLikes(request.session.user.id, parseInt(request.body.userId), 1).then(() => {
-                        checkDb.getMatches(request.session.user.id).then((myMatches) => {
+                    checkDb.updateLikes(decoded.id, parseInt(request.body.userId), 1).then(() => {
+                        checkDb.getMatches(decoded.id).then((myMatches) => {
                             response.json({flag: '1', getMatches: myMatches});
                         }).catch((myMatches) => {
                             console.log('err occured: ', myMatches);
@@ -1012,16 +1090,16 @@ class Routes{
                         response.json({flag: '0'});
                     })
                 } else if (request.body.submit === 'iUnliked') {
-                    checkDb.updateLikes(request.session.user.id, parseInt(request.body.userId), -1).then(() => {
-                        checkDb.getLikes(request.session.user.id).then((liked) => {
+                    checkDb.updateLikes(decoded.id, parseInt(request.body.userId), -1).then(() => {
+                        checkDb.getLikes(decoded.id).then((liked) => {
                             response.json({flag: '1', theyLikedMe: liked});
                         });
                     }).catch(() => {
                         response.json({flag: '0'});
                     })
                 } else if (request.body.submit === 'iReport') {
-                    checkDb.updateReports(request.session.user.id, parseInt(request.body.userId), 1).then(() => {
-                        checkDb.emailReport(request.session.user.id, request.body.userId).then(() => {
+                    checkDb.updateReports(decoded.id, parseInt(request.body.userId), 1).then(() => {
+                        checkDb.emailReport(decoded.id, request.body.userId).then(() => {
                             response.json({flag: 'reported updated'});
                         }).catch((result) => {
                             console.log('An error occured: ', result);
@@ -1030,13 +1108,13 @@ class Routes{
                         console.log('an error occured: ', result);
                     });
                 } else if (request.body.submit === 'iBlock') {
-                    checkDb.updateReports(request.session.user.id, parseInt(request.body.userId), 2).then(() => {
+                    checkDb.updateReports(decoded.id, parseInt(request.body.userId), 2).then(() => {
                         response.json({flag: 'blocked'});
                     }).catch((result) => {
                         console.log('an error occured: ', result);
                     });
                 } else if (request.body.submit === 'iUnblock') {
-                    checkDb.deleteReports(request.session.user.id, parseInt(request.body.userId)).then(() => {
+                    checkDb.deleteReports(decoded.id, parseInt(request.body.userId)).then(() => {
                         response.json({flag: 'unblocked'});
                     }).catch((result) => {
                         console.log('an error occured: ', result);
@@ -1046,31 +1124,38 @@ class Routes{
 
         /* Routes for Historique */
         this.app.get('/history', async (request, response) => {
-            if (!request.session.user) {
+
+            const token = request.cookies.token;
+            try {
+                const verify = jwt.verify(token, 'ratonlaveur');
+            } catch (e) {
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
             }
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
 
             //J'ai visité le profil d'un utilisateur
             const iVisited = 'SELECT `username`, `profil`,`visited_id`, `visited_at` FROM matcha.users INNER JOIN matcha.visits ON users.id = visits.visited_id WHERE visitor_id = ? ORDER BY `visited_at` DESC';
-            checkDb.query(iVisited, [request.session.user.id]).then((result1) => {
+            checkDb.query(iVisited, [decoded.id]).then((result1) => {
                 if (result1) {
 
                     //Un utilisateur a visité mon profil
                     const theyVisited = 'SELECT `username`, `profil`,`visitor_id`, `visited_at` FROM matcha.users INNER JOIN matcha.visits ON users.id = visits.visitor_id WHERE visited_id = ? ORDER BY `visited_at` DESC';
-                    checkDb.query(theyVisited, [request.session.user.id]).then((result2) => {
+                    checkDb.query(theyVisited, [decoded.id]).then((result2) => {
                         if (result2) {
 
                             //J'ai liké un utilisateur
                             const iLiked = 'SELECT `username`, `profil`,`user_liked`, `liked_at` FROM matcha.users INNER JOIN matcha.likes ON users.id = likes.user_liked WHERE user_id = ?';
-                            checkDb.query(iLiked, [request.session.user.id]).then((result3) => {
+                            checkDb.query(iLiked, [decoded.id]).then((result3) => {
 
                                 // Un utilisateur m'a liké
                                 const theyLiked = 'SELECT `username`, `profil`,`user_id`, `liked_at` FROM matcha.users INNER JOIN matcha.likes ON users.id = likes.user_id WHERE user_liked = ?';
-                                checkDb.query(theyLiked, [request.session.user.id]).then((result4) => {
+                                checkDb.query(theyLiked, [decoded.id]).then((result4) => {
 
                                     //Mes Matchs
-                                    checkDb.getMatches(request.session.user.id).then((tab) => {
+                                    checkDb.getMatches(decoded.id).then((tab) => {
                                         if (tab != "") {
                                             const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
                                             const sql = 'SELECT `id`, `username`, `profil` FROM matcha.users WHERE ' + sqlCondition + ';';
@@ -1111,6 +1196,23 @@ class Routes{
             });
 
         });
+
+        /* Routes for Chat */
+        this.app.get('/chat', (request, response) => {
+            const token = request.cookies.token;
+            try {
+                const verify = jwt.verify(token, 'ratonlaveur');
+            } catch (e) {
+                request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+                return response.render('index');
+            }
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+
+            console.log(request.cookies.token)
+            response.render('pages/chat', {token: request.cookies.token})
+        })
 
     }
 

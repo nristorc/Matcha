@@ -40,6 +40,9 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`description` LONGTEXT DEFAULT NULL," +
     "`popularity` INT(11) DEFAULT 0," +
     "`profil` VARCHAR(255) DEFAULT 'public/img/avatarDefault.png'," +
+    "`jwt` VARCHAR(255) DEFAULT NULL," +
+    // "`online` enum('N','Y') NOT NULL," +
+    // "`socketid` varchar(20) DEFAULT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
     
 const sql_tags = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.tags_table +
@@ -76,6 +79,14 @@ const sql_reports = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.reports_table
     // Flag: 1 = fake; 2 = block
     "`flag` TINYINT NOT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+
+// const sql_messages = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.messages_table +
+//     "(`id` INT(9) NOT NULL AUTO_INCREMENT," +
+//     "`from_user_id` INT(11) DEFAULT NULL," +
+//     "`to_user_id` INT(11) DEFAULT NULL," +
+//     "`message` TEXT DEFAULT NULL," +
+//     "`sent_at` DATETIME DEFAULT NULL," +
+//     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql_user, (err, result) => {
     if (err) {
@@ -124,5 +135,13 @@ connection.query(sql_reports, (err, result) => {
     }
     console.log("Table " + configDatabase.reports_table + " created");
 });
+
+// connection.query(sql_messages, (err, result) => {
+//     if (err) {
+//         console.error('error creating table: ' + err.stack);
+//         return
+//     }
+//     console.log("Table " + configDatabase.messages_table + " created");
+// });
 
 connection.end();

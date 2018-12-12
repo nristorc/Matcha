@@ -31,6 +31,19 @@ class DatabaseRequest {
         });
     }
 
+    // async userSessionCheck(userId){
+    //     try {
+    //         const result = await this.query(`SELECT online, username FROM matcha.users WHERE id = ? AND online = ?`, [userId,'Y']);
+    //         if(result !== null){
+    //             return result[0]['username'];
+    //         }else{
+    //             return null;
+    //         }
+    //     } catch (error) {
+    //         return null;
+    //     }
+    // }
+
     async loginUser(params){
         try {
             return new Promise((resolve, reject) => {
@@ -38,7 +51,7 @@ class DatabaseRequest {
                     if (hash && hash[0] && hash[0].password) {
                         bcrypt.compare(params.password, hash[0].password, (err, res) => {
                             if (res === true) {
-                                resolve(this.query(`SELECT id, email FROM matcha.users WHERE LOWER(username) = ? AND password = ?`, [params.username, hash[0].password]));
+                                resolve(this.query(`SELECT id, email, username FROM matcha.users WHERE LOWER(username) = ? AND password = ?`, [params.username, hash[0].password]));
                             } else {
                                 reject();
                             }
@@ -819,6 +832,16 @@ class DatabaseRequest {
             console.log(error);
             return false;
         }
+    }
+
+    close() {
+        return new Promise((resolve, reject) => {
+            this.connection.end(err => {
+                if (err)
+                    return reject(err);
+                resolve();
+            });
+        });
     }
 
 }

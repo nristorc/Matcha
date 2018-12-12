@@ -8,9 +8,15 @@ const session = require('express-session');
 var cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 const expressMessages = require('express-messages');
+const cors = require('cors');
 
 const routes    = require('./utils/routes');
 const login     = require('./utils/login');
+
+// const socketio = require('socket.io');
+// const socketEvents = require('./utils/socket');
+
+
 
 class Server{
 
@@ -20,6 +26,8 @@ class Server{
 
         this.app = express();
         this.http = http.Server(this.app);
+
+        // this.socket = socketio(this.http);
     }
 
     appConfig(){
@@ -37,22 +45,32 @@ class Server{
             saveUninitialized: false,
             cookie: { expires: 600000 }
         }));
+
+        this.app.use(cors({
+            origin: 'http://localhost:3000/',
+            credentials: true
+        }));
+
         this.app.use(flash());
         this.app.use(function (request, response, next) {
             response.locals.messages = expressMessages(request, response);
             next();
         });
 
+        /* ROUTES */
         this.app.use('/login', login);
 
-
+        /* EJS */
         this.app.set('views', './views');
         this.app.set('view engine', 'ejs');
+
+        /* SOCKETS */
 
     }
 
     includeRoutes(){
         new routes(this.app).routesConfig();
+        // new socketEvents(this.socket).socketConfig();
     }
 
     appExecute(){

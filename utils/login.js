@@ -41,6 +41,8 @@ function checkFileType(file, callback) {
     }
 }
 
+const jwt = require('jsonwebtoken');
+
 router.post('/', async (request, response)=> {
     const loginResponse = {};
     const data = {
@@ -68,16 +70,40 @@ router.post('/', async (request, response)=> {
     } else {
         checkDb.checkActive(data.username).then(() => {
             checkDb.loginUser(data).then( (result) => {
-                loginResponse.error = false;
-                loginResponse.type = 'dark';
-                loginResponse.userId = result[0].id;
-                loginResponse.message = `User logged in.`;
-                request.session.user = data;
-                request.session.user.id = result[0].id;
-                request.session.user.email = result[0].email;
-                console.log(request.session.user);
-                request.flash(loginResponse.type, loginResponse.message);
-                response.status(200).redirect('/profil');
+
+                const user = result[0];
+                const secret = 'ratonlaveur';
+                const jwtId = Math.random().toString(36).substring(7);
+                var payload = {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    jwtId
+                };
+                jwt.sign(payload, secret, {
+                    expiresIn: 3600000
+                }, (err, token) => {
+                    if (err) {
+                        console.log('Error occurred while generating token');
+                        console.log(err);
+                        return false;
+                    } else {
+                        if (token != false) {
+                            response.cookie('token', token, {
+                                maxAge: 360000,
+                                httpOnly: true,
+                                // secure: true
+                            });
+                            loginResponse.type = 'dark';
+                            loginResponse.message = `Vous êtes bien connecté à votre profil`;
+                            request.flash(loginResponse.type, loginResponse.message);
+                            response.status(200).redirect('/profil');
+                        } else {
+                            response.send("Could not create token");
+                            response.end();
+                        }
+                    }
+                });
             }).catch((result) => {
                 if (result === undefined || result === false) {
                     loginResponse.error = true;
