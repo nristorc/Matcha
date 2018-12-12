@@ -50,6 +50,8 @@ class Sort{
 					reqSort = "`birth` DESC";
 				} else if (sort == "loc"){
 					reqSort = "`birth` DESC";
+				} else if (sort == "tag"){
+					reqSort = "";
 				} else {
 					reqSort = "";
 				}
@@ -105,17 +107,5 @@ class Sort{
         });
 	}
 }
-
-    // tagSearch(params){
-    //     var tags = [];
-    //     if (params){
-    //         // var str = 
-    //         tags.push()
-    //     }
-    // }
-
-    
-
-// }
 
 module.exports = Sort;

@@ -352,6 +352,31 @@ class DatabaseRequest {
         }
     }
 
+
+    // SELECT *, COUNT(`tmp`.`id`) FROM (
+    //     SELECT `users`.*
+    //     FROM matcha.users as `g`
+    //     INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` 
+    //     WHERE (`tags`.`tag` = "patate")
+    //     AND registerToken = 'NULL' 
+    //     AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) 
+    //     AND `users`.`id` !=1 
+    //     AND `birth` BETWEEN "1919-11-12" AND "2000-11-12" AND `popularity` BETWEEN -100 AND 100
+    // UNION JOIN
+    //     SELECT `users`.* 
+    //     FROM matcha.users 
+    //     INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` 
+    //     WHERE (`tags`.`tag` = "cacahouete")
+    //     AND registerToken = 'NULL' 
+    //     AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) 
+    //     AND `users`.`id` !=1 
+    //     AND `birth` BETWEEN "1919-11-12" AND "2000-11-12" AND `popularity` BETWEEN -100 AND 100    
+    // ) AS `tmp` 
+    // GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil` 
+    // ORDER BY COUNT(`tmp`.`id`) DESC, `popularity` DESC
+
+
+
     async getAllUsers(orientation, filter, sort, tags, user_tags){
         try {
             return new Promise((resolve, reject) => {

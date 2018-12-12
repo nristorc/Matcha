@@ -20,6 +20,7 @@
 					<option value="loc" <% if (sort === "loc") {%> selected <%}%>>Localisation la plus proche</option>
 					<option value="popAsc" <% if (sort === "popAsc") {%> selected <%}%>>Popularité croissant</option>
 					<option value="popDesc" <% if (sort === "popDesc") {%> selected <%}%>>Popularité décroissant</option>
+					<option value="tag" <% if (sort === "tag") {%> selected <%}%>>Tags en commun</option>
 				</select>
 			</div>
 		</form>
@@ -204,9 +205,9 @@
 		i++;
 	}
 %>
-
+<button onclick="getLocation()">Try It</button>
+<p id="demo"></p>
 </div>
-
 
 <!-- Loading animation -->
 
@@ -220,6 +221,13 @@
 <script src="./public/js/scroll.js"></script>
 <script src="./public/js/like.js"></script>
 <script src="./public/js/tag-search.js"></script>
+<script src="./public/js/location.js"></script>
+<script>
+
+	const iplocation = require("iplocation").default;
+	console.log(iplocation);
+</script>
+
 
 <% } %>
 

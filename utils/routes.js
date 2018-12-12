@@ -700,23 +700,56 @@ class Routes{
 		/* Routes for search */
 
         this.app.get('/search', (request, response) => {
-            var ip = request.headers['x-forwarded-for'] || 
-            request.connection.remoteAddress || 
-            request.socket.remoteAddress ||
-            (request.connection.socket ? request.connection.socket.remoteAddress : null);
-            console.log("adresse IP: ", ip);
+            // var ip = request.headers['x-forwarded-for'] || 
+            // request.connection.remoteAddress || 
+            // request.socket.remoteAddress ||
+            // (request.connection.socket ? request.connection.socket.remoteAddress : null);
+            // console.log("adresse IP: ", ip);
+            // const publicIp = require('public-ip');
+            // publicIp.v4().then(ip => {
+            //     console.log("publicIP ====================", ip);
+            //     //=> '46.5.21.123'
+            //     // const ipstack = require('ipstack')
+            //     // // http://api.ipstack.com/134.201.250.155 ? access_key = "31f49d56e09d0468b0ac0349dfdb75fe"
+            //     // ipstack(ip,"31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
+            //     // console.log("IP 1 : ",response)
+            //     // });
+
+            //     // ipLocation(ip, function (err, data) {
+            //     //   console.log("IP 2 : ", data)
+            //     // });
+            // });
 
 
-			// var ipLocation = require('ip-location')
+            const iplocation = require("iplocation").default;
  
-			// ipLocation('56.70.97.8', function (err, data) {
-			//   console.log(data)
-			// })
-			const ipstack = require('ipstack')
-			// http://api.ipstack.com/134.201.250.155 ? access_key = "31f49d56e09d0468b0ac0349dfdb75fe"
-			ipstack("35.180.139.188","31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
-				console.log(response)
-			});
+            iplocation('62.210.32.231', [], (error, res) => {
+             console.log(res);
+                /* res:
+             
+                    {
+                        as: 'AS11286 KeyBank National Association',
+                        city: 'Cleveland',
+                        country: 'United States',
+                        countryCode: 'US',
+                        isp: 'KeyBank National Association',
+                        lat: 41.4875,
+                        lon: -81.6724,
+                        org: 'KeyBank National Association',
+                        query: '156.77.54.32',
+                        region: 'OH',
+                        regionName: 'Ohio',
+                        status: 'success',
+                        timezone: 'America/New_York',
+                        zip: '44115'
+                    }
+             
+                */
+             
+            });
+
+
+			
 
 				/* res:
 			
