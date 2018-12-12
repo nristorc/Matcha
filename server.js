@@ -13,7 +13,7 @@ const cors = require('cors');
 const routes    = require('./utils/routes');
 const login     = require('./utils/login');
 
-// const socketio = require('socket.io');
+const socketio = require('socket.io');
 // const socketEvents = require('./utils/socket');
 
 
@@ -26,11 +26,13 @@ class Server{
 
         this.app = express();
         this.http = http.Server(this.app);
+        this.io = socketio.listen(this.http);
 
         // this.socket = socketio(this.http);
     }
 
     appConfig(){
+
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: false }));
         this.app.use('/public', express.static('public'));

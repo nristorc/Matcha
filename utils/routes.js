@@ -727,14 +727,10 @@ class Routes{
         });
 
 		/* Routes for test */
-		
-		this.app.get('/test', (request, response) => {
-			resSort.getTag("").then((res) => {
-				console.log("hello" , res);
-				console.log("str" , res['req']);
-				console.log("tags" , res['tags']);
-			});
-		});
+
+        this.app.get('/test', (request, response) => {
+            response.render('pages/testSocket');
+        });
 
         // this.app.use((err, request, response, next) => {
         //     response.json(err);
@@ -1210,8 +1206,26 @@ class Routes{
                 algorithms: ['HS256']
             });
 
-            console.log(request.cookies.token)
-            response.render('pages/chat', {token: request.cookies.token})
+            checkDb.getMatches(decoded.id).then((tab) => {
+                if (tab != "") {
+                    const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
+                    const sql = 'SELECT `username`, `profil` FROM matcha.users WHERE ' + sqlCondition + ';';
+                    let push = [];
+                    checkDb.query(sql, tab)
+                        .then((res) => {
+                            push = res;
+                            response.render('pages/chatroom', {myMatches: push});
+                        })
+                        .catch((err) => {
+                            console.log(`An error occured: ${err}`);
+                        });
+                }
+                else {
+                    response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match'});
+                }
+            }).catch((tab) => {
+                console.log(`An error occured: ${tab}`);
+            });
         })
 
     }

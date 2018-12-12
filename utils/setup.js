@@ -40,7 +40,7 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`description` LONGTEXT DEFAULT NULL," +
     "`popularity` INT(11) DEFAULT 0," +
     "`profil` VARCHAR(255) DEFAULT 'public/img/avatarDefault.png'," +
-    "`jwt` VARCHAR(255) DEFAULT NULL," +
+    // "`jwt` VARCHAR(255) DEFAULT NULL," +
     // "`online` enum('N','Y') NOT NULL," +
     // "`socketid` varchar(20) DEFAULT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";

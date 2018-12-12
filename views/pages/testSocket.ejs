@@ -1,0 +1,13 @@
+<%- include('../partial/head')%>
+<%- include('../partial/header')%>
+
+
+
+<%- include('../partial/footer')%>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    jQuery(function($) {
+        var socket = io.connect();
+    });
+</script>
