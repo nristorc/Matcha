@@ -142,7 +142,6 @@ class DatabaseRequest {
     async checkRegisterToken(param){
         try {
             return new Promise((resolve, reject) => {
-
                 this.query(`SELECT * FROM matcha.users WHERE registerToken = ?`, [param]).then((result) => {
                     if (result && result[0] && result[0].registerToken === param && result[0].active === 0) {
                         this.query("UPDATE matcha.users SET `registerToken` = 'NULL', `active` = 1 WHERE users.registerToken = ?", [param]);

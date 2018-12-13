@@ -12,7 +12,7 @@
         <tr>
             <td style="vertical-align: middle"><i class="fas fa-heartbeat"></i></td>
             <td style="vertical-align: middle">Vous avez matché avec <a href="user/<%=myMatches[k].id%>"><%=myMatches[k].username%></a></td>
-            <td style="vertical-align: middle"><img src="<%=myMatches[k].profil%>" style="max-height: 50px; max-width: 50px"></td>
+            <td style="vertical-align: middle"><img src="<%=myMatches[k].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
         </tr>
         <%}} else {%>
             <td><%=myMatchesMsg%></td>
@@ -36,7 +36,7 @@
             <tr>
                 <td style="vertical-align: middle"><i class="fas fa-eye"></i></td>
                 <td style="vertical-align: middle"><a href="user/<%=theirVisits[j].visitor_id%>"><%=theirVisits[j].username%></a> a visité votre profil</td>
-                <td style="vertical-align: middle"><img src="<%=theirVisits[j].profil%>" style="max-height: 50px; max-width: 50px"></td>
+                <td style="vertical-align: middle"><img src="<%=theirVisits[j].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
                 <td style="vertical-align: middle">le <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
                     <%=theirVisits[j].visited_at.toLocaleDateString('fr-FR', options)%></td>
             </tr>
@@ -56,7 +56,7 @@
             <tr>
                 <td style="vertical-align: middle"><i class="fas fa-eye"></i></td>
                 <td style="vertical-align: middle">Vous avez visité le profil de <a href="user/<%=myVisits[i].visited_id%>"><%=myVisits[i].username%></a></td>
-                <td style="vertical-align: middle"><img src="<%=myVisits[i].profil%>" style="max-height: 50px; max-width: 50px"></td>
+                <td style="vertical-align: middle"><img src="<%=myVisits[i].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
                 <td style="vertical-align: middle">le <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
                     <%=myVisits[i].visited_at.toLocaleDateString('fr-FR', options)%></td>
             </tr>
@@ -76,7 +76,7 @@
             <tr>
                 <td style="vertical-align: middle"><i class="fas fa-thumbs-up"></i></td>
                 <td style="vertical-align: middle"><a href="user/<%=theirLikes[l].user_id%>"><%=theirLikes[l].username%></a> a liké votre profil, Well done !</td>
-                <td style="vertical-align: middle"><img src="<%=theirLikes[l].profil%>" style="max-height: 50px; max-width: 50px"></td>
+                <td style="vertical-align: middle"><img src="<%=theirLikes[l].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
                 <td style="vertical-align: middle">le <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
                     <%=theirLikes[l].liked_at.toLocaleDateString('fr-FR', options)%></td>
             </tr>
@@ -96,7 +96,7 @@
             <tr>
                 <td style="vertical-align: middle"><i class="fas fa-thumbs-up"></i></td>
                 <td style="vertical-align: middle">Vous avez liké le profil de <a href="user/<%=myLikes[m].user_liked%>"><%=myLikes[m].username%></a>, good choice !</td>
-                <td style="vertical-align: middle"><img src="<%=myLikes[m].profil%>" style="max-height: 50px; max-width: 50px"></td>
+                <td style="vertical-align: middle"><img src="<%=myLikes[m].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
                 <td style="vertical-align: middle">le <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
                     <%=myLikes[m].liked_at.toLocaleDateString('fr-FR', options)%></td>
             </tr>

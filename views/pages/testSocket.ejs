@@ -1,13 +1,51 @@
-<%- include('../partial/head')%>
-<%- include('../partial/header')%>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #chat {
+            height: 500px
+        }
+    </style>
+</head>
+<body>
+    <div id="chat"></div>
+    <form id="send-message">
+        <input size="35" id="message" />
+        <input type="submit"/>
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        jQuery(function($) {
+            var socket = io.connect();
+            console.log("socket connected");
+
+            var $messageForm = $('#send-message');
+            var $messageBox = $('#message');
+            var $chat = $('#chat');
+
+            $messageForm.submit(function (e) {
+                e.preventDefault();
+                socket.emit('send-message', $messageBox.val());
+                $messageBox.val('');
+            });
+
+            socket.on('new-message', function (data) {
+                $chat.append(data + "</br>")
+            })
+            // });
+            // socket.on("disconnect",function(){
+            //     console.log("socket disconnected");
+            // });
+        });
+    </script>
+</body>
+</html>
 
 
 
-<%- include('../partial/footer')%>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    jQuery(function($) {
-        var socket = io.connect();
-    });
-</script>
+
+
