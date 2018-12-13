@@ -46,7 +46,7 @@ function checkFileType(file, callback) {
     }
 }
 
-router.route('/')
+router.route('/:resetToken')
     .get((request, response) => {
         const resetResponse = {};
         checkDb.checkResetToken(request.params.resetToken).then((result) => {

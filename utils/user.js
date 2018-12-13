@@ -46,7 +46,7 @@ function checkFileType(file, callback) {
     }
 }
 
-router.route('/')
+router.route('/:id')
     .get(async (request, response) => {
 
         const token = request.cookies.token;

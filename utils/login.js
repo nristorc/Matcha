@@ -1,27 +1,20 @@
 const express	= require('express');
 const router 	= express.Router();
-
 const databaseRequest = require("../models/databaseRequest");
 const checkDb = new databaseRequest();
-
 const registerValidation = require('../models/registerValidation');
 let validation = new registerValidation();
-
 const userDatabase =require('../models/userData');
 const userData = new userDatabase();
-
 const multer = require('multer');
 const path = require('path');
-
 const fs = require('fs');
-
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function (request, file, callback) {
         callback(null, request.session.user.id + '-' + Date.now() + path.extname(file.originalname));
     }
 });
-
 const upload = multer({
     storage: storage,
     limits: {fileSize: 1000000},
@@ -29,7 +22,6 @@ const upload = multer({
         checkFileType(file, callback);
     }
 }).single('inputFile');
-
 function checkFileType(file, callback) {
     const filetypes = /jpeg|jpg|png|gif/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -40,7 +32,6 @@ function checkFileType(file, callback) {
         callback({message: "Image corrompue !"});
     }
 }
-
 const jwt = require('jsonwebtoken');
 
 router.post('/', async (request, response)=> {
@@ -90,8 +81,9 @@ router.post('/', async (request, response)=> {
                     } else {
                         if (token != false) {
                             response.cookie('token', token, {
-                                maxAge: 360000,
+                                // maxAge: 360000,
                                 httpOnly: true,
+                                expiresIn: 9000000
                                 // secure: true
                             });
                             loginResponse.type = 'dark';

@@ -47,7 +47,7 @@ function checkFileType(file, callback) {
 }
 
 
-router.get('/:registerToken', async (request, response) => {
+router.route('/:registerToken').get((request, response) => {
     const loginResponse = {};
     console.log('params', request.params);
     checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
@@ -72,9 +72,8 @@ router.get('/:registerToken', async (request, response) => {
                 } else {
                     if (token != false) {
                         response.cookie('token', token, {
-                            maxAge: '2 days',
                             httpOnly: true,
-                            expiresIn: 9000000
+                            expiresIn: 9000000,
                             // secure: true
                         });
                         loginResponse.type = 'dark';

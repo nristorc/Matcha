@@ -65,12 +65,12 @@ app.use('/login', login);
 app.use('/register', register);
 app.use('/resetPassword', resetPassword);
 app.use('/verify/register', registerToken);
-app.use('/verify/reset/:resetToken', resetToken);
+app.use('/verify/reset', resetToken);
 app.use('/logout', logout);
 app.use('/profil', profil);
 app.use('/search', search);
 app.use('/usersearch', userSearch);
-app.use('/user/:id', user);
+app.use('/user', user);
 app.use('/history', history);
 app.use('/chat', chat);
 
