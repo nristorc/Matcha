@@ -51,7 +51,7 @@ class Sort{
 				} else if (sort == "loc"){
 					reqSort = "`birth` DESC";
 				} else if (sort == "tag"){
-					reqSort = "";
+					reqSort = "tag";
 				} else {
 					reqSort = "";
 				}
