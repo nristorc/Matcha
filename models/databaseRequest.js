@@ -377,6 +377,38 @@ class DatabaseRequest {
 
 
 
+//     SELECT *, COUNT(`tmp`.`id`) FROM (
+//         SELECT `users`.*
+//         FROM matcha.users
+//         INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` 
+//         WHERE (`tags`.`tag` = "patate")
+//         AND registerToken = 'NULL'
+//         AND `users`.`id` !=1)
+//         JOIN (
+// 	        SELECT `users`.* 
+//             FROM matcha.users 
+//             INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` 
+//             WHERE (`tags`.`tag` = "cacahouete")
+//             AND registerToken = 'NULL' 
+//             AND `users`.`id` !=1 
+//         ) ON 
+         
+//     GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil` 
+//     ORDER BY COUNT(`tmp`.`id`) DESC, `popularity` DESC
+    
+    
+    
+//     SELECT t.name,
+//        t.num
+//   FROM TABLE t
+//   JOIN (SELECT c.id
+//                COUNT(*) 'num'
+//           FROM TABLE c
+//          WHERE c.column = 'a'
+//       GROUP BY c.id) ta ON ta.id = t.id
+
+
+
     async getAllUsers(orientation, filter, sort, tags, user_tags){
         try {
             return new Promise((resolve, reject) => {
