@@ -686,16 +686,6 @@ class Routes{
                 });
             }
         });
-
-		/* Routes for test */
-		
-		this.app.get('/test', (request, response) => {
-			resSort.getTag("").then((res) => {
-				console.log("hello" , res);
-				console.log("str" , res['req']);
-				console.log("tags" , res['tags']);
-			});
-		});
 		
 		/* Routes for search */
 
@@ -724,7 +714,7 @@ class Routes{
             const iplocation = require("iplocation").default;
  
             iplocation('62.210.32.231', [], (error, res) => {
-             console.log(res);
+            //  console.log(res);
                 /* res:
              
                     {
@@ -788,7 +778,39 @@ class Routes{
 					var popMin = popFilter.substring(0, popFilter.indexOf(","));
 					var popMax = popFilter.substring(popFilter.indexOf(",")+1);
 					var locMin = locFilter.substring(0, locFilter.indexOf(","));
-					var locMax = locFilter.substring(locFilter.indexOf(",")+1);
+                    var locMax = locFilter.substring(locFilter.indexOf(",")+1);
+                    
+                    // else if (request.body.submit === 'addTag') {
+                    //     if (request.body.tag) {
+                    //             checkDb.getTags(request.session.user.id).then((result) => {
+                    //                 if (result) {
+                    //                     if (result.length >= 6){
+                    //                         response.json({errors: "Vous avez atteint le nombre maximum de tags autorisé"});
+                    //                     } else {
+                    //                         var flag = false;
+                    //                         for (var i = 0; i < result.length; i++) {
+                    //                             if (result[i].tag === request.body.tag) {
+                    //                                 flag = true;
+                    //                             }
+                    //                         }
+                    //                         if (flag === true) {
+                    //                             response.json({errors: "Vous possédez déjà un tag similaire"});
+                    //                         } else {
+                    //                             checkDb.insertTag(request.session.user.id, request.body.tag).then((resTag) => {
+                    //                                 response.json({message: "Tag added"});
+                    //                             }).catch((resTag) => {
+                    //                                 response.json({errors: "Une erreur s'est produite: " + resTag});
+                    //                             })
+                    //                         }
+                    //                     }
+                    //                 }
+                    //             }).catch((result) => {
+                    //                 response.json({errors: "Une erreur s'est produite: " + result});
+                    //             });
+                    //     }
+        
+
+
 				}
 				checkDb.profilCompleted(request.session.user.id).then((result) => {
 					resSort.searchParamsCheck(request.query.filter, request.query.sort).then((searchPref) => {

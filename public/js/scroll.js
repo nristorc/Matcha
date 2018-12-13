@@ -140,7 +140,7 @@ $(function () {
 
         $('#inputFilter').click((event) => {
             if (1){
-                $(location).attr("href", "/search?filter=" + "age" + valSlideAge + "pop" + valSlidePop + "loc" + valSlideLoc + "tag" + $('#searchTag').val());
+                $(location).attr("href", "/search?filter=" + "age" + valSlideAge + "pop" + valSlidePop + "loc" + valSlideLoc + "tag" + $('#addTag').val());
                 // console.log($('#searchTag').val());
                 // console.log("salut la compagnie");
             } else {
@@ -148,17 +148,17 @@ $(function () {
             }
 		})
 		
-		$('#searchTag').on('keydown', (e) => {
-			var k = e.which || e.key
-			if(/^(9)$/.test(k)) {
-				$(this).value = ""
-				//console.log("Tabulation catch:" + k)
-				e.preventDefault()
-			}
-			if(/^(188|13)$/.test(k)) {
-				//console.log("Submit form:"+ $(this))
-				validFormTag();
-			}
-		})
+		// $('#searchTag').on('keydown', (e) => {
+		// 	var k = e.which || e.key
+		// 	if(/^(9)$/.test(k)) {
+		// 		$(this).value = ""
+		// 		//console.log("Tabulation catch:" + k)
+		// 		e.preventDefault()
+		// 	}
+		// 	if(/^(188|13)$/.test(k)) {
+		// 		//console.log("Submit form:"+ $(this))
+		// 		validFormTag();
+		// 	}
+		// })
     });
 });

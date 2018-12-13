@@ -392,7 +392,10 @@ class DatabaseRequest {
 				sql = sql.concat(" UNION ALL SELECT `users`.* FROM `matcha`.`users` INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` WHERE ");
 				if (user_tags){
 					for (var i=0; i < user_tags.length; i++){
-						if (i == 0){
+                        if (user_tags.length == 1){
+							sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\") AND ");
+                        }
+						else if (i == 0){
 							sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\"");
 						} else if (i < user_tags.length - 1){
 							sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\"");
@@ -473,15 +476,18 @@ class DatabaseRequest {
 					}
 					sql = sql.concat(") AS `g` INNER JOIN matcha.tags ON `g`.`id` = `tags`.`user_id` WHERE");
 					if (user_tags){
-						for (var i=0; i < user_tags.length; i++){
-							if (i == 0){
-								sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\"");
-							} else if (i < user_tags.length - 1){
-								sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\"");
-							} else {
-								sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\") ");
-							}
-						}
+                        for (var i=0; i < user_tags.length; i++){
+                            if (user_tags.length == 1){
+                                sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\") AND ");
+                            }
+                            else if (i == 0){
+                                sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\"");
+                            } else if (i < user_tags.length - 1){
+                                sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\"");
+                            } else {
+                                sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\") AND ");
+                            }
+                        }
 					}
                 }
             }

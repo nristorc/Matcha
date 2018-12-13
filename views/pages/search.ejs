@@ -83,12 +83,18 @@
 
 				<!-- Tags module -->
 				<div class="d-flex bd-highlight">
+						<div id="tags">
+							<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#cacahouete</a>
+								
+								<input type="text" placeholder="Ajouter un Tag" id="addTag" onkeydown="stockTag(this)">
+							</div>
+
 					<!-- <div id="tags"> -->
-						<a class="btn btn-primary hashtag" href="#" role="button" style="display:none;" onclick="deleteTag(this)">#</a>
-						<div id="divTagSearch"></div>
+						<!-- <a class="btn btn-primary hashtag" href="#" role="button" style="display:none;" onclick="deleteTag(this)">#</a>
+						<div id="divTagSearch"></div> -->
 						<!-- <input class="nav-item nav-link" type="text" id="searchTag" placeholder="Ajouter un Tag" onfocus="searchTag()"> -->
 						<!-- <input type="text" placeholder="Ajouter un Tag" id="addTag" onfocus="search()"/> -->
-					<input type="text" id="searchTag" class="nav-item nav-link" placeholder="Recherche par tags" ><!-- onfocus="tagSearch()" -->
+					<!-- <input type="text" id="searchTag" class="nav-item nav-link" placeholder="Recherche par tags" onKeyUp="check(this)" onChange="check(this)" onfocus="tagSearch()" >onfocus="tagSearch()" -->
 					<!-- </div> -->
 				</div>
 					<button type="button" class="btn btn-primary filter-search" id="inputFilter">Rechercher</button>
@@ -96,7 +102,6 @@
 			</div>
 		</div>	
 </nav>
-
 
 
 
@@ -205,8 +210,7 @@
 		i++;
 	}
 %>
-<button onclick="getLocation()">Try It</button>
-<p id="demo"></p>
+
 </div>
 
 <!-- Loading animation -->
@@ -222,11 +226,11 @@
 <script src="./public/js/like.js"></script>
 <script src="./public/js/tag-search.js"></script>
 <script src="./public/js/location.js"></script>
-<script>
+<!-- <script>
 
 	const iplocation = require("iplocation").default;
 	console.log(iplocation);
-</script>
+</script> -->
 
 
 <% } %>
