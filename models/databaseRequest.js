@@ -31,18 +31,23 @@ class DatabaseRequest {
         });
     }
 
-    // async userSessionCheck(userId){
-    //     try {
-    //         const result = await this.query(`SELECT online, username FROM matcha.users WHERE id = ? AND online = ?`, [userId,'Y']);
-    //         if(result !== null){
-    //             return result[0]['username'];
-    //         }else{
-    //             return null;
-    //         }
-    //     } catch (error) {
-    //         return null;
-    //     }
-    // }
+    async userSessionCheck(userId){
+        try {
+            return new Promise((resolve, reject) => {
+                this.query(`SELECT online, username FROM matcha.users WHERE id = ? AND online = ?`, [userId,'Y']).then((result) => {
+                    if (result && result != '') {
+                        resolve(result[0].username);
+                    } else {
+                        reject();
+                    }
+                }).catch((err) => {
+                    throw err;
+                });
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
 
     async loginUser(params){
         try {
