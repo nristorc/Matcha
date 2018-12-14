@@ -116,14 +116,16 @@ io.sockets.on('connection', (socket) => {
                 username: decoded.username,
                 count: 1
             };
-            let user = users.find(u => u.id === currentUser.id);
-            if (user) {
-                user.count++;
-            } else {
-                users.push(currentUser);
-                socket.broadcast.emit('users.new', {user: currentUser});
-            }
-            socket.emit('users', {users});
+            console.log('currentUser', currentUser);
+            // let user = users.find(u => u.id === currentUser.id);
+            // console.log(user);
+            // if (user) {
+            //     user.count++;
+            // } else {
+            //     users.push(currentUser);
+            //     socket.broadcast.emit('users.new', {user: currentUser});
+            // }
+            // socket.emit('users', {users});
         } catch (e) {
             throw e.message;
         }

@@ -46,7 +46,7 @@
             <%}}%>
 
         </div>
-        <div id="userInfo">
+        <div id="userOnline" data-token="<%=token%>">
             <%if (user[0].online === 'Y') {%>
             <h2 style="margin:0" class="mt-0" id="userDetails"><i style="color: green;" class="fas fa-circle fa-xs"></i> <%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>
             <%} else if (user[0].online === 'N') {%>
@@ -141,6 +141,8 @@
 </div>
 
 <% include ../partial/footer.ejs%>
+
+<script src="/socket.io/socket.io.js"></script>
 
 <script>
 
@@ -309,6 +311,29 @@
                     }
                 }
             });
+    }
+
+    let userOnline = document.querySelector('#userOnline');
+    // let onlineUser = (user) => {
+    //     let online = document.getElementById('userOnline');
+    //     console.log(online);
+        // li.innerText = user.username;
+        // li.id = 'user' + user.id;
+        // presence.appendChild(li);
+    // }
+
+    if (userOnline) {
+        let socket = io('http://localhost:3000');
+        socket.on('connect', () => {
+            console.log('je suis connecte');
+            socket.emit('identify', {
+                token: userOnline.dataset.token
+            });
+        });
+
+        // socket.on('users.new', ({user}) => {
+        //     onlineUser(user);
+        // });
     }
 
 </script>

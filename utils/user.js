@@ -54,126 +54,132 @@ router.route('/:id')
             const decoded = jwt.verify(token, 'ratonlaveur', {
                 algorithms: ['HS256']
             });
-        } catch (e) {
-            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-            return response.render('index');
-        }
-        checkDb.profilCompleted(decoded.id).then((result) => {
-            if (request.params.id == decoded.id) {
-                response.redirect('/profil');
-            } else {
-                const visits = 'INSERT INTO matcha.visits SET visitor_id = ?, visited_id = ?, visited_at = NOW()';
-                checkDb.query(visits, [decoded.id, parseInt(request.params.id, 10)]).then((result) => {
-                    if (result) {
-                        const sql = 'SELECT * FROM matcha.users WHERE id = ?';
-                        checkDb.query(sql, [request.params.id]).then((result) => {
-                            if (result == "") {
-                                request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
-                                response.redirect('/');
-                            } else {
-                                checkDb.getTags(request.params.id).then((tags) => {
-                                    checkDb.getPhotos(request.params.id).then((photos) => {
-                                        userData.userAge(result[0].birth).then((age) => {
-                                            checkDb.getLikes(decoded.id).then((liked) => {
-                                                checkDb.getMatches(decoded.id).then((matches) => {
-                                                    checkDb.getMyReports(decoded.id).then((reports) => {
-                                                        if (photos == '') {
-                                                            if (matches == ''){
-                                                                response.render('pages/user', {
-                                                                    user: result,
-                                                                    userage: age,
-                                                                    usertags: tags,
-                                                                    userphotos: photos,
-                                                                    likes: null,
-                                                                    matches: null,
-                                                                    reports: reports
-                                                                });
+            checkDb.profilCompleted(decoded.id).then((result) => {
+                if (request.params.id == decoded.id) {
+                    response.redirect('/profil');
+                } else {
+                    const visits = 'INSERT INTO matcha.visits SET visitor_id = ?, visited_id = ?, visited_at = NOW()';
+                    checkDb.query(visits, [decoded.id, parseInt(request.params.id, 10)]).then((result) => {
+                        if (result) {
+                            const sql = 'SELECT * FROM matcha.users WHERE id = ?';
+                            checkDb.query(sql, [request.params.id]).then((result) => {
+                                if (result == "") {
+                                    request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
+                                    response.redirect('/');
+                                } else {
+                                    checkDb.getTags(request.params.id).then((tags) => {
+                                        checkDb.getPhotos(request.params.id).then((photos) => {
+                                            userData.userAge(result[0].birth).then((age) => {
+                                                checkDb.getLikes(decoded.id).then((liked) => {
+                                                    checkDb.getMatches(decoded.id).then((matches) => {
+                                                        checkDb.getMyReports(decoded.id).then((reports) => {
+                                                            if (photos == '') {
+                                                                if (matches == ''){
+                                                                    response.render('pages/user', {
+                                                                        user: result,
+                                                                        userage: age,
+                                                                        usertags: tags,
+                                                                        userphotos: photos,
+                                                                        likes: null,
+                                                                        matches: null,
+                                                                        reports: reports,
+                                                                        token
+                                                                    });
+                                                                } else {
+                                                                    response.render('pages/user', {
+                                                                        user: result,
+                                                                        userage: age,
+                                                                        usertags: tags,
+                                                                        userphotos: photos,
+                                                                        likes: null,
+                                                                        matches: matches,
+                                                                        reports: reports,
+                                                                        token
+                                                                    });
+                                                                }
                                                             } else {
-                                                                response.render('pages/user', {
-                                                                    user: result,
-                                                                    userage: age,
-                                                                    usertags: tags,
-                                                                    userphotos: photos,
-                                                                    likes: null,
-                                                                    matches: matches,
-                                                                    reports: reports
-                                                                });
+                                                                if (matches == ''){
+                                                                    response.render('pages/user', {
+                                                                        user: result,
+                                                                        userage: age,
+                                                                        usertags: tags,
+                                                                        userphotos: photos,
+                                                                        likes: liked,
+                                                                        matches: null,
+                                                                        reports: reports,
+                                                                        token
+                                                                    });
+                                                                } else {
+                                                                    console.log('il y a des photos et des likes')
+                                                                    response.render('pages/user', {
+                                                                        user: result,
+                                                                        userage: age,
+                                                                        usertags: tags,
+                                                                        userphotos: photos,
+                                                                        likes: liked,
+                                                                        matches: matches,
+                                                                        reports: reports,
+                                                                        token
+                                                                    });
+                                                                }
                                                             }
-                                                        } else {
-                                                            if (matches == ''){
-                                                                response.render('pages/user', {
-                                                                    user: result,
-                                                                    userage: age,
-                                                                    usertags: tags,
-                                                                    userphotos: photos,
-                                                                    likes: liked,
-                                                                    matches: null,
-                                                                    reports: reports
-                                                                });
-                                                            } else {
-                                                                console.log('il y a des photos et des likes')
-                                                                response.render('pages/user', {
-                                                                    user: result,
-                                                                    userage: age,
-                                                                    usertags: tags,
-                                                                    userphotos: photos,
-                                                                    likes: liked,
-                                                                    matches: matches,
-                                                                    reports: reports
-                                                                });
-                                                            }
-                                                        }
-                                                    }).catch((reports) => {
-                                                        console.log('reports catch', reports)
+                                                        }).catch((reports) => {
+                                                            console.log('reports catch', reports)
+                                                        });
+                                                    }).catch((matches) => {
+                                                        console.log('catch matches', matches);
                                                     });
-                                                }).catch((matches) => {
-                                                    console.log('catch matches', matches);
+                                                }).catch((liked) => {
+                                                    console.log('likes list CATCH', liked);
                                                 });
-                                            }).catch((liked) => {
-                                                console.log('likes list CATCH', liked);
+                                            }).catch((age) => {
+                                                console.log('age CATCH: ', age);
+                                                response.render('pages/user', {
+                                                    user: result,
+                                                    usertags: tags,
+                                                    userage: null,
+                                                    userphotos: photos,
+                                                    token
+                                                });
                                             });
-                                        }).catch((age) => {
-                                            console.log('age CATCH: ', age);
+                                        }).catch((photos) => {
                                             response.render('pages/user', {
                                                 user: result,
                                                 usertags: tags,
                                                 userage: null,
-                                                userphotos: photos,
+                                                userphotos: null,
+                                                likes: null
                                             });
                                         });
-                                    }).catch((photos) => {
+                                    }).catch((tags) => {
                                         response.render('pages/user', {
                                             user: result,
                                             usertags: tags,
                                             userage: null,
-                                            userphotos: null,
-                                            likes: null
+                                            userphotos: photos,
+                                            token
                                         });
                                     });
-                                }).catch((tags) => {
-                                    response.render('pages/user', {
-                                        user: result,
-                                        usertags: tags,
-                                        userage: null,
-                                        userphotos: photos
-                                    });
-                                });
-                            }
+                                }
 
-                        }).catch((result) => {
-                            console.log('catch', result);
-                        });
-                    }
-                }).catch((result) => {
-                    console.log('catch', result);
-                });
-            }
+                            }).catch((result) => {
+                                console.log('catch', result);
+                            });
+                        }
+                    }).catch((result) => {
+                        console.log('catch', result);
+                    });
+                }
 
-        }).catch((result) => {
-            console.log('catch', result);
-            request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
-            response.redirect('/')
-        });
+            }).catch((result) => {
+                console.log('catch', result);
+                request.flash('warning', "Vous n'avez pas le droit d'accèder à cette page sans un profil complet");
+                response.redirect('/')
+            });
+        } catch (e) {
+            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+            return response.render('index');
+        }
 
 
     })
