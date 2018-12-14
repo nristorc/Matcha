@@ -31,18 +31,30 @@ class DatabaseRequest {
         });
     }
 
-    async userSessionCheck(userId){
+    async updateOnlineStatus(userId, status){
         try {
             return new Promise((resolve, reject) => {
-                this.query(`SELECT online, username FROM matcha.users WHERE id = ? AND online = ?`, [userId,'Y']).then((result) => {
-                    if (result && result != '') {
-                        resolve(result[0].username);
-                    } else {
-                        reject();
-                    }
-                }).catch((err) => {
-                    throw err;
-                });
+                if (status === 'login') {
+                    this.query(`UPDATE matcha.users SET online = ? WHERE id = ?`, ['Y', userId]).then((result) => {
+                        if (result) {
+                            resolve();
+                        } else {
+                            reject();
+                        }
+                    }).catch((err) => {
+                        throw err;
+                    });
+                } else if (status === 'logout') {
+                    this.query(`UPDATE matcha.users SET online = ?, lastOnline = NOW() WHERE id = ?`, ['N', userId]).then((result) => {
+                        if (result) {
+                            resolve();
+                        } else {
+                            reject();
+                        }
+                    }).catch((err) => {
+                        throw err;
+                    });
+                }
             });
         } catch (error) {
             throw error;

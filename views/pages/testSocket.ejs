@@ -1,0 +1,44 @@
+<%- include('../partial/head')%>
+<%- include('../partial/header')%>
+
+<ul id="presence" data-token="<%=token%>">
+
+</ul>
+
+<%- include('../partial/footer')%>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+    let presence = document.querySelector('#presence');
+    let addUser = (user) => {
+        let li = document.createElement('li');
+        li.innerText = user.username;
+        li.id = 'user' + user.id;
+        presence.appendChild(li);
+    }
+
+    if (presence) {
+        let socket = io('http://localhost:3000');
+        socket.on('connect', () => {
+            socket.emit('identify', {
+                token: presence.dataset.token
+            });
+        });
+
+        socket.on('users.new', ({user}) => {
+            addUser(user);
+        });
+
+        socket.on('users', ({users}) => {
+            for (k in users) {
+                addUser(users[k]);
+            }
+        })
+
+        socket.on('users.leave', ({user}) => {
+            presence.removeChild(document.querySelector('#user' + user.id));
+        })
+
+    }
+</script>

@@ -13,6 +13,9 @@ const cors = require('cors');
 const databaseRequest = require("./models/databaseRequest");
 const checkDb = new databaseRequest();
 
+const sockets = require("./models/socketsEvents");
+const socketsEvents = new sockets();
+
 const login     = require('./utils/login');
 const index     = require('./utils/index');
 const register = require('./utils/register');
@@ -79,179 +82,73 @@ app.use('/user', user);
 app.use('/history', history);
 app.use('/chat', chat);
 
-
-/* TEST */
-app.get('/test', function (req, res) {
-    const token = req.cookies.token;
-    try {
-        const verify = jwt.verify(token, 'ratonlaveur');
-    } catch (e) {
-        req.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-        return res.render('index');
-    }
-    const decoded = jwt.verify(token, 'ratonlaveur', {
-        algorithms: ['HS256']
-    });
-
-    io.use( async (socket, next) => {
-        let userId = decoded.id;
-        let userSocketId = socket.id;
-        const response = await addSocketId(userId, userSocketId);
-        if(response &&  response !== null){
-            next();
-        }else{
-            console.error(`Socket connection failed, for  user Id ${decoded.id}.`);
-        }
-    });
-
-
-        console.log('Un utilisateur est connecté');
-
-        function socketEmit(eventName, params) {
-            socket.emit(eventName, params);
-        }
-
-        function socketOn(eventName, callback) {
-            socket.on(eventName, (response) => {
-                if (callback) {
-                    callback(response);
-                }
-            });
-        }
-
-        socketEmit('chat-list', decoded.id);
-        socketOn('chat-list-response', (response) => {
-            console.log('reponse socketON server', response);
-        });
-            // $scope.$apply( () =>{
-            //     if (response) {
-            //         $scope.data.chatlist = response.chatList;
-            //     } else if (response && !decoded.id) {
-            //         data.chatlist = data.chatlist.filter(function (obj) {
-            //             return obj.socketid !== response.socketId;
-            //         });
-            //     }
-            //         if (response.singleUser) {
-            //             /*
-            //             * Removing duplicate user from chat list array
-            //             */
-            //             if ($scope.data.chatlist.length > 0) {
-            //                 $scope.data.chatlist = $scope.data.chatlist.filter(function (obj) {
-            //                     return obj.id !== response.chatList.id;
-            //                 });
-            //             }
-            //             /*
-            //             * Adding new online user into chat list array
-            //             */
-            //             $scope.data.chatlist.push(response.chatList);
-            //         } else if (response.userDisconnected) {
-            //             /*
-            //             * Removing a user from chat list, if user goes offline
-            //             */
-            //
-            //         } else {
-            //             /*
-            //             * Updating entire chatlist if user logs in
-            //             */
-            //
-            //         }
-            //     } else {
-            //
-            //     }
-            // });
-
-    res.render('pages/testSocket');
-});
-
 /* EJS */
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
-/* SOCKETS */
+/* TEST SOCKETS */
+const jwtSecret = 'ratonlaveur';
+let users = [];
 
-
-/*TEST 2*/
-
-function getMessages(userId, friendId) {
-    return new Promise((resolve, reject) => {
-        checkDb.query('SELECT message FROM matcha.messages WHERE from_user_id = ? AND to_user_id = ?',
-            [userId, friendId])
-            .then((response) => {
-                resolve(response);
-            }).catch((error) => {
-            reject(error);
-        });
-    });
-}
-
-function getChatList(userId, userSocketId){
+app.get('/test', function (request, response) {
+    const token = request.cookies.token;
     try {
-        return Promise.all([
-            this.db.query(`SELECT id,username,online,socketid FROM matcha.users WHERE id = ?`, [userId]),
-            this.db.query(`SELECT id,username,online,socketid FROM matcha.users WHERE online = ? and socketid != ?`, ['Y',userSocketId])
-        ]).then( (response) => {
-            return {
-                userinfo : response[0].length > 0 ? response[0][0] : response[0],
-                chatlist : response[1]
-            };
-        }).catch( (error) => {
-            console.warn(error);
-            return (null);
+        const decoded = jwt.verify(token, jwtSecret, {
+            algorithms: ['HS256']
         });
-    } catch (error) {
-        console.warn(error);
-        return null;
+        response.render('pages/testSocket', {token});
+    } catch (e) {
+        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+        return response.render('index');
     }
-}
+});
 
 io.sockets.on('connection', (socket) => {
+    let currentUser = null;
 
-    /**
-     * get the user's Chat list
-     */
-    socket.on('chat-list', async (userId) => {
-
-        let chatListResponse = {};
-
-        if (userId === '' && (typeof userId !== 'string' || typeof userId !== 'number')) {
-
-            chatListResponse.error = true;
-            chatListResponse.message = `User does not exits.`;
-
-            this.io.emit('chat-list-response',chatListResponse);
-        }else{
-            getChatList(userId, socket.id).then((result) => {
-                io.sockets.to(socket.id).emit('chat-list-response', {
-                    error: result !== null ? false : true,
-                    singleUser: false,
-                    chatList: result.chatlist
-                });
-
-                socket.broadcast.emit('chat-list-response', {
-                    error: result !== null ? false : true,
-                    singleUser: true,
-                    chatList: result.userinfo
-                });
-            }).catch((result) => {
-                throw result;
+    socket.on('identify', ({token}) => {
+        try{
+            const decoded = jwt.verify(token, jwtSecret, {
+                algorithms: ['HS256']
             });
+            currentUser = {
+                id: decoded.id,
+                username: decoded.username,
+                count: 1
+            };
+            let user = users.find(u => u.id === currentUser.id);
+            if (user) {
+                user.count++;
+            } else {
+                users.push(currentUser);
+                socket.broadcast.emit('users.new', {user: currentUser});
+            }
+            socket.emit('users', {users});
+        } catch (e) {
+            throw e.message;
         }
     });
 
+    socket.on('disconnect', () => {
+        if (currentUser) {
+            let user = users.find(u => u.id === currentUser.id);
+            if (user) {
+                user.count--;
+                if (user.count === 0) {
+                    users = users.filter(u => u.id !== currentUser.id);
+                    socket.broadcast.emit('users.leave', {user: currentUser});
+                }
+            }
+        }
+    })
 });
 
-function scrollToBottom() {
-    const messageThread = document.querySelector('.message-thread');
-    setTimeout(() => {
-        messageThread.scrollTop = messageThread.scrollHeight + 500;
-    }, 10);
-}
 
-async function addSocketId(userId, userSocketId) {
-    try {
-        return await checkDb.query(`UPDATE matcha.users SET socketid = ?, online= ? WHERE id = ?`, [userSocketId,'Y',userId]);
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
+// function scrollToBottom() {
+//     const messageThread = document.querySelector('.message-thread');
+//     setTimeout(() => {
+//         messageThread.scrollTop = messageThread.scrollHeight + 500;
+//     }, 10);
+// }
+
+//

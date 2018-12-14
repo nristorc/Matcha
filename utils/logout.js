@@ -47,16 +47,28 @@ function checkFileType(file, callback) {
 }
 
 router.get('/', function(request, result){
-    console.log("Je suis dans LOGOUT");
-    let cookie = request.cookies;
-    for (let prop in cookie) {
-        if (!cookie.hasOwnProperty(prop)) {
-            continue;
-        }
-        result.cookie(prop, '', {expires: new Date(0)});
-        request.session = null;
+    const token = request.cookies.token;
+    try {
+        const decoded = jwt.verify(token, 'ratonlaveur', {
+            algorithms: ['HS256']
+        });
+        checkDb.updateOnlineStatus(decoded.id, 'logout').then(() => {
+            let cookie = request.cookies;
+            for (let prop in cookie) {
+                if (!cookie.hasOwnProperty(prop)) {
+                    continue;
+                }
+                result.cookie(prop, '', {expires: new Date(0)});
+                request.session = null;
+            }
+            result.redirect('/');
+        }).catch((err) => {
+            console.log('error occured', err);
+        });
+    } catch (e) {
+        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+        return response.render('index');
     }
-    result.redirect('/');
 });
 
 module.exports = router;

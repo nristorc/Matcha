@@ -76,10 +76,14 @@ router.route('/:registerToken').get((request, response) => {
                             expiresIn: 9000000,
                             // secure: true
                         });
-                        loginResponse.type = 'dark';
-                        loginResponse.message = `Vous êtes bien connecté à votre profil`;
-                        request.flash(loginResponse.type, loginResponse.message);
-                        response.status(200).redirect('/profil');
+                        checkDb.updateOnlineStatus(user.id, 'login').then(() => {
+                            loginResponse.type = 'dark';
+                            loginResponse.message = `Vous êtes bien connecté à votre profil`;
+                            request.flash(loginResponse.type, loginResponse.message);
+                            response.status(200).redirect('/profil');
+                        }).catch((err) => {
+                           console.log('an error occured, please try again later', err);
+                        });
                     } else {
                         response.send("Could not create token");
                         response.end();
