@@ -467,6 +467,7 @@ class DatabaseRequest {
 					}
                 }
                 if (sort == "tag"){
+                    // console.log("------------TAGS-------------", tags);
 					sql = sql.concat(" UNION ALL SELECT `g`.* FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ");
 					if (orientation){
 						sql = sql.concat(orientation);
@@ -478,14 +479,14 @@ class DatabaseRequest {
 					if (user_tags){
                         for (var i=0; i < user_tags.length; i++){
                             if (user_tags.length == 1){
-                                sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\") AND ");
+                                sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\" )");
                             }
                             else if (i == 0){
                                 sql = sql.concat("(`tags`.`tag` = \"" + user_tags[i].tag + "\"");
-                            } else if (i < user_tags.length - 1){
-                                sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\"");
+                            } else if (i < user_tags.length - 1) {
+                                sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\" ");
                             } else {
-                                sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\") AND ");
+                                sql = sql.concat(" OR `tags`.`tag` = \"" + user_tags[i].tag + "\") ");
                             }
                         }
 					}
