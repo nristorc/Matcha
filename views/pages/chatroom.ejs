@@ -22,9 +22,9 @@
                                 <div id="chatOnline">
                                     <h5><%=myMatches[x].username%>
                                         <%if (myMatches[x].online === 'N') {%>
-                                            <i style="color: red" class="fas fa-circle fa-xs"></i>
+                                            <i style="color: red" class="fas fa-circle fa-xs user<%=myMatches[x].id%>"></i>
                                         <%} else if (myMatches[x].online === 'Y') {%>
-                                            <i style="color: green" class="fas fa-circle fa-xs"></i>
+                                        <i style="color: green" class="fas fa-circle fa-xs user<%=myMatches[x].id%>"></i>
                                         <%}%>
                                     </h5>
                                 </div>

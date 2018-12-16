@@ -54,7 +54,7 @@ router.get('/', (request, response) => {
         checkDb.getMatches(decoded.id).then((tab) => {
             if (tab != "") {
                 const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
-                const sql = 'SELECT `username`, `profil`, `online` FROM matcha.users WHERE ' + sqlCondition + ';';
+                const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE ' + sqlCondition + ';';
                 let push = [];
                 checkDb.query(sql, tab)
                     .then((res) => {

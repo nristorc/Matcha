@@ -12,7 +12,6 @@
 
     let socket = io('http://localhost:3000');
     socket.on('connect', () => {
-        console.log('je suis connecté');
         socket.emit('identify', {
             token: document.getElementById('token').dataset.token
         });
@@ -37,14 +36,6 @@
         userOffline = document.querySelector('.lastConnected');
         userOnline = document.querySelector('#userDetails .fa-circle');
     }
-
-    const onlineChatPage = (user) => {
-        if (document.querySelector('#chatOnline .fa-circle').style.color === 'red') {
-            // console.log(document.querySelector('#chatOnline .fa-circle').style.color);
-            document.querySelector('#chatOnline .fa-circle').setAttribute('style', 'color: green;');
-        }
-    }
-
     const offlineUserPage = (user) => {
         if (userOnline) {
             userOnline.remove();
@@ -58,14 +49,6 @@
         userOnline = document.querySelector('#userDetails .fa-circle');
         userOffline = document.querySelector('.lastConnected');
     }
-
-    const offlineChatPage = (user) => {
-        if (document.querySelector('#chatOnline .fa-circle').style.color === 'green') {
-            // console.log(document.querySelector('#chatOnline .fa-circle').style.color);
-            document.querySelector('#chatOnline .fa-circle').setAttribute('style', 'color: red;');
-        }
-    }
-
     if (checkOnline){
         socket.on('users.new', ({user}) => {
             onlineUserPage(user);
@@ -76,16 +59,36 @@
         })
     }
 
+    const onlineChatPage = (user) => {
+        console.log('user online', user);
+        console.log('query', document.querySelector('#chatOnline .user' + user.id));
+        if (document.querySelector('#chatOnline .user' + user.id).style.color === 'red') {
+            console.log('online');
+            document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: green;');
+        }
+    }
+
+    const offlineChatPage = (user) => {
+        console.log('user offline', user);
+        console.log('query', document.querySelector('#chatOnline .user' + user.id));
+        if (document.querySelector('#chatOnline .user' + user.id).style.color === 'green') {
+            console.log('offline');
+            document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: red;');
+        }
+    }
+
     if (chatOnline) {
+        console.log('chatOnline');
         socket.on('users.new', ({user}) => {
+            console.log('new user')
             onlineChatPage(user);
         });
 
         socket.on('users.leave', ({user}) => {
+            console.log('leave user');
             offlineChatPage(user);
         })
     }
-
 
 </script>
 
