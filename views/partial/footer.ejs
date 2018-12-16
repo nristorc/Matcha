@@ -17,8 +17,10 @@
         });
     });
 
-    var chatOnline = document.querySelector('#chatOnline');
     var checkOnline = document.querySelector('#checkOnline');
+    var chatOnline = document.querySelector('#chatOnline');
+    var histoOnline = document.querySelector('.histoOnline');
+
     var userDetails = document.querySelector('#userDetails');
     var userOnline = document.querySelector('#userDetails .fa-circle');
     var userOffline = document.querySelector('.lastConnected');
@@ -60,33 +62,43 @@
     }
 
     const onlineChatPage = (user) => {
-        console.log('user online', user);
-        console.log('query', document.querySelector('#chatOnline .user' + user.id));
         if (document.querySelector('#chatOnline .user' + user.id).style.color === 'red') {
-            console.log('online');
             document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: green;');
         }
     }
-
     const offlineChatPage = (user) => {
-        console.log('user offline', user);
-        console.log('query', document.querySelector('#chatOnline .user' + user.id));
         if (document.querySelector('#chatOnline .user' + user.id).style.color === 'green') {
-            console.log('offline');
             document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: red;');
         }
     }
-
     if (chatOnline) {
-        console.log('chatOnline');
         socket.on('users.new', ({user}) => {
-            console.log('new user')
             onlineChatPage(user);
         });
 
         socket.on('users.leave', ({user}) => {
-            console.log('leave user');
             offlineChatPage(user);
+        })
+    }
+
+    const onlineHistoPage = (user) => {
+        if (document.querySelector('.histoOnline .user' + user.id).style.color === 'red') {
+            document.querySelector('.histoOnline .user' + user.id).setAttribute('style', 'color: green;');
+        }
+    }
+    const offlineHistoPage = (user) => {
+        if (document.querySelector('.histoOnline .user' + user.id).style.color === 'green') {
+            document.querySelector('.histoOnline .user' + user.id).setAttribute('style', 'color: red;');
+        }
+    }
+    if (histoOnline) {
+        console.log('histo')
+        socket.on('users.new', ({user}) => {
+            onlineHistoPage(user);
+        });
+
+        socket.on('users.leave', ({user}) => {
+            offlineHistoPage(user);
         })
     }
 
