@@ -18,17 +18,16 @@
         });
     });
 
-    var checkOnline = document.querySelector('.checkOnline');
+    var chatOnline = document.querySelector('#chatOnline');
+    var checkOnline = document.querySelector('#checkOnline');
     var userDetails = document.querySelector('#userDetails');
-    var userOnline = document.querySelector('.fa-circle');
+    var userOnline = document.querySelector('#userDetails .fa-circle');
     var userOffline = document.querySelector('.lastConnected');
 
-    const online = (user) => {
-        console.log(userOffline);
+    const onlineUserPage = (user) => {
          if (userOffline) {
              userOffline.remove();
          }
-         console.log(userOnline);
         if (userOnline === null) {
             const i = document.createElement('i');
             i.setAttribute('class', 'fas fa-circle fa-xs');
@@ -36,11 +35,17 @@
             userDetails.prepend(i);
         }
         userOffline = document.querySelector('.lastConnected');
-        userOnline = document.querySelector('.fa-circle');
+        userOnline = document.querySelector('#userDetails .fa-circle');
     }
 
-    const offline = (user) => {
-        console.log(userOnline);
+    const onlineChatPage = (user) => {
+        if (document.querySelector('#chatOnline .fa-circle').style.color === 'red') {
+            // console.log(document.querySelector('#chatOnline .fa-circle').style.color);
+            document.querySelector('#chatOnline .fa-circle').setAttribute('style', 'color: green;');
+        }
+    }
+
+    const offlineUserPage = (user) => {
         if (userOnline) {
             userOnline.remove();
         }
@@ -50,17 +55,34 @@
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
         p.innerText = 'dernière connexion le : ' + new Date().toLocaleDateString('fr-FR', options);
         checkOnline.appendChild(p);
-        userOnline = document.querySelector('.fa-circle');
+        userOnline = document.querySelector('#userDetails .fa-circle');
         userOffline = document.querySelector('.lastConnected');
+    }
+
+    const offlineChatPage = (user) => {
+        if (document.querySelector('#chatOnline .fa-circle').style.color === 'green') {
+            // console.log(document.querySelector('#chatOnline .fa-circle').style.color);
+            document.querySelector('#chatOnline .fa-circle').setAttribute('style', 'color: red;');
+        }
     }
 
     if (checkOnline){
         socket.on('users.new', ({user}) => {
-            online(user);
+            onlineUserPage(user);
         });
 
         socket.on('users.leave', ({user}) => {
-            offline(user);
+            offlineUserPage(user);
+        })
+    }
+
+    if (chatOnline) {
+        socket.on('users.new', ({user}) => {
+            onlineChatPage(user);
+        });
+
+        socket.on('users.leave', ({user}) => {
+            offlineChatPage(user);
         })
     }
 

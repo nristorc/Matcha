@@ -47,7 +47,7 @@
 
         </div>
 
-        <div class="checkOnline">
+        <div id="checkOnline">
             <%if (user[0].online === 'Y') {%>
             <h2 style="margin:0" class="mt-0" id="userDetails"><i style="color: green;" class="fas fa-circle fa-xs"></i> <%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>
             <%} else if (user[0].online === 'N') {%>
