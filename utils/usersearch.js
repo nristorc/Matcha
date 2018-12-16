@@ -17,15 +17,14 @@ const storage = multer.diskStorage({
     filename: function (request, file, callback) {
         const token = request.cookies.token;
         try {
-            const verify = jwt.verify(token, 'ratonlaveur');
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+            callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
         } catch (e) {
             request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
             return response.render('index');
         }
-        const decoded = jwt.verify(token, 'ratonlaveur', {
-            algorithms: ['HS256']
-        });
-        callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 const upload = multer({
@@ -50,12 +49,7 @@ router.post('/', async (request, response) => {
 
     const token = request.cookies.token;
     try {
-        const verify = jwt.verify(token, 'ratonlaveur');
-    } catch (e) {
-        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-        return response.render('index');
-    }
-    const decoded = jwt.verify(token, 'ratonlaveur', {
+        const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
 
@@ -71,6 +65,10 @@ router.post('/', async (request, response) => {
     }).catch((result) => {
         console.log('result catch: ', result);
     });
+    } catch (e) {
+        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+        return response.render('index');
+    }
 });
 
 module.exports = router;

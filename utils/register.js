@@ -17,15 +17,14 @@ const storage = multer.diskStorage({
     filename: function (request, file, callback) {
         const token = request.cookies.token;
         try {
-            const verify = jwt.verify(token, 'ratonlaveur');
-        } catch (e) {
-            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-            return response.render('index');
-        }
         const decoded = jwt.verify(token, 'ratonlaveur', {
             algorithms: ['HS256']
         });
         callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
+        } catch (e) {
+            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+            return response.render('index');
+        }
     }
 });
 const upload = multer({
@@ -47,7 +46,6 @@ function checkFileType(file, callback) {
 }
 
 router.post('/', async (request, response)=> {
-    // console.log("Je suis dans REGISTER");
     const registrationResponse = {};
     const data = {
         lastname: request.body.lastname,
@@ -100,9 +98,7 @@ router.post('/', async (request, response)=> {
                 response.status(401).redirect('/');
             }
             else {
-                //console.log("Je peux ajouter le nouvel utilisateur !! Youpiiii");
                 const result = await checkDb.registerUser(data);
-                //console.log(result);
                 if (result === false) {
                     registrationResponse.type = 'warning';
                     registrationResponse.error = true;

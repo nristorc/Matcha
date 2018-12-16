@@ -12,7 +12,16 @@ const fs = require('fs');
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function (request, file, callback) {
-        callback(null, request.session.user.id + '-' + Date.now() + path.extname(file.originalname));
+        const token = request.cookies.token;
+        try {
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+            callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
+        } catch (e) {
+            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+            return response.render('index');
+        }
     }
 });
 const upload = multer({
@@ -40,15 +49,14 @@ router.get('/', async (request,response) => {
     } else {
         const token = request.cookies.token;
         try {
-            const verify = jwt.verify(token, 'ratonlaveur');
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+            response.status(200).redirect('/profil');
         } catch (e) {
             request.flash('warning', "Une erreur s'est produite... merci de recommencer");
             return response.render('index');
         }
-        const decoded = jwt.verify(token, 'ratonlaveur', {
-            algorithms: ['HS256']
-        });
-        response.status(200).redirect('/profil');
     }
 });
 

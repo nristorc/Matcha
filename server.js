@@ -90,19 +90,6 @@ app.set('view engine', 'ejs');
 const jwtSecret = 'ratonlaveur';
 let users = [];
 
-app.get('/test', function (request, response) {
-    const token = request.cookies.token;
-    try {
-        const decoded = jwt.verify(token, jwtSecret, {
-            algorithms: ['HS256']
-        });
-        response.render('pages/testSocket', {token});
-    } catch (e) {
-        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-        return response.render('index');
-    }
-});
-
 io.sockets.on('connection', (socket) => {
     let currentUser = null;
 
@@ -116,16 +103,14 @@ io.sockets.on('connection', (socket) => {
                 username: decoded.username,
                 count: 1
             };
-            console.log('currentUser', currentUser);
-            // let user = users.find(u => u.id === currentUser.id);
-            // console.log(user);
-            // if (user) {
-            //     user.count++;
-            // } else {
-            //     users.push(currentUser);
-            //     socket.broadcast.emit('users.new', {user: currentUser});
-            // }
-            // socket.emit('users', {users});
+            let user = users.find(u => u.id === currentUser.id);
+            if (user) {
+                user.count++;
+            } else {
+                users.push(currentUser);
+                socket.broadcast.emit('users.new', {user: currentUser});
+                console.log('user connected');
+            }
         } catch (e) {
             throw e.message;
         }
@@ -134,11 +119,13 @@ io.sockets.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (currentUser) {
             let user = users.find(u => u.id === currentUser.id);
+            console.log('user', user);
             if (user) {
                 user.count--;
                 if (user.count === 0) {
                     users = users.filter(u => u.id !== currentUser.id);
                     socket.broadcast.emit('users.leave', {user: currentUser});
+                    console.log('user disconnected');
                 }
             }
         }

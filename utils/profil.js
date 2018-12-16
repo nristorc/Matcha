@@ -17,15 +17,14 @@ const storage = multer.diskStorage({
     filename: function (request, file, callback) {
         const token = request.cookies.token;
         try {
-            const verify = jwt.verify(token, 'ratonlaveur');
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+            callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
         } catch (e) {
             request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
             return response.render('index');
         }
-        const decoded = jwt.verify(token, 'ratonlaveur', {
-            algorithms: ['HS256']
-        });
-        callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 const upload = multer({
@@ -49,11 +48,6 @@ function checkFileType(file, callback) {
 router.route('/').get((request, response) => {
     const token = request.cookies.token;
     try {
-        const verify = jwt.verify(token, 'ratonlaveur');
-    } catch (e) {
-        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-        return response.render('index');
-    }
     const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
@@ -65,14 +59,16 @@ router.route('/').get((request, response) => {
                         user: user,
                         userage: age,
                         usertags: tags,
-                        userphotos: photos
+                        userphotos: photos,
+                        token
                     });
                 }).catch((age) => {
                     response.render('pages/profil', {
                         user: user,
                         usertags: tags,
                         userage: null,
-                        userphotos: photos
+                        userphotos: photos,
+                        token
                     });
                 });
             }).catch((photos) => {
@@ -80,7 +76,8 @@ router.route('/').get((request, response) => {
                     user: user,
                     usertags: tags,
                     userage: null,
-                    userphotos: null
+                    userphotos: null,
+                    token
                 });
             });
         }).catch((tags) => {
@@ -88,22 +85,23 @@ router.route('/').get((request, response) => {
                 user: user,
                 usertags: tags,
                 userage: null,
-                userphotos: photos
+                userphotos: photos,
+                token
             });
         });
     }).catch((user) => {
         response.render('index');
     });
+    } catch (e) {
+        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+        return response.render('index');
+    }
 
 }).post(async (request, response) => {
 
     const token = request.cookies.token;
     try {
-        const verify = jwt.verify(token, 'ratonlaveur');
-    } catch (e) {
-        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-        return response.render('index');
-    }
+
     const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
@@ -204,7 +202,6 @@ router.route('/').get((request, response) => {
             checkDb.query(sql, [data.birthdate, data.birthdate, data.gender, data.orientation, data.description, decoded.id]).then(() => {
                 checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [decoded.id]).then((result) => {
                     response.json({user: result[0]});
-                    // request.session.user.profil = data;
 
                 }).catch((result) => {
                     console.log('result CATCH:',result);
@@ -390,6 +387,10 @@ router.route('/').get((request, response) => {
                 });
             }
         });
+    }
+    } catch (e) {
+        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+        return response.render('index');
     }
 });
 

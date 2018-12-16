@@ -17,15 +17,14 @@ const storage = multer.diskStorage({
     filename: function (request, file, callback) {
         const token = request.cookies.token;
         try {
-            const verify = jwt.verify(token, 'ratonlaveur');
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+            callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
         } catch (e) {
             request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
             return response.render('index');
         }
-        const decoded = jwt.verify(token, 'ratonlaveur', {
-            algorithms: ['HS256']
-        });
-        callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 const upload = multer({
@@ -55,11 +54,7 @@ router.route('/').get((request, response) => {
 
     const token = request.cookies.token;
     try {
-        const verify = jwt.verify(token, 'ratonlaveur');
-    } catch (e) {
-        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-        return response.render('index');
-    }
+
     const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
@@ -96,6 +91,7 @@ router.route('/').get((request, response) => {
                                 locMin: locMin,
                                 locMax: locMax,
                                 sort: request.query.sort,
+                                token
                             });
                         }).catch((likes) => {
                             response.render('pages/search', {
@@ -109,6 +105,7 @@ router.route('/').get((request, response) => {
                                 locMin: locMin,
                                 locMax: locMax,
                                 sort: request.query.sort,
+                                token
                             });
                         });
                     } else {
@@ -125,6 +122,7 @@ router.route('/').get((request, response) => {
                                     locMin: locMin,
                                     locMax: locMax,
                                     sort: request.query.sort,
+                                    token
                                 });
                             }).catch((likes) => {
                                 response.render('pages/search', {
@@ -138,6 +136,7 @@ router.route('/').get((request, response) => {
                                     locMin: locMin,
                                     locMax: locMax,
                                     sort: request.query.sort,
+                                    token
                                 });
                             });
                         } else {
@@ -183,20 +182,20 @@ router.route('/').get((request, response) => {
     // console.log(request.query);
     // console.log(`02: date min is now ${dateMin}`)
 
+    } catch (e) {
+        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+        return response.render('index');
+    }
 
 
 }).post(async(request, response) => {
 
     const token = request.cookies.token;
     try {
-        const verify = jwt.verify(token, 'ratonlaveur');
-    } catch (e) {
-        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-        return response.render('index');
-    }
-    const decoded = jwt.verify(token, 'ratonlaveur', {
-        algorithms: ['HS256']
-    });
+        const decoded = jwt.verify(token, 'ratonlaveur', {
+            algorithms: ['HS256']
+        });
+
     if (request.body.id_liked) {
         var data = request.body.id_liked;
         var likeAction = data.substring(0, 12);
@@ -208,6 +207,10 @@ router.route('/').get((request, response) => {
             checkDb.updateLikes(decoded.id, userLiked, -1).then((update) => {
             });
         }
+    }
+    } catch (e) {
+        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+        return response.render('index');
     }
 });
 

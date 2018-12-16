@@ -6,16 +6,63 @@
 
 <script type="text/javascript" src="/js/search.js"></script>
 
-<!--<script src="/socket.io/socket.io.js"></script>-->
+<script src="/socket.io/socket.io.js"></script>
 
 <script>
-    // const h1 = document.getElementsByTagName('h1');
-    // if (h1) {
-    //     var socket = io.connect();
-    //     console.log("socket connected");
-    //     console.log('socket', socket);
-    // }
 
+    let socket = io('http://localhost:3000');
+    socket.on('connect', () => {
+        console.log('je suis connecté');
+        socket.emit('identify', {
+            token: document.getElementById('token').dataset.token
+        });
+    });
+
+    var checkOnline = document.querySelector('.checkOnline');
+    var userDetails = document.querySelector('#userDetails');
+    var userOnline = document.querySelector('.fa-circle');
+    var userOffline = document.querySelector('.lastConnected');
+
+    const online = (user) => {
+        console.log(userOffline);
+         if (userOffline) {
+             userOffline.remove();
+         }
+         console.log(userOnline);
+        if (userOnline === null) {
+            const i = document.createElement('i');
+            i.setAttribute('class', 'fas fa-circle fa-xs');
+            i.setAttribute('style', 'color: green;');
+            userDetails.prepend(i);
+        }
+        userOffline = document.querySelector('.lastConnected');
+        userOnline = document.querySelector('.fa-circle');
+    }
+
+    const offline = (user) => {
+        console.log(userOnline);
+        if (userOnline) {
+            userOnline.remove();
+        }
+        const p = document.createElement('p');
+        p.setAttribute('class', 'lastConnected');
+        p.setAttribute('style', 'margin-bottom: 10px; padding: 0; font-size: 12px;');
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+        p.innerText = 'dernière connexion le : ' + new Date().toLocaleDateString('fr-FR', options);
+        checkOnline.appendChild(p);
+        userOnline = document.querySelector('.fa-circle');
+        userOffline = document.querySelector('.lastConnected');
+    }
+
+    if (checkOnline){
+        socket.on('users.new', ({user}) => {
+            online(user);
+        });
+
+        socket.on('users.leave', ({user}) => {
+            offline(user);
+        })
+    }
 
 
 </script>

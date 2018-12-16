@@ -17,15 +17,14 @@ const storage = multer.diskStorage({
     filename: function (request, file, callback) {
         const token = request.cookies.token;
         try {
-            const verify = jwt.verify(token, 'ratonlaveur');
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+            callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
         } catch (e) {
             request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
             return response.render('index');
         }
-        const decoded = jwt.verify(token, 'ratonlaveur', {
-            algorithms: ['HS256']
-        });
-        callback(null, decoded.id + '-' + Date.now() + path.extname(file.originalname));
     }
 });
 const upload = multer({
@@ -49,35 +48,33 @@ function checkFileType(file, callback) {
 router.get('/', (request, response) => {
     const token = request.cookies.token;
     try {
-        const verify = jwt.verify(token, 'ratonlaveur');
+        const decoded = jwt.verify(token, 'ratonlaveur', {
+            algorithms: ['HS256']
+        });
+        checkDb.getMatches(decoded.id).then((tab) => {
+            if (tab != "") {
+                const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
+                const sql = 'SELECT `username`, `profil`, `online` FROM matcha.users WHERE ' + sqlCondition + ';';
+                let push = [];
+                checkDb.query(sql, tab)
+                    .then((res) => {
+                        push = res;
+                        response.render('pages/chatroom', {myMatches: push, token});
+                    })
+                    .catch((err) => {
+                        console.log(`An error occured: ${err}`);
+                    });
+            }
+            else {
+                response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match'}, token);
+            }
+        }).catch((tab) => {
+            console.log(`An error occured: ${tab}`);
+        });
     } catch (e) {
         request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
         return response.render('index');
     }
-    const decoded = jwt.verify(token, 'ratonlaveur', {
-        algorithms: ['HS256']
-    });
-
-    checkDb.getMatches(decoded.id).then((tab) => {
-        if (tab != "") {
-            const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
-            const sql = 'SELECT `username`, `profil`, `online` FROM matcha.users WHERE ' + sqlCondition + ';';
-            let push = [];
-            checkDb.query(sql, tab)
-                .then((res) => {
-                    push = res;
-                    response.render('pages/chatroom', {myMatches: push});
-                })
-                .catch((err) => {
-                    console.log(`An error occured: ${err}`);
-                });
-        }
-        else {
-            response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match'});
-        }
-    }).catch((tab) => {
-        console.log(`An error occured: ${tab}`);
-    });
 });
 
 module.exports = router;
