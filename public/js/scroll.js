@@ -32,8 +32,8 @@ const   requestNextPage = () => {
         },
         url: window.location.pathname + window.location.search,
         success: function(html) {
-            $('.scroll').append(html);
-            $('#loading').hide();
+			$('#container').append(html);
+			$('#loading').hide();
             if (html == ""){
                 end = 1;
             }
@@ -55,7 +55,7 @@ $(function () {
         win.scroll(function() {
             if ($(document).height() - win.height() == win.scrollTop() && end == 0) {
                 $('#loading').show();
-                requestNextPage()
+                requestNextPage();
                 i=i+6;
             }
         });

@@ -146,6 +146,8 @@
 				<span><i class="fas fa-thumbs-up picto" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)">Unlike</i></span>
 
 				<h5><%=users[x]['username']%></h5>
+				X = <%=x%>
+				I = <%=i%>
 				<h6>
 					<% if (users[x]['gender'] === null) { %>
 						Genre non renseigne,
@@ -199,11 +201,11 @@
 			<% }
 		} %>
 		</div>
-		<% if (x===2 || x===5){ %>
+		<% i++;
+		if (i===3 || i===6){ %>
 			</div>
 		<% }  
 		x++;
-		i++;
 	}
 %>
 
