@@ -33,9 +33,7 @@ class Sort{
 	// }
 
     async searchParamsCheck(filter, sort){
-		// console.log("AAA filter", filter);
         return new Promise((resolve, reject) => {
-			// console.log("AAA sort", sort);
 			var reqSort;
 			var reqFilter;
 			var reqTag;
@@ -59,7 +57,6 @@ class Sort{
 				reqSort = "";
 			}
 			if (filter != undefined){
-				// console.log("BBB");
 				var ageFilter = filter.substring(3, filter.indexOf("pop"));
 				var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
 				var locFilter = filter.substring(filter.indexOf("loc") + 3, filter.indexOf("tag"));
@@ -69,7 +66,6 @@ class Sort{
 				if (ageMin == ageMax){
 					ageMin++;
 				}
-				// console.log("CCC");
 				var today = new Date();
 				var dateMin = today.getFullYear() - ageMin + "-" + today.getMonth() + "-" + today.getDate();
 				var dateMax = today.getFullYear() - ageMax + "-" + today.getMonth() + "-" + today.getDate();
@@ -77,24 +73,20 @@ class Sort{
 				var popMax = popFilter.substring(popFilter.indexOf(",")+1);
 				var locMin = locFilter.substring(0, locFilter.indexOf(","));
 				var locMax = locFilter.substring(locFilter.indexOf(",")+1);
-				// console.log("DDD");
 				reqFilter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + 
 				"\" AND `popularity` BETWEEN " + popMin + " AND " + popMax;
 				if (tagFilter != ""){
-					// console.log("EEE");
-					tagFilter = tagFilter.split('-');
+					tagFilter = tagFilter.split(',');
 					reqTag = " INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id`";
-					// console.log("tagFilter:", tagFilter);
+					// console.log("tagFilter", tagFilter);
 					for (var i=0; i < tagFilter.length; i++){
 						if (i == 0){
 							reqTag = reqTag.concat(" WHERE (`tags`.`tag` = \"" + tagFilter[i] + "\"");
-						} else {
+						} else if (i < 6) {
 							reqTag = reqTag.concat(" OR `tags`.`tag` = \"" + tagFilter[i] + "\"");
 						}
-						// console.log("reqTag",{i},":", reqTag);
 					}
 					reqTag = reqTag.concat(") ");
-					// console.log("FFF");
 				} else {
 					reqTag = "";
 				}
@@ -102,7 +94,6 @@ class Sort{
 				reqFilter = "";
 				reqTag = "";
 			}
-			// console.log("reqSort : ", reqSort, "reqFilter : ", reqFilter, "reqTag : ", reqTag);
 			resolve({reqSort, reqFilter, reqTag});
         });
 	}
