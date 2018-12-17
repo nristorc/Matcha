@@ -45,8 +45,10 @@
                 </div>
                 <div class="type_msg">
                     <div class="input_msg_write">
-                        <input type="text" class="write_msg" placeholder="Type a message" />
-                        <button class="msg_send_btn" type="button"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+                        <form id="send-message">
+                            <input type="text" id="write_msg" class="write_msg" placeholder="Type a message" />
+                            <button class="msg_send_btn" type="submit"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -65,6 +67,18 @@
 
     function activeChat(tab, userId) {
         $('.type_msg').show();
+
+        var inputHidden = document.getElementById('hiddenInput');
+        if (inputHidden) {
+            inputHidden.remove();
+        }
+        inputHidden = document.createElement('input');
+        inputHidden.id = 'hiddenInput';
+        inputHidden.type = 'hidden'
+        inputHidden.value = userId;
+        tab.prepend(inputHidden);
+
+
         const active = document.getElementsByClassName('active_chat');
         if (active) {
             for (var i = 0; i < active.length; i++) {

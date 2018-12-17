@@ -116,6 +116,14 @@ io.sockets.on('connection', (socket) => {
         }
     });
 
+    /**
+     * Nouveaux Messages Chat
+     */
+    socket.on('newMsg', (info) => {
+        console.log('info message', info);
+    });
+
+
     socket.on('disconnect', () => {
         if (currentUser) {
             let user = users.find(u => u.id === currentUser.id);

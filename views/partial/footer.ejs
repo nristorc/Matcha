@@ -122,6 +122,32 @@
         })
     }
 
+    // Chat
+    // const msgHistory = document.getElementsByClassName('.msg_history');
+    var msgForm = document.getElementById('send-message');
+    // var button = document.getElementsByClassName('msg_send_btn');
+    if (msgForm) {
+
+        var token = document.getElementById('token').dataset.token;
+        function decodeToken(token){
+            var playload = JSON.parse(atob(token.split('.')[1]));
+            return playload;
+
+        }
+        var user = decodeToken(token);
+
+        msgForm.onsubmit = (e) => {
+            e.preventDefault();
+            var inputMessage = document.getElementById('write_msg');
+            // console.log('message', inputMessage.value);
+            // console.log('from', user)
+            // console.log('to', document.getElementById('hiddenInput').value);
+            socket.emit('newMsg', {message: inputMessage.value,
+                fromUser: user.id,
+                toUser: parseInt(document.getElementById('hiddenInput').value)});
+        }
+    }
+
 </script>
 
 </body>
