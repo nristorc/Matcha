@@ -141,7 +141,13 @@
 				<span><i class="far fa-thumbs-up picto" id="oklikeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
 				<span><i class="fas fa-thumbs-up picto" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)">Unlike</i></span>
 
-				<h5><%=users[x]['username']%></h5>
+			<div id="searchOnline">
+				<%if (users[x]['online'] === 'Y') {%>
+				<h5><i style="color: green;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i> <%=users[x]['username']%></h5>
+				<%} else if (users[x]['online'] === 'N') {%>
+				<h5><i style="color: red;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i> <%=users[x]['username']%></h5>
+				<%}%>
+			</div>
 				<h6>
 					<% if (users[x]['gender'] === null) { %>
 						Genre non renseigne,

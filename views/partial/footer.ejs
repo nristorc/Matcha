@@ -20,6 +20,7 @@
     var checkOnline = document.querySelector('#checkOnline');
     var chatOnline = document.querySelector('#chatOnline');
     var histoOnline = document.querySelector('.histoOnline');
+    var searchOnline = document.querySelector('#searchOnline');
 
     var userDetails = document.querySelector('#userDetails');
     var userOnline = document.querySelector('#userDetails .fa-circle');
@@ -92,13 +93,32 @@
         }
     }
     if (histoOnline) {
-        console.log('histo')
         socket.on('users.new', ({user}) => {
             onlineHistoPage(user);
         });
 
         socket.on('users.leave', ({user}) => {
             offlineHistoPage(user);
+        })
+    }
+
+    const onlineSearchPage = (user) => {
+        if (document.querySelector('#searchOnline .user' + user.id).style.color === 'red') {
+            document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: green;');
+        }
+    }
+    const offlineSearchPage = (user) => {
+        if (document.querySelector('#searchOnline .user' + user.id).style.color === 'green') {
+            document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: red;');
+        }
+    }
+    if (searchOnline) {
+        socket.on('users.new', ({user}) => {
+            onlineSearchPage(user);
+        });
+
+        socket.on('users.leave', ({user}) => {
+            offlineSearchPage(user);
         })
     }
 
