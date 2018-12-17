@@ -45,7 +45,7 @@ function checkFileType(file, callback) {
     }
 }
 
-router.get('/', (request, response) => {
+router.route('/').get((request, response) => {
     const token = request.cookies.token;
     try {
         const decoded = jwt.verify(token, 'ratonlaveur', {
@@ -75,6 +75,27 @@ router.get('/', (request, response) => {
         request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
         return response.render('index');
     }
-});
+})
+    .post(async (request, response) => {
+        const token = request.cookies.token;
+        try {
+            const decoded = jwt.verify(token, 'ratonlaveur', {
+                algorithms: ['HS256']
+            });
+
+            if (request.body.submit === 'getMessages') {
+                console.log(request.body.userId);
+                checkDb.getMessages(decoded.id, request.body.userId, request.body.userId, decoded.id).then((result) => {
+                    response.json(result);
+                }).catch((result) => {
+                    console.log('result catch', result);
+                })
+            }
+
+        }catch (e) {
+            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+            return response.render('index');
+        }
+    });
 
 module.exports = router;

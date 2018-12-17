@@ -15,7 +15,7 @@
 
                     <%if (typeof myMatches === "object") {%>
                     <%for (var x = 0; x < myMatches.length; x++) {%>
-                    <div class="chat_list active_chat">
+                    <div class="chat_list" onclick="activeChat(this, <%=myMatches[x].id%>)">
                         <div class="chat_people">
                             <div class="chat_img"> <img src="<%=myMatches[x].profil%>" style="border-radius: 50%" alt="profil"> </div>
                             <div class="chat_ib">
@@ -38,59 +38,10 @@
                         <p><%=myMatchesMsg%>...</p>
                     </div>
                     <%}%>
-
-                    <!--<div class="chat_list">-->
-                        <!--<div class="chat_people">-->
-                            <!--<div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>-->
-                            <!--<div class="chat_ib">-->
-                                <!--<h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>-->
-                                <!--<p>Test, which is a new approach to have all solutions-->
-                                    <!--astrology under one roof.</p>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
                 </div>
             </div>
             <div class="mesgs">
                 <div class="msg_history">
-                    <div class="incoming_msg">
-                        <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                        <div class="received_msg">
-                            <div class="received_withd_msg">
-                                <p>Test which is a new approach to have all
-                                    solutions</p>
-                                <span class="time_date"> 11:01 AM    |    June 9</span></div>
-                        </div>
-                    </div>
-                    <div class="outgoing_msg">
-                        <div class="sent_msg">
-                            <p>Test which is a new approach to have all
-                                solutions</p>
-                            <span class="time_date"> 11:01 AM    |    June 9</span> </div>
-                    </div>
-                    <div class="incoming_msg">
-                        <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                        <div class="received_msg">
-                            <div class="received_withd_msg">
-                                <p>Test, which is a new approach to have</p>
-                                <span class="time_date"> 11:01 AM    |    Yesterday</span></div>
-                        </div>
-                    </div>
-                    <div class="outgoing_msg">
-                        <div class="sent_msg">
-                            <p>Apollo University, Delhi, India Test</p>
-                            <span class="time_date"> 11:01 AM    |    Today</span> </div>
-                    </div>
-                    <div class="incoming_msg">
-                        <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                        <div class="received_msg">
-                            <div class="received_withd_msg">
-                                <p>We work directly with our designers and suppliers,
-                                    and sell direct to you, which means quality, exclusive
-                                    products, at a price anyone can afford.</p>
-                                <span class="time_date"> 11:01 AM    |    Today</span></div>
-                        </div>
-                    </div>
                 </div>
                 <div class="type_msg">
                     <div class="input_msg_write">
@@ -103,3 +54,110 @@
     </div>
 
 <%- include('../partial/footer')%>
+
+<script>
+
+    $(function () {
+
+        $(document).ready(function () {
+            $('.type_msg').hide();
+        });
+    });
+
+    function activeChat(tab, userId) {
+        $('.type_msg').show();
+        const active = document.getElementsByClassName('active_chat');
+        if (active) {
+            for (var i = 0; i < active.length; i++) {
+                active[i].classList.remove('active_chat');
+            }
+        }
+        tab.setAttribute('class', 'chat_list active_chat');
+
+        const formData = {
+            'userId': userId,
+            'submit': 'getMessages'
+        }
+        $.ajax({
+            type		: 'POST',
+            url         : '/chat',
+            data		: formData,
+            dataType	: 'json',
+            encode		: true
+        })
+            .done(function(data) {
+                if (data) {
+                    const chat = document.querySelector('.msg_history');
+                    const noMessage = document.getElementById('noMessage');
+
+                    if (data.length === 0) {
+                        if (!noMessage) {
+                            while (chat.firstChild) {
+                                chat.removeChild(chat.firstChild);
+                            }
+                            const noMessage = document.createElement('h3');
+                            noMessage.id = 'noMessage';
+                            noMessage.innerText = "Aucun message n'a encore été échangé..."
+                            noMessage.setAttribute('style', 'color: #989898');
+                            console.log(noMessage);
+                            console.log(chat);
+                            chat.append(noMessage);
+                            chat.style.textAlign = 'center';
+                            console.log('pas de message')
+                        }
+                    } else {
+                        if (noMessage) {
+                            noMessage.remove();
+                        }
+                        while (chat.firstChild) {
+                            chat.removeChild(chat.firstChild);
+                        }
+                        for (var x = 0; x < data.length; x++) {
+                            if (data[x].to_user_id === userId) {
+                                console.log('outgoing message');
+                                const outgoing = document.createElement('div');
+                                outgoing.setAttribute('class', 'outgoing_msg');
+                                const sentMsg = document.createElement('div');
+                                sentMsg.setAttribute('class', 'sent_msg');
+                                const p = document.createElement('p');
+                                p.innerText = data[x].message;
+                                const span = document.createElement('span');
+                                span.setAttribute('class', 'time_date')
+                                span.innerText = data[x].sent_at;
+                                sentMsg.append(p);
+                                sentMsg.append(span);
+                                outgoing.append(sentMsg);
+                                chat.append(outgoing);
+                                console.log('outgoing', chat);
+
+                            } else if (data[x].from_user_id === userId) {
+                                console.log('incoming message');
+                                const incoming = document.createElement('div');
+                                incoming.setAttribute('class', 'incoming_msg');
+
+                                const receivedMsg = document.createElement('div');
+                                receivedMsg.setAttribute('class', 'received_msg');
+
+                                const receivedMsgWith = document.createElement('div');
+                                receivedMsgWith.setAttribute('class', 'received_withd_msg');
+
+                                const p = document.createElement('p');
+                                p.innerText = data[x].message;
+                                const span = document.createElement('span');
+                                span.setAttribute('class', 'time_date')
+                                span.innerText = data[x].sent_at;
+                                receivedMsgWith.append(p);
+                                receivedMsgWith.append(span);
+                                receivedMsg.append(receivedMsgWith);
+                                incoming.append(receivedMsg);
+                                chat.append(incoming);
+                            }
+                            setTimeout(() => {
+                                chat.scrollTop = chat.scrollHeight + 500;
+                            }, 10);
+                        }
+                    }
+                }
+            });
+    }
+</script>

@@ -607,6 +607,24 @@ class DatabaseRequest {
         }
     }
 
+    async getMessages(from, to){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.messages WHERE (from_user_id = ? AND to_user_id = ?) OR (from_user_id = ? AND to_user_id = ?)";
+                this.query(sql, [from, to, to, from]).then((messages) => {
+                    if (messages){
+                        resolve(messages);
+                    } else {
+                        reject(messages);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async updatePop(user_id, flag){ 
 		// Flag 1 : like
 		// Flag 2 : unlike

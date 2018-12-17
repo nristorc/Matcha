@@ -131,13 +131,3 @@ io.sockets.on('connection', (socket) => {
         }
     })
 });
-
-
-// function scrollToBottom() {
-//     const messageThread = document.querySelector('.message-thread');
-//     setTimeout(() => {
-//         messageThread.scrollTop = messageThread.scrollHeight + 500;
-//     }, 10);
-// }
-
-//
