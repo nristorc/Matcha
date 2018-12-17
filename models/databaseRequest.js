@@ -457,8 +457,8 @@ class DatabaseRequest {
 
         // -------------------------------------------------------
 			else if (tags){
-				console.log("tags: ", tags);
-				console.log("sort: ", sort);
+				// console.log("tags: ", tags);
+				// console.log("sort: ", sort);
 				sql = "SELECT *, COUNT(`tmp`.`id`) FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
 				if (orientation){
 					sql = sql.concat(orientation);
@@ -498,7 +498,7 @@ class DatabaseRequest {
 			}
             sql = sql.concat("COUNT(`tmp`.`id`) DESC", secretSauce);
             
-			console.log("SQL = ", sql);
+			// console.log("SQL = ", sql);
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);

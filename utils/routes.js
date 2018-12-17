@@ -738,29 +738,6 @@ class Routes{
              
             });
 
-
-			
-
-				/* res:
-			
-					{
-						as: 'AS11286 KeyBank National Association',
-						city: 'Cleveland',
-						country: 'United States',
-						countryCode: 'US',
-						isp: 'KeyBank National Association',
-						lat: 41.4875,
-						lon: -81.6724,
-						org: 'KeyBank National Association',
-						query: '156.77.54.32',
-						region: 'OH',
-						regionName: 'Ohio',
-						status: 'success',
-						timezone: 'America/New_York',
-						zip: '44115'
-					}	
-				*/
-
 			if (!request.session.user) {
                 request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
                 return response.render('index');
@@ -769,7 +746,8 @@ class Routes{
                     var filter = request.query.filter;
 					var ageFilter = filter.substring(3, filter.indexOf("pop"));
 					var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
-					var locFilter = filter.substring(filter.indexOf("loc") + 3, filter.indexOf("tag"));
+                    var locFilter = filter.substring(filter.indexOf("loc") + 3, filter.indexOf("tag"));
+                    var tagFilter = filter.substring(filter.indexOf("tag") + 3);
 					var ageMin = ageFilter.substring(0, ageFilter.indexOf(","));
 					var ageMax = ageFilter.substring(ageFilter.indexOf(",")+1);
 					if (ageMin == ageMax){
@@ -779,47 +757,28 @@ class Routes{
 					var popMax = popFilter.substring(popFilter.indexOf(",")+1);
 					var locMin = locFilter.substring(0, locFilter.indexOf(","));
                     var locMax = locFilter.substring(locFilter.indexOf(",")+1);
-                    
-                    // else if (request.body.submit === 'addTag') {
-                    //     if (request.body.tag) {
-                    //             checkDb.getTags(request.session.user.id).then((result) => {
-                    //                 if (result) {
-                    //                     if (result.length >= 6){
-                    //                         response.json({errors: "Vous avez atteint le nombre maximum de tags autorisé"});
-                    //                     } else {
-                    //                         var flag = false;
-                    //                         for (var i = 0; i < result.length; i++) {
-                    //                             if (result[i].tag === request.body.tag) {
-                    //                                 flag = true;
-                    //                             }
-                    //                         }
-                    //                         if (flag === true) {
-                    //                             response.json({errors: "Vous possédez déjà un tag similaire"});
-                    //                         } else {
-                    //                             checkDb.insertTag(request.session.user.id, request.body.tag).then((resTag) => {
-                    //                                 response.json({message: "Tag added"});
-                    //                             }).catch((resTag) => {
-                    //                                 response.json({errors: "Une erreur s'est produite: " + resTag});
-                    //                             })
-                    //                         }
-                    //                     }
-                    //                 }
-                    //             }).catch((result) => {
-                    //                 response.json({errors: "Une erreur s'est produite: " + result});
-                    //             });
-                    //     }
-        
-
-
-				}
+                    if (tagFilter != ""){
+                        tagFilter = tagFilter.split(',');
+                        for (var a=0; a < tagFilter.length; a++){
+                            for (var x=0; x < tagFilter.length; x++){
+                                if (a != x && tagFilter[a] == tagFilter[x]){
+                                    tagFilter.splice(a, 1);
+                                }
+                            }
+                        }
+                        console.log("tagFilter : ", tagFilter);
+                    }
+                }
 				checkDb.profilCompleted(request.session.user.id).then((result) => {
 					resSort.searchParamsCheck(request.query.filter, request.query.sort).then((searchPref) => {
 						checkDb.setOrientation(request.session.user.id).then((orientation) => {
                             checkDb.getTags(request.session.user.id).then((user_tags) => {
                                 checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag'], user_tags).then((users) => {
                                     checkDb.getMyReports(request.session.user.id).then((reports) => {
+                                        console.log("index : ", request.query.index);
                                         if (!request.query.index) {
                                             checkDb.getLikes(request.session.user.id).then((likes) => {
+                                                console.log("request.query.tag", request.query);
                                                 response.render('pages/search', {
                                                     users: users,
                                                     index: 0,
@@ -831,6 +790,7 @@ class Routes{
                                                     locMin: locMin,
                                                     locMax: locMax,
                                                     sort: request.query.sort,
+                                                    tags : tagFilter,
                                                     reports: reports,
                                                 });
                                             }).catch((likes) => {
@@ -845,10 +805,14 @@ class Routes{
                                                     locMin: locMin,
                                                     locMax: locMax,
                                                     sort: request.query.sort,
+                                                    tags : tagFilter,
                                                     reports: reports,
                                                 });
                                             });
                                         } else {
+                                            // for (var i = 0; i<users.length; i++){
+                                            //     console.log("users : ", users[i].username);
+                                            // }
                                             if (request.query.index < users.length){
                                                 checkDb.getLikes(request.session.user.id).then((likes) => {
                                                     response.render('pages/search', {
@@ -862,6 +826,7 @@ class Routes{
                                                         locMin: locMin,
                                                         locMax: locMax,
                                                         sort: request.query.sort,
+                                                        tags : tagFilter,
                                                         reports: reports,
                                                     });
                                                 }).catch((likes) => {
@@ -876,6 +841,7 @@ class Routes{
                                                         locMin: locMin,
                                                         locMax: locMax,
                                                         sort: request.query.sort,
+                                                        tags : tagFilter,
                                                         reports: reports,
                                                     });
                                                 });

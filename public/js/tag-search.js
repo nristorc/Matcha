@@ -1,13 +1,13 @@
 var tags= [];
 
 function deleteTag(tag) {
-    $('#addTag').show();
+	$('#addTag').show();
     for(var i = 0; i < tags.length; i++){
-        if ( tags[i] === tag.innerHTML.substring(1)) {
-            tags.splice(i, 1);
+        if (tags[i] === tag.innerHTML.substring(1)) {
+			tags.splice(i, 1);
         }
     }
-    tag.remove();
+	tag.remove();
 }
 
 const	validTag = (tag) => {
@@ -20,6 +20,7 @@ const	validTag = (tag) => {
 	if (tagDiv == null)
 		return
 	tagDiv.innerHTML = ""
+	console.log("tags valid", tags);
 }
 
 const validFormTag = () => {
@@ -27,8 +28,7 @@ const validFormTag = () => {
 		var inputTag = $('#addTag')[0]
 		var addedTag = $("#addTag")[0].value;
 		var match = new RegExp('^[a-zA-Z]+$');
-		
-		console.log("nombre de tags", $(".hashtag").length);
+
 		if (addedTag != "" && tags.length < 6){
 			tags.push(addedTag);
 		}
@@ -48,7 +48,6 @@ const validFormTag = () => {
 		} else {
 			if (document.getElementById('messages')) {
 				const flash = document.getElementsByClassName('alert');
-				// console.log('flash', flash);
 				flash[0].className = 'alert alert-warning alert-dismissible';
 				flash[0].innerHTML = "Mauvais format de tag";
 			} else {
@@ -63,6 +62,10 @@ const validFormTag = () => {
 
 $(function () {
     $(document).ready(function() {
+		if ($('#previousTag').val() != ""){
+			tags = $('#previousTag').val().split(",");
+		}
+
         $('#addTag').on('keydown', (e) => {
             var k = e.which || e.key
             if(/^(9)$/.test(k)) {
@@ -77,7 +80,6 @@ $(function () {
 			var inputVal = $(this).val();
 			var data = 'tagSearch=' + inputVal;
 			if (inputVal.length > 1){
-
 				$.ajax({
 					type : "POST",
 					url : "/tagsearch",
@@ -88,22 +90,9 @@ $(function () {
 							return
 						tagDiv.innerHTML = ""
 						$('#resultTag').html(server_response);
-						// $('#resultTag').on('click', 'li', function(){
-						// 	console.log("--patate kikou lol ---");
-						// 	event.preventDefault();
-						// 	var tagName = $(this).text();
-						// 	$('#addTag').val(tagName);
-						// 	$('#resultTag').html("");
-						// 	$('ul').remove();
-						// 	validFormTag();
-						// });
 					}
 				});
 			}
-		});
-
-		
-
-        
+		});       
     });
 });

@@ -83,8 +83,15 @@
 
 				<!-- Tags module -->
 				<div class="d-flex bd-highlight">
-						<div id="tags">						
+						<div id="tags">
+
+							<% if (tags != null){
+								for (var k=0; k< tags.length; k++) {%>
+									<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#<%=tags[k]%></a>
+								<% }
+							}%>
 							<input type="text" placeholder="Ajouter un Tag" id="addTag">
+							<input id="previousTag" type="hidden" value ="<%=tags%>">
 						</div>
 						<div class="resultTag" id="resultTag"></div>
 				</div>
@@ -93,8 +100,6 @@
 			</div>
 		</div>	
 </nav>
-
-
 
 <%}%>
 

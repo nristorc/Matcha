@@ -78,7 +78,13 @@ class Sort{
 				if (tagFilter != ""){
 					tagFilter = tagFilter.split(',');
 					reqTag = " INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id`";
-					// console.log("tagFilter", tagFilter);
+					for (var a=0; a < tagFilter.length; a++){
+						for (var x=0; x < tagFilter.length; x++){
+							if (a != x && tagFilter[a] == tagFilter[x]){
+								tagFilter.splice(a, 1);
+							}
+						}
+					}
 					for (var i=0; i < tagFilter.length; i++){
 						if (i == 0){
 							reqTag = reqTag.concat(" WHERE (`tags`.`tag` = \"" + tagFilter[i] + "\"");
