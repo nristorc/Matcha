@@ -58,7 +58,6 @@
 <script>
 
     $(function () {
-
         $(document).ready(function () {
             $('.type_msg').hide();
         });
@@ -99,11 +98,8 @@
                             noMessage.id = 'noMessage';
                             noMessage.innerText = "Aucun message n'a encore été échangé..."
                             noMessage.setAttribute('style', 'color: #989898');
-                            console.log(noMessage);
-                            console.log(chat);
                             chat.append(noMessage);
                             chat.style.textAlign = 'center';
-                            console.log('pas de message')
                         }
                     } else {
                         if (noMessage) {
@@ -112,9 +108,10 @@
                         while (chat.firstChild) {
                             chat.removeChild(chat.firstChild);
                         }
+                        const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
                         for (var x = 0; x < data.length; x++) {
+                            chat.removeAttribute('style', 'text-align: center;');
                             if (data[x].to_user_id === userId) {
-                                console.log('outgoing message');
                                 const outgoing = document.createElement('div');
                                 outgoing.setAttribute('class', 'outgoing_msg');
                                 const sentMsg = document.createElement('div');
@@ -123,29 +120,23 @@
                                 p.innerText = data[x].message;
                                 const span = document.createElement('span');
                                 span.setAttribute('class', 'time_date')
-                                span.innerText = data[x].sent_at;
+                                span.innerText = new Date(data[x].sent_at).toLocaleDateString('fr-FR', options);
                                 sentMsg.append(p);
                                 sentMsg.append(span);
                                 outgoing.append(sentMsg);
                                 chat.append(outgoing);
-                                console.log('outgoing', chat);
-
                             } else if (data[x].from_user_id === userId) {
-                                console.log('incoming message');
                                 const incoming = document.createElement('div');
                                 incoming.setAttribute('class', 'incoming_msg');
-
                                 const receivedMsg = document.createElement('div');
                                 receivedMsg.setAttribute('class', 'received_msg');
-
                                 const receivedMsgWith = document.createElement('div');
                                 receivedMsgWith.setAttribute('class', 'received_withd_msg');
-
                                 const p = document.createElement('p');
                                 p.innerText = data[x].message;
                                 const span = document.createElement('span');
                                 span.setAttribute('class', 'time_date')
-                                span.innerText = data[x].sent_at;
+                                span.innerText = new Date(data[x].sent_at).toLocaleDateString('fr-FR', options);
                                 receivedMsgWith.append(p);
                                 receivedMsgWith.append(span);
                                 receivedMsg.append(receivedMsgWith);
