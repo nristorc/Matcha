@@ -198,9 +198,7 @@ class DatabaseRequest {
     async updateProfilPic(path, id){
         try {
             return new Promise((resolve, reject) => {
-                //console.log('3.1 - je rentre dans Update Profil')
                 this.query(`UPDATE matcha.users SET profil = ? WHERE id = ?`, [path, id]).then((result) => {
-                    //console.log('3.2 - result Update fonction: ', result);
                     resolve(result);
                 }).catch((result) => {
                     reject(result);
@@ -366,7 +364,7 @@ class DatabaseRequest {
     async getUser(params){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT * FROM matcha.users WHERE username = ?";
+                const sql = "SELECT * FROM matcha.users WHERE id = ?";
                 this.query(sql, params).then((user) => {
                     if (user){
                         resolve(user);

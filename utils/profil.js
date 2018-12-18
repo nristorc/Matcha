@@ -51,7 +51,7 @@ router.route('/').get((request, response) => {
     const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
-    checkDb.getUser(decoded.username).then((user) => {
+    checkDb.getUser(decoded.id).then((user) => {
         checkDb.getTags(decoded.id).then((tags) => {
             checkDb.getPhotos(decoded.id).then((photos) => {
                 userData.userAge(user[0]['birth']).then((age) => {

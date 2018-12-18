@@ -102,16 +102,16 @@ io.sockets.on('connection', (socket) => {
             });
             currentUser = {
                 id: decoded.id,
-                username: decoded.username,
                 count: 1
             };
             let user = users.find(u => u.id === currentUser.id);
             if (user) {
                 user.count++;
             } else {
+                currentUser.socket = socket.id;
                 users.push(currentUser);
                 socket.broadcast.emit('users.new', {user: currentUser});
-                console.log('user connected');
+                // console.log('user connected', users);
             }
         } catch (e) {
             throw e.message;
@@ -122,12 +122,23 @@ io.sockets.on('connection', (socket) => {
      * Nouveaux Messages Chat
      */
     socket.on('newMsg', (info) => {
-        console.log('info message', info);
+        console.log('info', info);
         if (info.message !== '') {
             const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?';
             checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
                 if (result) {
-                    socket.emit('displayMsg', {msg: info, date: new Date()});
+                    console.log(users);
+                    var u = users.reduce((acc, elem) => {
+                        if (elem.id == info.toUser) {
+                            acc.push(elem);
+                        }
+                        return acc;
+                    }, []);
+                    console.log('u',u[0]);
+                    socket.emit('sendingMessage', {users, msg: info, date: new Date()});
+                    u.forEach(user => {
+                        io.sockets.connected[user.socket].emit('sendingMessage', {users, msg: info, date: new Date()});
+                    })
                 }
             }).catch((err) => {
                 console.log('an error occured: ', err);
@@ -135,11 +146,10 @@ io.sockets.on('connection', (socket) => {
         }
     });
 
-
     socket.on('disconnect', () => {
         if (currentUser) {
             let user = users.find(u => u.id === currentUser.id);
-            console.log('user', user);
+            // console.log('user', user);
             if (user) {
                 user.count--;
                 if (user.count === 0) {
