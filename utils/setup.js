@@ -42,7 +42,6 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`profil` VARCHAR(255) DEFAULT 'public/img/avatarDefault.png'," +
     "`online` enum('N','Y') DEFAULT 'N'," +
     "`lastOnline` DATETIME DEFAULT NULL," +
-    "`socketid` varchar(20) DEFAULT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
     
 const sql_tags = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.tags_table +
