@@ -20,6 +20,7 @@
 					<option value="loc" <% if (sort === "loc") {%> selected <%}%>>Localisation la plus proche</option>
 					<option value="popAsc" <% if (sort === "popAsc") {%> selected <%}%>>Popularité croissant</option>
 					<option value="popDesc" <% if (sort === "popDesc") {%> selected <%}%>>Popularité décroissant</option>
+					<option value="tag" <% if (sort === "tag") {%> selected <%}%>>Tags en commun</option>
 				</select>
 			</div>
 		</form>
@@ -82,13 +83,17 @@
 
 				<!-- Tags module -->
 				<div class="d-flex bd-highlight">
-					<!-- <div id="tags"> -->
-						<a class="btn btn-primary hashtag" href="#" role="button" style="display:none;" onclick="deleteTag(this)">#</a>
-						<div id="divTagSearch"></div>
-						<!-- <input class="nav-item nav-link" type="text" id="searchTag" placeholder="Ajouter un Tag" onfocus="searchTag()"> -->
-						<!-- <input type="text" placeholder="Ajouter un Tag" id="addTag" onfocus="search()"/> -->
-					<input type="text" id="searchTag" class="nav-item nav-link" placeholder="Recherche par tags" ><!-- onfocus="tagSearch()" -->
-					<!-- </div> -->
+						<div id="tags">
+
+							<% if (tags != null){
+								for (var k=0; k< tags.length; k++) {%>
+									<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#<%=tags[k]%></a>
+								<% }
+							}%>
+							<input type="text" placeholder="Ajouter un Tag" id="addTag">
+							<input id="previousTag" type="hidden" value ="<%=tags%>">
+						</div>
+						<div class="resultTag" id="resultTag"></div>
 				</div>
 					<button type="button" class="btn btn-primary filter-search" id="inputFilter">Rechercher</button>
 				</form>
@@ -96,10 +101,9 @@
 		</div>	
 </nav>
 
-
-
-
 <%}%>
+
+<!-- Block check -->
 
 <!-- Results -->
 <div class="scroll" id="scroll">
@@ -201,16 +205,15 @@
 			<% }
 		} %>
 		</div>
-		<% if (x===2 || x===5){ %>
+		<% i++;
+		if (i===3 || i===6){ %>
 			</div>
 		<% }  
 		x++;
-		i++;
 	}
 %>
 
 </div>
-
 
 <!-- Loading animation -->
 
@@ -224,6 +227,13 @@
 <script src="./public/js/scroll.js"></script>
 <script src="./public/js/like.js"></script>
 <script src="./public/js/tag-search.js"></script>
+<!-- <script src="./public/js/location.js"></script> -->
+<!-- <script>
+
+	const iplocation = require("iplocation").default;
+	console.log(iplocation);
+</script> -->
+
 
 <% } %>
 

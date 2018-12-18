@@ -1,195 +1,98 @@
-function tagSearch() {
-    // console.log("je test");
-    if ($('#divTagSearch').length === 0) {
-        const div = document.createElement('div');
-        $('.navbar-nav').append(div);
-        div.id = 'divTagSearch';
-    }
+var tags= [];
 
-    $(document).on('keyup', function () {
-        // $('#accessProfil').remove();
-        const query = $('#searchTag').val();
-        if (query.length > 1) {
-            var formData = {
-                'search': 1,
-                'q': query
-            };
-            $.ajax({
-                type: 'POST',
-                url: '/search',
-                data: formData,
-                dataType: 'json',
-                encode: true
-            })
-                .done(function (data) {
-
-
-                    console.log('data', data)
-                    console.log('length', $('#response').length);
-
-                    if (data.res == ''){
-                        console.log('pas de match')
-                    }
-
-                    if ($('#response').length === 0 && data.res != '') {
-                        const ul = document.createElement('ul');
-                        $('#divTagSearch').append(ul);
-                        ul.setAttribute('id', 'response');
-                        ul.setAttribute('style', 'position: absolute;');
-                    }
-                    $('#response').html(data.res);
-
-                    $(document).on('click', 'li', function(){
-
-                        var username = $(this).text();
-                            console.log('data', data.userdata);
-                            $('#searchTag').val(username);
-
-                            $('#response').html("");
-                            $('ul').remove();
-
-                            if ($('#accessProfil').length === 0) {
-
-                                console.log('data', data.userdata);
-
-
-                                const button = document.createElement('button');
-                                $('#divTagSearch').append(button);
-                                button.setAttribute('id', 'accessProfil');
-                                button.setAttribute('class', 'btn btn-alert login-btn');
-                                button.innerHTML = 'Accéder au profil';
-
-                                button.onclick = (elem) => {
-                                    console.log('userdata', data.userdata.length)
-                                    for (var i = 0; i < data.userdata.length; i++) {
-                                        if ($('#searchTag').val() === data.userdata[i].username) {
-                                            $(location).attr('href', '/user/' + data.userdata[i].id);
-                                        }
-                                    }
-                                }
-                            }
-                        // }
-                    });
-
-                });
-        } else {
-            if (query.length <= 1) {
-                $('ul').remove();
-            }
+function deleteTag(tag) {
+	$('#addTag').show();
+    for(var i = 0; i < tags.length; i++){
+        if (tags[i] === tag.innerHTML.substring(1)) {
+			tags.splice(i, 1);
         }
-    });
+    }
+	tag.remove();
 }
 
-// function deleteTag(tag) {
-//     const delTag = tag.innerHTML.substring(1);
+const	validTag = (tag) => {
+	var i = document.getElementById('addTag')
+	if (i == null)
+		return
+	i.value = tag
+	validFormTag()
+	var tagDiv = document.getElementById('resultTag')
+	if (tagDiv == null)
+		return
+	tagDiv.innerHTML = ""
+	console.log("tags valid", tags);
+}
 
-//     var formData = {
-//         'tag': delTag,
-//         'submit': 'deleteTag'
-//     }
+const validFormTag = () => {
+	if ($('.hashtag').length < 6) {
+		var inputTag = $('#addTag')[0]
+		var addedTag = $("#addTag")[0].value;
+		var match = new RegExp('^[a-zA-Z]+$');
 
-//     $.ajax({
-//         type		: 'POST',
-//         url		: '/profil',
-//         data		: formData,
-//         dataType	: 'json',
-//         encode		: true
-//     })
-//         .done(function (data) {
-//             console.log('delete Pic data: ', data);
-//             if (data.errors) {
-//                 if (document.getElementById('messages')) {
-//                     const flash = document.getElementsByClassName('alert');
-//                     flash[0].className = 'alert alert-warning alert-dismissible';
-//                     flash[0].innerHTML = data.errors;
-//                 } else {
-//                     $('#container').prepend('<div id="messages"></div>');
-//                     $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
-//                 }
-//             } else if (data.message) {
-//                     tag.remove();
-//                     $('#addTag').show();
-//             }
-//         });
-//     }
+		if (addedTag != "" && tags.length < 6){
+			tags.push(addedTag);
+		}
+		if (match.test(addedTag) === true) {
+			const formData = {
+				'tag': addedTag,
+				'submit': 'addTag'
+			};
+		if ($('.hashtag').length >= 5) {
+			$("#addTag").hide();
+		}
+		if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag +'</a>');
+			inputTag.value = "";
+			addedTag = "";
+			inputTag.focus();
+
+		} else {
+			if (document.getElementById('messages')) {
+				const flash = document.getElementsByClassName('alert');
+				flash[0].className = 'alert alert-warning alert-dismissible';
+				flash[0].innerHTML = "Mauvais format de tag";
+			} else {
+				$('#container').prepend('<div id="messages"></div>');
+				$('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag JQUERY</div>')
+			}
+		}
+
+	}
+}
 
 
-// $(function () {
+$(function () {
+    $(document).ready(function() {
+		if ($('#previousTag').val() != ""){
+			tags = $('#previousTag').val().split(",");
+		}
 
-// 	$(document).ready(function() {
-// 		$('#addTag').on('keydown', (e) => {
-// 			var k = e.which || e.key
-// 			if(/^(9)$/.test(k)) {
-// 				$(this).value = ""
-// 				//console.log("Tabulation catch:" + k)
-// 				e.preventDefault()
-// 			}
-// 			if(/^(188|13)$/.test(k)) {
-// 				//console.log("Submit form:"+ $(this))
-// 				validFormTag();
-// 			}
-// 		})
-
-// 		const validFormTag = () => {
-// 			//console.log($("#addTag")[0].value);
-// 			if ($('.hashtag').length < 6) {
-// 				//console.log("Submit call")
-
-// 				var inputTag = $('#addTag')[0]
-// 				var addedTag = $("#addTag")[0].value;
-// 				var match = new RegExp('^[a-zA-Z]+$');
-
-// 				if (match.test(addedTag) === true) {
-// 					const formData = {
-// 						'tag': addedTag,
-// 						'submit': 'addTag'
-// 					};
-
-// 					$.ajax({
-// 						type		: 'POST',
-// 						url		: '/profil',
-// 						data		: formData,
-// 						dataType	: 'json',
-// 						encode		: true
-// 					})
-// 						.done((data) => {
-// 							if (data.errors) {
-// 								if (document.getElementById('messages')) {
-// 									const flash = document.getElementsByClassName('alert');
-// 									// console.log('flash', flash);
-// 									flash[0].className = 'alert alert-warning alert-dismissible';
-// 									flash[0].innerHTML = data.errors;
-// 								} else {
-// 									$('#container').prepend('<div id="messages"></div>');
-// 									$('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
-// 								}
-// 							} else {
-// 								if (document.getElementById('messages')) {
-// 									$('#messages').remove();
-// 								}
-// 								// console.log("Je dois ajouter un tag")
-// 								// console.log(addedTag)
-// 								if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag +'</a>');
-// 								inputTag.value = ""
-// 								inputTag.focus();
-// 							}
-// 							if ($(".hashtag").length === 6) {
-// 								$("#addTag").hide();
-// 							}
-// 						});
-// 				} else {
-// 					if (document.getElementById('messages')) {
-// 						const flash = document.getElementsByClassName('alert');
-// 						// console.log('flash', flash);
-// 						flash[0].className = 'alert alert-warning alert-dismissible';
-// 						flash[0].innerHTML = "Mauvais format de tag";
-// 					} else {
-// 						$('#container').prepend('<div id="messages"></div>');
-// 						$('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag JQUERY</div>')
-// 					}
-// 				}
-
-// 			}
-// 		}
-// 	});
-// });
+        $('#addTag').on('keydown', (e) => {
+            var k = e.which || e.key
+            if(/^(9)$/.test(k)) {
+                $(this).value = ""
+                console.log("Tabulation catch:" + k)
+                e.preventDefault()
+            }
+		})
+		
+		$('#addTag').keyup(function(){
+			$('ul').remove();
+			var inputVal = $(this).val();
+			var data = 'tagSearch=' + inputVal;
+			if (inputVal.length > 1){
+				$.ajax({
+					type : "POST",
+					url : "/tagsearch",
+					data : data,
+					success : function(server_response){
+						var tagDiv = document.getElementById('resultTag')
+						if (tagDiv == null)
+							return
+						tagDiv.innerHTML = ""
+						$('#resultTag').html(server_response);
+					}
+				});
+			}
+		});       
+    });
+});
