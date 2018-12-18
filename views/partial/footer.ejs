@@ -219,6 +219,34 @@
                     chat.scrollTop = chat.scrollHeight + 500;
                 }, 10);
         })
+
+        socket.on('blockMessage', (msg) => {
+            console.log('msg', msg);
+            var inputHidden = document.getElementById('hiddenInput')
+            if(inputHidden == null)
+                return
+            inputHidden  = inputHidden.value;
+            const chat = document.querySelector('.msg_history');
+            const noMessage = document.getElementById('noMessage');
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
+            if (document.getElementById('blockedMsg')) {
+                document.getElementById('blockedMsg').remove();
+            }
+
+            if (noMessage) {
+                console.log('il ny avait pas de message, maintenant oui');
+                noMessage.remove();
+            }
+
+            const bloc = document.createElement('p');
+            bloc.innerText = msg.msg;
+            bloc.id = 'blockedMsg';
+            chat.append(bloc);
+            setTimeout(() => {
+                chat.scrollTop = chat.scrollHeight + 500;
+            }, 10);
+        })
     }
 
 </script>
