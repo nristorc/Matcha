@@ -105,7 +105,15 @@ router.route('/').get((request, response) => {
     const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
-
+    if (request.body.latitude && request.body.longitude && request.body.city){
+        const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, city = ? WHERE users.id = ?";
+        checkDb.query(sql, [request.body.latitude, request.body.longitude, request.body.city, decoded.id]).then(() => {
+            console.log("update longitude/latitude reussi")
+        }).catch(() =>{
+            console.log("longitude/latitude ratay")
+        });
+        console.log("POST", request.body);
+    }
 
     if (request.body.submit === 'modifyParams') {
         const data = {

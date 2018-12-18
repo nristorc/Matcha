@@ -381,12 +381,35 @@ class DatabaseRequest {
         }
     }
 
+    async getPosition(user_id){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT `users`.`latitude`, `users`.`longitude` FROM matcha.users WHERE id = ?";
+                this.query(sql, user_id).then((position) => {
+                    if (position){
+                        resolve(position);
+                    } else {
+                        reject('no position found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async getAllUsers(orientation, filter, sort, tags, user_tags){
         try {
             return new Promise((resolve, reject) => {
+                // console.log("-----SORT-------", sort)
+                var location = "";
+                if (sort == "`tmp`.loc` ASC"){
+                    location = ", (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`users`.`latitude`)) * COS(RADIANS(`users`.`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`users`.`latitude`))) AS `tmp`.`loc`";
+                }
 				var sql;
 				var secretSauce =  ", `popularity` DESC"; //A COMPLETER
-				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline` ";
+				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline`, `tmp`.`city`, `tmp`.`latitude`, `tmp`.`longitude` ";
 		// ---------- structure de requete generique ----------
 
 					// SELECT *, COUNT(`tmp`.`id`) FROM (
@@ -411,7 +434,7 @@ class DatabaseRequest {
 
 		// -------------------------------------------------------
 			if (!tags){
-				sql = "SELECT *, COUNT(`tmp`.`id`) FROM (SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL' ";
+				sql = "SELECT *, COUNT(`tmp`.`id`)" + location + "FROM (SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL' ";
 				if (orientation){
 					sql = sql.concat(orientation);
 					if (filter){
@@ -488,7 +511,7 @@ class DatabaseRequest {
 			else if (tags){
 				// console.log("tags: ", tags);
 				// console.log("sort: ", sort);
-				sql = "SELECT *, COUNT(`tmp`.`id`) FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
+				sql = "SELECT *, COUNT(`tmp`.`id`) " + location + "FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
 				if (orientation){
 					sql = sql.concat(orientation);
 					if (filter){
@@ -527,7 +550,7 @@ class DatabaseRequest {
 			}
             sql = sql.concat("COUNT(`tmp`.`id`) DESC", secretSauce);
             
-			// console.log("SQL = ", sql);
+			console.log("SQL = ", sql);
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);

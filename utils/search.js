@@ -52,6 +52,20 @@ router.route('/').get((request, response) => {
         algorithms: ['HS256']
         });
 
+
+        var googleMapsClient = require('@google/maps').createClient({
+            key: 'AIzaSyBeGqsazfzYjC4__DuVZ-pB6Hik52ciaNI'
+          });
+
+        // googleMapsClient.geocode({
+        // address: '93 rue du faubourg saint-martin, paris, france'
+        // }, function(err, response) {
+        // if (!err) {
+        //     console.log(response.json.results[0]);
+        // }
+		// });
+		
+
         // var ip = request.headers['x-forwarded-for'] ||
         // request.connection.remoteAddress ||
         // request.socket.remoteAddress ||
@@ -126,56 +140,19 @@ router.route('/').get((request, response) => {
         }
 
         checkDb.profilCompleted(decoded.id).then((result) => {
-            resSort.searchParamsCheck(request.query.filter, request.query.sort).then((searchPref) => {
-                checkDb.setOrientation(decoded.id).then((orientation) => {
-                    checkDb.getTags(decoded.id).then((user_tags) => {
-                        checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag'], user_tags).then((users) => {
-                            checkDb.getMyReports(decoded.id).then((reports) => {
-                                console.log("index : ", request.query.index);
-                                if (!request.query.index) {
-                                    checkDb.getLikes(decoded.id).then((likes) => {
-                                        console.log("request.query.tag", request.query);
-                                        response.render('pages/search', {
-                                            users: users,
-                                            index: 0,
-                                            likes: likes,
-                                            ageMin: ageMin,
-                                            ageMax: ageMax,
-                                            popMin: popMin,
-                                            popMax: popMax,
-                                            locMin: locMin,
-                                            locMax: locMax,
-                                            sort: request.query.sort,
-                                            tags : tagFilter,
-                                            reports: reports,
-                                            token
-                                        });
-                                    }).catch((likes) => {
-                                        response.render('pages/search', {
-                                            users: users,
-                                            index: 0,
-                                            likes: likes,
-                                            ageMin: ageMin,
-                                            ageMax: ageMax,
-                                            popMin: popMin,
-                                            popMax: popMax,
-                                            locMin: locMin,
-                                            locMax: locMax,
-                                            sort: request.query.sort,
-                                            tags : tagFilter,
-                                            reports: reports,
-                                            token
-                                        });
-                                    });
-                                } else {
-                                    // for (var i = 0; i<users.length; i++){
-                                    //     console.log("users : ", users[i].username);
-                                    // }
-                                    if (request.query.index < users.length){
+            checkDb.getPosition(decoded.id).then((user_position) => {
+                resSort.searchParamsCheck(request.query.filter, request.query.sort, user_position).then((searchPref) => {
+                    checkDb.setOrientation(decoded.id).then((orientation) => {
+                        checkDb.getTags(decoded.id).then((user_tags) => {
+                            checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag'], user_tags, user_position).then((users) => {
+                                checkDb.getMyReports(decoded.id).then((reports) => {
+                                    console.log("index : ", request.query.index);
+                                    if (!request.query.index) {
                                         checkDb.getLikes(decoded.id).then((likes) => {
+                                            console.log("request.query.tag", request.query);
                                             response.render('pages/search', {
                                                 users: users,
-                                                index: request.query.index,
+                                                index: 0,
                                                 likes: likes,
                                                 ageMin: ageMin,
                                                 ageMax: ageMax,
@@ -191,7 +168,7 @@ router.route('/').get((request, response) => {
                                         }).catch((likes) => {
                                             response.render('pages/search', {
                                                 users: users,
-                                                index: request.query.index,
+                                                index: 0,
                                                 likes: likes,
                                                 ageMin: ageMin,
                                                 ageMax: ageMax,
@@ -206,29 +183,70 @@ router.route('/').get((request, response) => {
                                             });
                                         });
                                     } else {
-                                        response.end();
+                                        // for (var i = 0; i<users.length; i++){
+                                        //     console.log("users : ", users[i].username);
+                                        // }
+                                        if (request.query.index < users.length){
+                                            checkDb.getLikes(decoded.id).then((likes) => {
+                                                response.render('pages/search', {
+                                                    users: users,
+                                                    index: request.query.index,
+                                                    likes: likes,
+                                                    ageMin: ageMin,
+                                                    ageMax: ageMax,
+                                                    popMin: popMin,
+                                                    popMax: popMax,
+                                                    locMin: locMin,
+                                                    locMax: locMax,
+                                                    sort: request.query.sort,
+                                                    tags : tagFilter,
+                                                    reports: reports,
+                                                    token
+                                                });
+                                            }).catch((likes) => {
+                                                response.render('pages/search', {
+                                                    users: users,
+                                                    index: request.query.index,
+                                                    likes: likes,
+                                                    ageMin: ageMin,
+                                                    ageMax: ageMax,
+                                                    popMin: popMin,
+                                                    popMax: popMax,
+                                                    locMin: locMin,
+                                                    locMax: locMax,
+                                                    sort: request.query.sort,
+                                                    tags : tagFilter,
+                                                    reports: reports,
+                                                    token
+                                                });
+                                            });
+                                        } else {
+                                            response.end();
+                                        }
                                     }
-                                }
-                            }).catch((reports) => {
-                                console.log("oups");
+                                }).catch((reports) => {
+                                    console.log("oups");
+                                    return response.render('index');
+                                });
+                            }).catch((users) => {
+                                console.log('catch', users);
                                 return response.render('index');
                             });
-                        }).catch((users) => {
-                            console.log('catch', users);
+                        }).catch((user_tags) => {
+                            console.log('catch', user_tags);
                             return response.render('index');
                         });
-                    }).catch((user_tags) => {
-                        console.log('catch', user_tags);
+                    }).catch((orientation) => {
+                        console.log('catch', orientation);
                         return response.render('index');
                     });
-                }).catch((orientation) => {
-                    console.log('catch', orientation);
-                    return response.render('index');
+                }).catch((searchPref) => {
+                    console.log('catch', searchPref);
+                    response.render('index');
                 });
-            }).catch((searchPref) => {
-                console.log('catch', searchPref);
-                response.render('index', {
-                });
+            }).catch((user_position) => {
+                console.log('catch', user_position);
+                response.render('index');
             });
         }).catch((result) => {
             console.log('catch', result);

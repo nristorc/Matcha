@@ -26,3 +26,16 @@
     justify-content: center;
     align-items: center;
 }
+
+#displayLoc {
+    display: inline-flex;
+    align-items: center;
+}
+
+#displayLoc input{
+    background:#eee;
+    border:0;
+    margin:4px;
+    padding:7px;
+    width:auto;
+}
