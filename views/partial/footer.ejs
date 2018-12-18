@@ -139,13 +139,81 @@
         msgForm.onsubmit = (e) => {
             e.preventDefault();
             var inputMessage = document.getElementById('write_msg');
-            // console.log('message', inputMessage.value);
-            // console.log('from', user)
-            // console.log('to', document.getElementById('hiddenInput').value);
-            socket.emit('newMsg', {message: inputMessage.value,
+            var toUser = document.getElementById('hiddenInput').value;
+            socket.emit('newMsg', {message: inputMessage.value.trim(),
                 fromUser: user.id,
-                toUser: parseInt(document.getElementById('hiddenInput').value)});
+                toUser: parseInt(toUser)
+            });
+            inputMessage.value = '';
+            inputMessage.focus();
         }
+
+        socket.on('displayMsg', (msg, date) => {
+            var inputHidden = document.getElementById('hiddenInput').value;
+            const chat = document.querySelector('.msg_history');
+            const noMessage = document.getElementById('noMessage');
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+            // var sentMsg = document.getElementsByClassName('sent_msg');
+
+            // console.log(typeof info);
+
+            if (noMessage) {
+                console.log('il ny avait pas de message, maintenant oui');
+                noMessage.remove();
+            }
+            if (parseInt(inputHidden) === msg.to_user_id) {
+                console.log('outgoing message: de ma part')
+                // const outgoing = document.createElement('div');
+                // outgoing.setAttribute('class', 'outgoing_msg');
+                // const sentMsg = document.createElement('div');
+                // sentMsg.setAttribute('class', 'sent_msg');
+
+                // const p = document.createElement('p');
+                // p.innerText = info.message;
+                // const span = document.createElement('span');
+                // span.setAttribute('class', 'time_date')
+                // span.innerText = date.toLocaleDateString('fr-FR', options);
+                // sentMsg.append(p);
+                // sentMsg.append(span);
+                // outgoing.append(sentMsg);
+                // chat.append(outgoing);
+
+            } else if (parseInt(inputHidden) === msg.from_user_id) {
+                console.log('incoming message: pour moi')
+                // const incoming = document.createElement('div');
+                // incoming.setAttribute('class', 'incoming_msg');
+                // const receivedMsg = document.createElement('div');
+                // receivedMsg.setAttribute('class', 'received_msg');
+                // const receivedMsgWith = document.createElement('div');
+                // receivedMsgWith.setAttribute('class', 'received_withd_msg');
+                // const p = document.createElement('p');
+                // p.innerText = info.message;
+                // const span = document.createElement('span');
+                // span.setAttribute('class', 'time_date')
+                // span.innerText = date.toLocaleDateString('fr-FR', options);
+                // receivedMsgWith.append(p);
+                // receivedMsgWith.append(span);
+                // receivedMsg.append(receivedMsgWith);
+                // incoming.append(receivedMsg);
+                // chat.append(incoming);
+            }
+            // setTimeout(() => {
+            //     chat.scrollTop = chat.scrollHeight + 500;
+            // }, 10);
+
+                // while (chat.firstChild) {
+                //     chat.removeChild(chat.firstChild);
+                // }
+
+                // for (var x = 0; x < data.length; x++) {
+            // chat.removeAttribute('style', 'text-align: center;');
+                //     if (data[x].to_user_id === userId) {
+
+                //     } else if (data[x].from_user_id === userId) {
+                //
+                //     }
+
+        })
     }
 
 </script>

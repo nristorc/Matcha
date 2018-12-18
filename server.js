@@ -121,6 +121,16 @@ io.sockets.on('connection', (socket) => {
      */
     socket.on('newMsg', (info) => {
         console.log('info message', info);
+        if (info.message !== '') {
+            const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?';
+            checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
+                if (result) {
+                    socket.emit('displayMsg', {msg: info, date: new Date()});
+                }
+            }).catch((err) => {
+                console.log('an error occured: ', err);
+            });
+        }
     });
 
 
