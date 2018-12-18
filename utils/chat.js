@@ -52,11 +52,16 @@ router.route('/').get((request, response) => {
             algorithms: ['HS256']
         });
         checkDb.getMatches(decoded.id).then((tab) => {
+            const tableau = Array.from(tab);
+            // console.log(typeof tableau);
             if (tab != "") {
                 const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
-                const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE ' + sqlCondition + ';';
+
+                const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE (' + sqlCondition + ') AND `id` NOT IN (SELECT reported_id FROM matcha.reports WHERE flag = 2 AND report_id = ?);';
+                console.log(sql);
                 let push = [];
-                checkDb.query(sql, tab)
+                tableau.push(decoded.id);
+                checkDb.query(sql, tableau)
                     .then((res) => {
                         push = res;
                         response.render('pages/chatroom', {myMatches: push, token});

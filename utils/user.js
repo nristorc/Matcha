@@ -45,8 +45,7 @@ function checkFileType(file, callback) {
     }
 }
 
-router.route('/:id')
-    .get(async (request, response) => {
+router.route('/:id').get(async (request, response) => {
 
         const token = request.cookies.token;
         try {
@@ -182,8 +181,8 @@ router.route('/:id')
         }
 
 
-    })
-    .post(async (request, response) => {
+    }).post(async (request, response) => {
+        console.log(request.body);
         const token = request.cookies.token;
         try {
         const decoded = jwt.verify(token, 'ratonlaveur', {

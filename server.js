@@ -124,25 +124,26 @@ io.sockets.on('connection', (socket) => {
     socket.on('newMsg', (info) => {
         console.log('info', info);
         if (info.message !== '') {
-            const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?';
-            checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
-                if (result) {
-                    console.log(users);
-                    var u = users.reduce((acc, elem) => {
-                        if (elem.id == info.toUser) {
-                            acc.push(elem);
-                        }
-                        return acc;
-                    }, []);
-                    console.log('u',u[0]);
-                    socket.emit('sendingMessage', {users, msg: info, date: new Date()});
-                    u.forEach(user => {
-                        io.sockets.connected[user.socket].emit('sendingMessage', {users, msg: info, date: new Date()});
-                    })
-                }
-            }).catch((err) => {
-                console.log('an error occured: ', err);
-            });
+            const checkBlock = 'SELECT reported_id FROM matcha.reports WHERE report_id = ? AND flag = 2';
+            // const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?';
+            // checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
+            //     if (result) {
+            //         console.log(users);
+            //         var u = users.reduce((acc, elem) => {
+            //             if (elem.id == info.toUser) {
+            //                 acc.push(elem);
+            //             }
+            //             return acc;
+            //         }, []);
+            //         console.log('u',u[0]);
+            //         socket.emit('sendingMessage', {users, msg: info, date: new Date()});
+            //         u.forEach(user => {
+            //             io.sockets.connected[user.socket].emit('sendingMessage', {users, msg: info, date: new Date()});
+            //         })
+            //     }
+            // }).catch((err) => {
+            //     console.log('an error occured: ', err);
+            // });
         }
     });
 

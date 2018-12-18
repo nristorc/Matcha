@@ -850,7 +850,7 @@ class DatabaseRequest {
     async updateReports(id, reported, flag){
         try {
             return new Promise((resolve, reject) => {
-                this.query("SELECT `report_id` FROM matcha.reports WHERE `report_id` = ? AND reported_id = ?", [id, reported]).then((exist) => {
+                this.query("SELECT `report_id` FROM matcha.reports WHERE `report_id` = ? AND reported_id = ? AND flag = ?", [id, reported, flag]).then((exist) => {
                     if (exist == ""){
                         if (flag == 1){
                             this.query("INSERT INTO matcha.reports(`report_id`, `reported_id`, `reported_at`, `flag`) VALUES (?, ?, NOW(), ?)", [id, reported, flag]).then(() => {
@@ -863,12 +863,6 @@ class DatabaseRequest {
                                 reject();
                             });
                         } else if (flag == 2) {
-                            reject();
-                        }
-                    } else {
-                        if (flag == 1){
-                            reject();
-                        } else if (flag == 2) {
                             this.query("INSERT INTO matcha.reports(`report_id`, `reported_id`, `reported_at`, `flag`) VALUES (?, ?, NOW(), ?)", [id, reported, flag]).then(() => {
                                 this.updatePop(id, 3);
                                 resolve();
@@ -876,9 +870,11 @@ class DatabaseRequest {
                                 reject();
                             });
                         }
+                    } else {
+                            reject();
                     }
                 }).catch((exist)=> {
-                    console.log('catch existe', exist)
+                    console.log('catch existe', exist);
                     return(false);
                 });
             })
