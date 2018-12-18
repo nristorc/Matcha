@@ -29,6 +29,7 @@ const userSearch = require('./utils/usersearch');
 const user = require('./utils/user');
 const history = require('./utils/history');
 const chat = require('./utils/chat');
+const tagSearch = require('./utils/tagSearch');
 
 const port =  process.env.PORT || 3000;
 const host = 'localhost';
@@ -81,6 +82,7 @@ app.use('/usersearch', userSearch);
 app.use('/user', user);
 app.use('/history', history);
 app.use('/chat', chat);
+app.use('/tagsearch', tagSearch);
 
 /* EJS */
 app.set('views', './views');
