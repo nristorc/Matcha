@@ -200,15 +200,21 @@
 		</div>
 		<div class="row" id="location">
 			<div class="col-sm" id="displayLoc">
-				<% if (user[0]['city'] === null) { %>
-					Localisation manquante
+				<% if (user[0]['city'] == "") { %>
+					<p id="localisation">Localisation non renseignée</p>
+					<!-- <script src="./public/js/localisation.js"></script> -->
 				<%} else { %>
 					<p id="localisation">À <%=user[0]['city']%></p>
 				<% } %>
 					<div id="locationField">
-						<input id="autocomplete" placeholder="Modifier votre addresse"
-							   onFocus="geolocate()" type="text">
+						<input id="autocomplete" placeholder="Modifier votre ville" type="text">
 					</div>
+					<a class="btn btn-primary hashtag" href="#" role="button" onclick="getLocation(1)"><i class="fas fa-map-marker-alt"></i></a>
+				<% if (user[0]['changed_loc'] == "N") { %>
+					<script src="./public/js/auto-geoloc.js"></script>
+				<% } else if (user[0]['changed_loc'] == "E") { %>
+					<script src="./public/js/newloc.js"></script>
+				<% } %>
 				</div>
 		</div>
 		<div class="description" id="desc">
@@ -252,7 +258,4 @@
 
 <script src="./public/js/profilscript.js"></script>
 <script src="./public/js/localisation.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeGqsazfzYjC4__DuVZ-pB6Hik52ciaNI&libraries=places&callback=initAutocomplete"
-async defer></script>
-
 <% include ../partial/footer.ejs%>

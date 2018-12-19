@@ -52,65 +52,6 @@ router.route('/').get((request, response) => {
         algorithms: ['HS256']
         });
 
-
-        var googleMapsClient = require('@google/maps').createClient({
-            key: 'AIzaSyBeGqsazfzYjC4__DuVZ-pB6Hik52ciaNI'
-          });
-
-        // googleMapsClient.geocode({
-        // address: '93 rue du faubourg saint-martin, paris, france'
-        // }, function(err, response) {
-        // if (!err) {
-        //     console.log(response.json.results[0]);
-        // }
-		// });
-		
-
-        // var ip = request.headers['x-forwarded-for'] ||
-        // request.connection.remoteAddress ||
-        // request.socket.remoteAddress ||
-        // (request.connection.socket ? request.connection.socket.remoteAddress : null);
-        // console.log("adresse IP: ", ip);
-        // const publicIp = require('public-ip');
-        // publicIp.v4().then(ip => {
-        //     console.log("publicIP ====================", ip);
-        //     //=> '46.5.21.123'
-        //     // const ipstack = require('ipstack')
-        //     // // http://api.ipstack.com/134.201.250.155 ? access_key = "31f49d56e09d0468b0ac0349dfdb75fe"
-        //     // ipstack(ip,"31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
-        //     // console.log("IP 1 : ",response)
-        //     // });
-
-        //     // ipLocation(ip, function (err, data) {
-        //     //   console.log("IP 2 : ", data)
-        //     // });
-        // });
-
-        const iplocation = require("iplocation").default;
-
-        iplocation('62.210.32.231', [], (error, res) => {
-            //  console.log(res);
-            /* res:
-
-                {
-                    as: 'AS11286 KeyBank National Association',
-                    city: 'Cleveland',
-                    country: 'United States',
-                    countryCode: 'US',
-                    isp: 'KeyBank National Association',
-                    lat: 41.4875,
-                    lon: -81.6724,
-                    org: 'KeyBank National Association',
-                    query: '156.77.54.32',
-                    region: 'OH',
-                    regionName: 'Ohio',
-                    status: 'success',
-                    timezone: 'America/New_York',
-                    zip: '44115'
-                }
-            */
-        });
-
         if (request.query.filter != undefined) {
             var filter = request.query.filter;
             var ageFilter = filter.substring(3, filter.indexOf("pop"));

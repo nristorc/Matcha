@@ -44,6 +44,9 @@ function checkFileType(file, callback) {
         callback({message: "Image corrompue !"});
     }
 }
+var googleMapsClient = require('@google/maps').createClient({
+	key: 'AIzaSyBeGqsazfzYjC4__DuVZ-pB6Hik52ciaNI'
+	});
 
 router.route('/').get((request, response) => {
     const token = request.cookies.token;
@@ -106,8 +109,8 @@ router.route('/').get((request, response) => {
         algorithms: ['HS256']
     });
     if (request.body.latitude && request.body.longitude && request.body.city){
-        const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, city = ? WHERE users.id = ?";
-        checkDb.query(sql, [request.body.latitude, request.body.longitude, request.body.city, decoded.id]).then(() => {
+        const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `city` = ?, `changed_loc` = ? WHERE users.id = ?";
+        checkDb.query(sql, [request.body.latitude, request.body.longitude, request.body.city, request.body.change, decoded.id]).then(() => {
             console.log("update longitude/latitude reussi")
         }).catch(() =>{
             console.log("longitude/latitude ratay")

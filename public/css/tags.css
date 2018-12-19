@@ -29,7 +29,7 @@
 
 #displayLoc {
     display: inline-flex;
-    align-items: center;
+    align-items: baseline;
 }
 
 #displayLoc input{

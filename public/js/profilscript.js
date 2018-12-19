@@ -1,3 +1,45 @@
+function initAutocomplete() {
+    var placeSearch, autocomplete;
+      var option = {
+          types: ['(regions)'],
+          componentRestrictions: {country: "fr"}
+      };
+    autocomplete = new google.maps.places.Autocomplete(
+       document.getElementById('autocomplete'), option);
+
+      autocomplete.addListener('place_changed', function(){
+          var place = autocomplete.getPlace();
+      if (!place.geometry) {
+        window.alert("Aucune correpondance trouvée pour : '" + place.name + "'");
+        return;
+              }
+              if (autocomplete.getPlace().vicinity && !document.getElementById('localisation')) {
+                  $('#autocomplete').before('<p id="localisation">À '+autocomplete.getPlace().vicinity+'</p>');
+              } else if (autocomplete.getPlace().vicinity && document.getElementById('localisation')) {
+                  document.getElementById("localisation").innerHTML = "À " + autocomplete.getPlace().vicinity;
+              }
+            //   console.log("place", place.address_components);
+            //   console.log("LONG place", place.address_components[0].long_name);
+              var latitude = place.geometry.location.lat();
+              var longitude = place.geometry.location.lng(); 
+            //   console.log("latitude", latitude);
+            //   console.log("longitude", longitude);
+            //   console.log("autocomplete.getPlace()", autocomplete.getPlace().vicinity);
+              var data = {
+                  'latitude': latitude,
+                  'longitude': longitude,
+                  'city': autocomplete.getPlace().vicinity,
+                  'change': "Y"
+              };
+              $.ajax({
+                  type : "POST",
+                  url : "/profil",
+                  data : data,
+              });
+            //   autocomplete.value = "";
+      });
+  }
+
 function deleteTag(tag) {
     const delTag = tag.innerHTML.substring(1);
 
