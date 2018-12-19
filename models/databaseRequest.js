@@ -747,6 +747,25 @@ class DatabaseRequest {
         }
     }
 
+    async countUnreadMessages(from, to){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT count(unread) as unread, from_user_id FROM matcha.messages WHERE from_user_id = ? AND to_user_id = ?";
+                this.query(sql, [from, to]).then((number) => {
+                    // console.log(number[0]);
+                    if (number){
+                        resolve(number);
+                    } else {
+                        reject(number);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async updatePop(user_id, flag){ 
 		// Flag 1 : like
 		// Flag 2 : unlike

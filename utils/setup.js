@@ -85,6 +85,7 @@ const sql_messages = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.messages_tab
     "`to_user_id` INT(11) DEFAULT NULL," +
     "`message` TEXT DEFAULT NULL," +
     "`sent_at` DATETIME DEFAULT NOW()," +
+    "`unread` TINYINT DEFAULT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
 connection.query(sql_user, (err, result) => {

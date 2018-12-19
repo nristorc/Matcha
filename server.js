@@ -134,15 +134,15 @@ io.sockets.on('connection', (socket) => {
                             }
                             return acc;
                         }, []);
-                        console.log('u',u[0]);
+                        // console.log('u',u[0]);
                         socket.emit('blockMessage', {users, msg: "Cet utilisateur vous a bloqué, vous ne pouvez plus lui envoyer de message"});
                         u.forEach(user => {
                             io.sockets.connected[user.socket].emit('sendingMessage', {users, msg: info, date: new Date()});
                         })
 
                 } else {
-                    console.log(block);
-                    const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?';
+                    // console.log(block);
+                    const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?, unread = 1';
                     checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
                         if (result) {
                             console.log(users);
