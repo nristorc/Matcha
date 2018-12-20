@@ -73,7 +73,7 @@
 
         var unread = document.getElementById('unreadMsg' + userId);
         if (unread) {
-            // console.log('unread: ', unread);
+            decrementMsg(parseInt(unread.innerText));
             unread.remove();
         }
 

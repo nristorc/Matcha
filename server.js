@@ -110,8 +110,17 @@ io.sockets.on('connection', (socket) => {
             } else {
                 currentUser.socket = socket.id;
                 users.push(currentUser);
-                socket.broadcast.emit('users.new', {user: currentUser});
-                // console.log('user connected', users);
+
+                const getUnreadMessages = 'SELECT count(unread) as allUnread FROM matcha.messages WHERE to_user_id = ?';
+                checkDb.query(getUnreadMessages, [decoded.id]).then((result) => {
+                    if (result) {
+                        socket.broadcast.emit('users.new', {user: currentUser});
+                        socket.emit('allUnreadMsg', {countMsg: result[0].allUnread});
+                    }
+                    // console.log('result all unread', result);
+                }).catch((err) => {
+                    console.log('error while trying to get all unread messages from a user: ', err);
+                });
             }
         } catch (e) {
             throw e.message;

@@ -6,6 +6,7 @@
 
 <script type="text/javascript" src="/js/search.js"></script>
 <!--<script type="text/javascript" src="/js/notifications.js"></script>-->
+<script src="/js/newMessage.js"></script>
 
 <!--NOTIFICATIONS-->
 <script>
@@ -16,12 +17,54 @@
 
 <script>
 
+    var unreadAll = 0;
+
+    const msgNotif = () => {
+        console.log('iceToast', iceToast);
+        iceToast.setPosition('top-right');
+        iceToast.setColor('pink','#05728f');
+        iceToast.push({
+            words: 'Vous avez reçu un nouveau message',
+            bgcolor: 'pink',
+            time: 5000
+        });
+    }
+
+    const incrementMsg = () => {
+        unreadAll++;
+        var header = document.getElementById('headerMsg');
+        if (unreadAll !== 0) {
+            header.innerText = 'Messagerie (' + unreadAll + ')';
+        }
+    }
+
+    const decrementMsg = (messages = 1) => {
+        unreadAll -= messages;
+        var header = document.getElementById('headerMsg');
+        if (unreadAll !== 0) {
+            header.innerText = 'Messagerie (' + unreadAll + ')';
+        } else {
+            header.innerText = 'Messagerie';
+        }
+    }
+
     let socket = io('http://localhost:3000');
     socket.on('connect', () => {
         socket.emit('identify', {
             token: document.getElementById('token').dataset.token
         });
     });
+
+    socket.on('allUnreadMsg', (number) => {
+        var header = document.getElementById('headerMsg');
+        if (number.countMsg !== 0) {
+            unreadAll = number.countMsg;
+            header.innerText = 'Messagerie (' + number.countMsg + ')';
+        } else {
+            header.innerText = 'Messagerie';
+        }
+    });
+
 
     var checkOnline = document.querySelector('#checkOnline');
     var chatOnline = document.querySelector('#chatOnline');
@@ -141,9 +184,7 @@
     }
 
     /* CHAT SOCKETS */
-    // const msgHistory = document.getElementsByClassName('.msg_history');
     var msgForm = document.getElementById('send-message');
-    // var button = document.getElementsByClassName('msg_send_btn');
     if (msgForm) {
         var token = document.getElementById('token').dataset.token;
         function decodeToken(token){
@@ -166,13 +207,12 @@
         }
 
         socket.on('sendingMessage', (msg) => {
-            // console.log('msgSending', msg)
-
             var inputHidden = document.getElementById('hiddenInput')
             var user = document.querySelector('#chatOnline .user' + msg.msg.fromUser);
 
                 if(inputHidden == null) {
-                    console.log('aucun onglet ouvert', user);
+                    msgNotif();
+                    incrementMsg();
                     var unread = document.getElementById('unreadMsg' + msg.msg.fromUser);
                     var count = unread;
                     if (count) {
@@ -193,6 +233,8 @@
 
                 } else if (inputHidden && (parseInt(inputHidden.value) !== msg.msg.fromUser)) {
                     if (user) {
+                        msgNotif();
+                        incrementMsg();
                         var unread2 = document.getElementById('unreadMsg' + msg.msg.fromUser);
                         var count2 = unread2;
                         if (count2) {
@@ -212,7 +254,6 @@
                         return
                     }
                 }
-            console.log('utilisateur voit le message');
             inputHidden  = inputHidden.value;
             const chat = document.querySelector('.msg_history');
             const noMessage = document.getElementById('noMessage');
@@ -262,6 +303,7 @@
                 setTimeout(() => {
                     chat.scrollTop = chat.scrollHeight + 500;
                 }, 10);
+
         });
 
         socket.on('blockMessage', (msg) => {
