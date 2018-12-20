@@ -399,17 +399,17 @@ class DatabaseRequest {
         }
     }
 
-    async getAllUsers(orientation, filter, sort, tags, user_tags){
+    async getAllUsers(orientation, filter, sort, tags, user_tags, user_position){
         try {
             return new Promise((resolve, reject) => {
-                // console.log("-----SORT-------", sort)
                 var location = "";
-                if (sort == "`tmp`.loc` ASC"){
-                    location = ", (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`users`.`latitude`)) * COS(RADIANS(`users`.`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`users`.`latitude`))) AS `tmp`.`loc`";
+                if (sort == "`loc` ASC"){
+                    // console.log("-----SORT-------", sort)
+                    location = ", (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`latitude`)))) AS `loc` ";
                 }
 				var sql;
 				var secretSauce =  ", `popularity` DESC"; //A COMPLETER
-				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline`, `tmp`.`city`, `tmp`.`latitude`, `tmp`.`longitude` ";
+				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline`, `tmp`.`city`, `tmp`.`latitude`, `tmp`.`longitude`, `tmp`.`changed_loc` ";
 		// ---------- structure de requete generique ----------
 
 					// SELECT *, COUNT(`tmp`.`id`) FROM (

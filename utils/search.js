@@ -85,7 +85,9 @@ router.route('/').get((request, response) => {
                 resSort.searchParamsCheck(request.query.filter, request.query.sort, user_position).then((searchPref) => {
                     checkDb.setOrientation(decoded.id).then((orientation) => {
                         checkDb.getTags(decoded.id).then((user_tags) => {
+                            console.log(user_position);
                             checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag'], user_tags, user_position).then((users) => {
+                                console.log("AAAA");
                                 checkDb.getMyReports(decoded.id).then((reports) => {
                                     console.log("index : ", request.query.index);
                                     if (!request.query.index) {

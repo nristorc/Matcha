@@ -49,7 +49,7 @@ class Sort{
 				} else if (sort == "ageDesc"){
 					reqSort = "`birth` DESC";
 				} else if (sort == "loc"){
-					reqSort = "`tmp`.`loc` ASC";
+					reqSort = "`loc` ASC";
 				} else if (sort == "tag"){
 					reqSort = "tag";
 				} else {
