@@ -423,13 +423,15 @@ class DatabaseRequest {
         try {
             return new Promise((resolve, reject) => {
                 var location = "";
-                location = ", (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`latitude`)))) AS `loc` ";
+                location = "(6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`latitude`))))";
+                // location = ", (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`latitude`)))) AS `loc` ";
                 var block = "";
                 for (var r=0; r < reports.length; r++){
                     block = block.concat(" AND `users`.`id` != " + reports[r].reported_id);
                 }
 				var sql;
-				var secretSauce = " COUNT(`tmp`.`id`) DESC, `popularity` DESC, `loc` ASC ";
+				var secretSauce = "(1000 / LN(" + location + "+ 1.1) + COUNT(`tmp`.`id`) * 1000 + (`popularity` + 100))";
+				// var secretSauce = " COUNT(`tmp`.`id`) DESC, `popularity` DESC, `loc` ASC ";
 				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline`, `tmp`.`city`, `tmp`.`latitude`, `tmp`.`longitude`, `tmp`.`changed_loc` ";
 		// ---------- structure de requete generique ----------
 
@@ -455,7 +457,7 @@ class DatabaseRequest {
 
 		// -------------------------------------------------------
 			if (!tags){
-				sql = "SELECT *, COUNT(`tmp`.`id`)" + location + "FROM (SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL' ";
+				sql = "SELECT *, COUNT(`tmp`.`id`), " + location + " AS `loc`," + secretSauce + " AS 'score' FROM (SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL' ";
 				if (orientation){
 					sql = sql.concat(orientation + block);
 					if (filter){
@@ -532,7 +534,7 @@ class DatabaseRequest {
 			else if (tags){
 				// console.log("tags: ", tags);
 				// console.log("sort: ", sort);
-				sql = "SELECT *, COUNT(`tmp`.`id`) " + location + "FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
+				sql = "SELECT *, COUNT(`tmp`.`id`), " + location + " AS `loc`," + secretSauce + " AS 'score' FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
 				if (orientation){
 					sql = sql.concat(orientation + block);
 					if (filter){
@@ -569,7 +571,7 @@ class DatabaseRequest {
 			if (sort && sort != "tag"){
 				sql = sql.concat(sort + ", ");
 			}
-            sql = sql.concat(secretSauce);
+            sql = sql.concat(" `score` DESC");
             
 			console.log("SQL = ", sql);
                 this.query(sql).then((users) => {
