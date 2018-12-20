@@ -88,6 +88,21 @@ const sql_messages = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.messages_tab
     "`unread` TINYINT DEFAULT NULL," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
 
+// Flag = 1 - like
+// Flag = 2 - match
+// Flag = 3 - unlike
+// Flag = 4 - unmatch
+// Flag = 5 - visite
+
+const sql_notifications =  'CREATE TABLE IF NOT EXISTS ' + configDatabase.notifications_table +
+    "(`id` INT(9) NOT NULL AUTO_INCREMENT," +
+    "`from` INT(11) DEFAULT NULL," +
+    "`to` INT(11) DEFAULT NULL," +
+    "`date` DATETIME DEFAULT NOW()," +
+    "`flag` INT DEFAULT NULL," +
+    "`unread` TINYINT DEFAULT 1," +
+    "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+
 connection.query(sql_user, (err, result) => {
     if (err) {
         console.error('error creating table: ' + err.stack);
@@ -137,6 +152,14 @@ connection.query(sql_reports, (err, result) => {
 });
 
 connection.query(sql_messages, (err, result) => {
+    if (err) {
+        console.error('error creating table: ' + err.stack);
+        return
+    }
+    console.log("Table " + configDatabase.messages_table + " created");
+});
+
+connection.query(sql_notifications, (err, result) => {
     if (err) {
         console.error('error creating table: ' + err.stack);
         return
