@@ -85,8 +85,8 @@ router.route('/').get((request, response) => {
                         msg = msg.concat(") AND to_user_id = ? GROUP BY from_user_id");
                         // console.log(msg);
                         checkDb.query(msg, decoded.id).then((count) => {
-                            console.log("count: ", count);
-                            console.log('push: ', push);
+                            // console.log("count: ", count);
+                            // console.log('push: ', push);
                             response.render('pages/chatroom', {myMatches: push, token, unread: count});
                         }).catch((error)=>{
                             console.log(error);

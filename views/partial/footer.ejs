@@ -166,28 +166,59 @@
         }
 
         socket.on('sendingMessage', (msg) => {
-            console.log('msgSending', msg)
-
+            // console.log('msgSending', msg)
 
             var inputHidden = document.getElementById('hiddenInput')
             var user = document.querySelector('#chatOnline .user' + msg.msg.fromUser);
 
                 if(inputHidden == null) {
-                    count++;
-                    var unread = document.getElementById('unreadMsg');
-                    unread.innerText = count + ' message(s) non lu';
-                    user.nextSibling(unread);
+                    console.log('aucun onglet ouvert', user);
+                    var unread = document.getElementById('unreadMsg' + msg.msg.fromUser);
+                    var count = unread;
+                    if (count) {
+                        count = count.innerText.split(' ');
+                        count = count[0];
+                        count = parseInt(count);
+                        count++;
+                        unread.innerText = count + ' message(s) non lu';
+                    }
+                    else {
+                        var notRead = document.createElement('p');
+                        notRead.id = 'unreadMsg' + msg.msg.fromUser;
+                        notRead.innerText = '1 message(s) non lu';
+                        console.log('user1', user);
+                        user.insertAdjacentElement('afterend', notRead);
+                    }
                     return
-                }
 
-            // console.log('je suis la');
+                } else if (inputHidden && (parseInt(inputHidden.value) !== msg.msg.fromUser)) {
+                    if (user) {
+                        var unread2 = document.getElementById('unreadMsg' + msg.msg.fromUser);
+                        var count2 = unread2;
+                        if (count2) {
+                            count2 = count2.innerText.split(' ');
+                            count2 = count2[0];
+                            count2 = parseInt(count2);
+                            count2++;
+                            unread2.innerText = count2 + ' message(s) non lu';
+                        }
+                        else {
+                            var notRead2 = document.createElement('p');
+                            notRead2.id = 'unreadMsg' + msg.msg.fromUser;
+                            notRead2.innerText = '1 message(s) non lu';
+                            console.log('user1', user);
+                            user.insertAdjacentElement('afterend', notRead2);
+                        }
+                        return
+                    }
+                }
+            console.log('utilisateur voit le message');
             inputHidden  = inputHidden.value;
             const chat = document.querySelector('.msg_history');
             const noMessage = document.getElementById('noMessage');
             const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 
             if (noMessage) {
-                // console.log('il ny avait pas de message, maintenant oui');
                 noMessage.remove();
             }
 
@@ -206,7 +237,7 @@
                     sentMsg.append(span);
                     outgoing.append(sentMsg);
                     chat.append(outgoing);
-
+                    // socket.emit('readMsg', msg);
                 }
                 else if (parseInt(document.getElementById('hiddenInput').value) === msg.msg.fromUser) {
                     chat.removeAttribute('style', 'text-align: center;');
@@ -226,14 +257,15 @@
                     receivedMsg.append(receivedMsgWith);
                     incoming.append(receivedMsg);
                     chat.append(incoming);
+                    socket.emit('readMsg', msg);
                 }
                 setTimeout(() => {
                     chat.scrollTop = chat.scrollHeight + 500;
                 }, 10);
-        })
+        });
 
         socket.on('blockMessage', (msg) => {
-            console.log('msg', msg);
+            // console.log('msg', msg);
             var inputHidden = document.getElementById('hiddenInput')
             if(inputHidden == null)
                 return

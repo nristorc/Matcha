@@ -127,7 +127,7 @@ io.sockets.on('connection', (socket) => {
             checkDb.query(checkBlock, [info.toUser]).then((block) => {
                 if (block[0] && block[0].reported_id === info.fromUser) {
 
-                        console.log(users);
+                        // console.log(users);
                         var u = users.reduce((acc, elem) => {
                             if (elem.id == info.toUser) {
                                 acc.push(elem);
@@ -141,18 +141,17 @@ io.sockets.on('connection', (socket) => {
                         })
 
                 } else {
-                    // console.log(block);
                     const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?, unread = 1';
                     checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
                         if (result) {
-                            console.log(users);
+                            // console.log(users);
                             var u = users.reduce((acc, elem) => {
                                 if (elem.id == info.toUser) {
                                     acc.push(elem);
                                 }
                                 return acc;
                             }, []);
-                            console.log('u',u[0]);
+                            // console.log('u',u[0]);
                             socket.emit('sendingMessage', {users, msg: info, date: new Date()});
                             u.forEach(user => {
                                 io.sockets.connected[user.socket].emit('sendingMessage', {users, msg: info, date: new Date()});
@@ -168,6 +167,20 @@ io.sockets.on('connection', (socket) => {
         }
     });
 
+    socket.on('readMsg', (msg) => {
+        // console.log('read');
+        // console.log('msg.msg : ', msg.msg);
+        const updateRead = 'UPDATE matcha.messages SET unread = null WHERE from_user_id = ? AND to_user_id = ?';
+        // console.log('msg.msg.fromUser ', msg.msg.fromUser)
+        // console.log('msg.msg.toUser ', msg.msg.toUser);
+        checkDb.query(updateRead, [msg.msg.fromUser, msg.msg.toUser]).then((result) => {
+            // console.log('result', result)
+            // console.log('update');
+        }).catch((err) => {
+            console.log('erreur on update unread message ', err);
+        })
+    });
+
     socket.on('disconnect', () => {
         if (currentUser) {
             let user = users.find(u => u.id === currentUser.id);
@@ -176,7 +189,6 @@ io.sockets.on('connection', (socket) => {
                 if (user.count === 0) {
                     users = users.filter(u => u.id !== currentUser.id);
                     socket.broadcast.emit('users.leave', {user: currentUser});
-                    console.log('user disconnected');
                 }
             }
         }

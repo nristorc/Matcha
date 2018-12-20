@@ -32,7 +32,7 @@
                                     <%for (var y = 0; y < unread.length; y++) {%>
                                         <%if (unread[y].from_user_id === myMatches[x].id) {%>
                                             <%if (unread[y].unread !== 0) {%>
-                                            <p id="unreadMsg<%=unread[y].from_user_id%>"><%=unread[y].unread%> message(s) non lus</p>
+                                            <p id="unreadMsg<%=unread[y].from_user_id%>"><%=unread[y].unread%> message(s) non lu</p>
                                 <%}}}}%>
                             </div>
                         </div>
@@ -73,7 +73,7 @@
 
         var unread = document.getElementById('unreadMsg' + userId);
         if (unread) {
-            console.log('unread: ', unread);
+            // console.log('unread: ', unread);
             unread.remove();
         }
 
