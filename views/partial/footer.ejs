@@ -165,14 +165,12 @@
             inputMessage.focus();
         }
 
-        var count = 0;
-
         socket.on('sendingMessage', (msg) => {
             console.log('msgSending', msg)
 
+
             var inputHidden = document.getElementById('hiddenInput')
             var user = document.querySelector('#chatOnline .user' + msg.msg.fromUser);
-            // console.log(user);
 
                 if(inputHidden == null) {
                     count++;

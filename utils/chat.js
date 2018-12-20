@@ -53,7 +53,7 @@ router.route('/').get((request, response) => {
         });
         checkDb.getMatches(decoded.id).then((tab) => {
             const tableau = Array.from(tab);
-            console.log('tableau: ', tableau);
+            // console.log('tableau: ', tableau);
             if (tab != "") {
                 const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
 
@@ -65,7 +65,7 @@ router.route('/').get((request, response) => {
                 checkDb.query(sql, tableau)
                     .then((res) => {
                         push = res;
-                        console.log('push', push);
+                        // console.log('push', push);
                         // var unread = [];
                         var msg = "SELECT count(unread) as unread, from_user_id FROM matcha.messages WHERE (";
                         for (var i = 0; i < push.length; i++) {
@@ -85,33 +85,12 @@ router.route('/').get((request, response) => {
                         msg = msg.concat(") AND to_user_id = ? GROUP BY from_user_id");
                         // console.log(msg);
                         checkDb.query(msg, decoded.id).then((count) => {
-                            console.log("count:", count);
-                            response.render('pages/chatroom', {myMatches: push, token, count});
+                            console.log("count: ", count);
+                            console.log('push: ', push);
+                            response.render('pages/chatroom', {myMatches: push, token, unread: count});
                         }).catch((error)=>{
                             console.log(error);
                         })
-
-
-                            // const tableau2 = Array.from(push);
-                        // console.log('tableau2: ', tableau2)
-                        // if (push != "") {
-                        //     const sqlCondition2 = tab.map(el => 'from_user_id = ?').join(' OR ');;
-                        //     const sql2 = 'SELECT count(unread) as unread, from_user_id FROM matcha.messages WHERE (' + sqlCondition2 + ') AND to_user_id = ?';
-                        //     let unread = [];
-                        //     checkDb.query(sql2, push.id). then((result) => {console.log(result)}).catch((err) => {console.log('error sql2', err)})
-                        // }
-
-                        // for (var i = 0; i < push.length; i++) {
-                        //     checkDb.countUnreadMessages(push[i].id, decoded.id).then((count) => {
-                        //         unread.push(count[0]);
-                        //         console.log('unread', unread);
-                        //         // unread = unread.push(count[0]);
-                        //     }).catch((err) => {
-                        //         console.log('err', err);
-                        //     })
-
-                        // console.log('unreadout', unread);
-
                     })
                     .catch((err) => {
                         console.log(`An error occured patate: ${err}`);
@@ -138,7 +117,12 @@ router.route('/').get((request, response) => {
             if (request.body.submit === 'getMessages') {
                 console.log(request.body.userId);
                 checkDb.getMessages(decoded.id, request.body.userId, request.body.userId, decoded.id).then((result) => {
-                    response.json(result);
+                    const sqlRead = 'UPDATE matcha.messages SET unread = null WHERE from_user_id = ? AND to_user_id = ?';
+                    checkDb.query(sqlRead, [request.body.userId, decoded.id]).then((res) => {
+                        response.json(result);
+                    }).catch((err) => {
+                        console.log('catch read ', err);
+                    });
                 }).catch((result) => {
                     console.log('result catch', result);
                 })
