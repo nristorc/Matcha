@@ -85,14 +85,13 @@ router.route('/').get((request, response) => {
                 resSort.searchParamsCheck(request.query.filter, request.query.sort, user_position).then((searchPref) => {
                     checkDb.setOrientation(decoded.id).then((orientation) => {
                         checkDb.getTags(decoded.id).then((user_tags) => {
-                            console.log(user_position);
-                            checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag'], user_tags, user_position).then((users) => {
-                                console.log("AAAA");
-                                checkDb.getMyReports(decoded.id).then((reports) => {
-                                    console.log("index : ", request.query.index);
+                            checkDb.getMyReports(decoded.id).then((reports) => {
+                                checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag'], user_tags, user_position, reports).then((users) => {
+                                    // console.log("----------REPORTS------------", reports, "------------------------");
+                                    // console.log("index : ", request.query.index);
                                     if (!request.query.index) {
                                         checkDb.getLikes(decoded.id).then((likes) => {
-                                            console.log("request.query.tag", request.query);
+                                            // console.log("request.query.tag", request.query);
                                             response.render('pages/search', {
                                                 users: users,
                                                 index: 0,
@@ -126,9 +125,6 @@ router.route('/').get((request, response) => {
                                             });
                                         });
                                     } else {
-                                        // for (var i = 0; i<users.length; i++){
-                                        //     console.log("users : ", users[i].username);
-                                        // }
                                         if (request.query.index < users.length){
                                             checkDb.getLikes(decoded.id).then((likes) => {
                                                 response.render('pages/search', {
@@ -167,12 +163,12 @@ router.route('/').get((request, response) => {
                                             response.end();
                                         }
                                     }
-                                }).catch((reports) => {
-                                    console.log("oups");
+                                }).catch((users) => {
+                                    console.log('catch', users);
                                     return response.render('index');
                                 });
-                            }).catch((users) => {
-                                console.log('catch', users);
+                            }).catch((reports) => {
+                                console.log('catch', reports);
                                 return response.render('index');
                             });
                         }).catch((user_tags) => {

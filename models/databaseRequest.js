@@ -399,16 +399,37 @@ class DatabaseRequest {
         }
     }
 
-    async getAllUsers(orientation, filter, sort, tags, user_tags, user_position){
+// -------------------------ALGO PONDERE-------------------------
+    // SELECT *, COUNT(`tmp`.`id`), 
+    // (6371 * ACOS(COS(RADIANS(48.792001)) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS(2.3985099999999875)) + SIN(RADIANS(48.792001)) * SIN(RADIANS(`latitude`)))) AS `loc`, 
+    // (1000 / LN((6371 * ACOS(COS(RADIANS(48.792001)) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS(2.3985099999999875)) + SIN(RADIANS(48.792001)) * SIN(RADIANS(`latitude`)))) + 1.1) + COUNT(`tmp`.`id`) * 1000 + (`popularity` + 100)) AS 'score' FROM (
+    //     SELECT `users`.* 
+    //     FROM matcha.users 
+    //     WHERE registerToken = 'NULL' 
+    //     AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) 
+    //     AND `users`.`id` !=1 AND `users`.`id` !=3 AND `users`.`id` !=2
+        
+    //     UNION ALL 
+        
+    //     SELECT `users`.* 
+    //     FROM `matcha`.`users` INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` WHERE (`tags`.`tag` = "cacahouete") AND registerToken = 'NULL' AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) 
+    //     AND `users`.`id` !=1 
+        
+    // ) AS `tmp` 
+    // GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline`, `tmp`.`city`, `tmp`.`latitude`, `tmp`.`longitude`, `tmp`.`changed_loc`
+    // ORDER BY `score` DESC
+
+    async getAllUsers(orientation, filter, sort, tags, user_tags, user_position, reports){
         try {
             return new Promise((resolve, reject) => {
                 var location = "";
-                if (sort == "`loc` ASC"){
-                    // console.log("-----SORT-------", sort)
-                    location = ", (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`latitude`)))) AS `loc` ";
+                location = ", (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`latitude`)))) AS `loc` ";
+                var block = "";
+                for (var r=0; r < reports.length; r++){
+                    block = block.concat(" AND `users`.`id` != " + reports[r].reported_id);
                 }
 				var sql;
-				var secretSauce =  ", `popularity` DESC"; //A COMPLETER
+				var secretSauce = " COUNT(`tmp`.`id`) DESC, `popularity` DESC, `loc` ASC ";
 				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline`, `tmp`.`city`, `tmp`.`latitude`, `tmp`.`longitude`, `tmp`.`changed_loc` ";
 		// ---------- structure de requete generique ----------
 
@@ -436,7 +457,7 @@ class DatabaseRequest {
 			if (!tags){
 				sql = "SELECT *, COUNT(`tmp`.`id`)" + location + "FROM (SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL' ";
 				if (orientation){
-					sql = sql.concat(orientation);
+					sql = sql.concat(orientation + block);
 					if (filter){
 						sql = sql.concat(filter);
 					}
@@ -457,7 +478,7 @@ class DatabaseRequest {
 					}
 				}
 				if (orientation){
-					sql = sql.concat("registerToken = 'NULL' " + orientation);
+					sql = sql.concat("registerToken = 'NULL' " + orientation + block);
 					if (filter){
 						sql = sql.concat(filter);
 					}
@@ -513,7 +534,7 @@ class DatabaseRequest {
 				// console.log("sort: ", sort);
 				sql = "SELECT *, COUNT(`tmp`.`id`) " + location + "FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
 				if (orientation){
-					sql = sql.concat(orientation);
+					sql = sql.concat(orientation + block);
 					if (filter){
 						sql = sql.concat(filter);
 					}
@@ -522,7 +543,7 @@ class DatabaseRequest {
                     // console.log("------------TAGS-------------", tags);
 					sql = sql.concat(" UNION ALL SELECT `g`.* FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ");
 					if (orientation){
-						sql = sql.concat(orientation);
+						sql = sql.concat(orientation + block);
 						if (filter){
 							sql = sql.concat(filter);
 						}
@@ -548,7 +569,7 @@ class DatabaseRequest {
 			if (sort && sort != "tag"){
 				sql = sql.concat(sort + ", ");
 			}
-            sql = sql.concat("COUNT(`tmp`.`id`) DESC", secretSauce);
+            sql = sql.concat(secretSauce);
             
 			console.log("SQL = ", sql);
                 this.query(sql).then((users) => {
