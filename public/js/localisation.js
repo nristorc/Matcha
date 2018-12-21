@@ -31,8 +31,7 @@ function showPosition(position){
 function showError(error){
     switch(error.code){
         case error.PERMISSION_DENIED:
-						x.innerHTML="Localisation non renseignée";
-						// alert("Veuillez autoriser la géolocalisation de votre appareil.");
+			x.innerHTML="Localisation non renseignée";
         break;
         case error.POSITION_UNAVAILABLE:
             x.innerHTML="Location information is unavailable."
@@ -49,7 +48,7 @@ function showError(error){
 function showError1(error){
 	switch(error.code){
 			case error.PERMISSION_DENIED:
-					alert("Veuillez autoriser la géolocalisation de votre appareil.");
+				alert("Veuillez autoriser la géolocalisation de votre appareil.");
 			break;
 			case error.POSITION_UNAVAILABLE:
 					x.innerHTML="Location information is unavailable."
@@ -66,8 +65,8 @@ function showError1(error){
 function showError2(error){
 	switch(error.code){
 			case error.PERMISSION_DENIED:
-					x.innerHTML="Localisation non renseignée";
-					test()
+				x.innerHTML="Localisation non renseignée";
+				forceGeo();
 			break;
 			case error.POSITION_UNAVAILABLE:
 					x.innerHTML="Location information is unavailable."
