@@ -71,30 +71,29 @@ router.get('/', async (request, response) => {
                             const theyLiked = 'SELECT `username`, `profil`,`user_id`, `liked_at` FROM matcha.users INNER JOIN matcha.likes ON users.id = likes.user_id WHERE user_liked = ?';
                             checkDb.query(theyLiked, [decoded.id]).then((result4) => {
 
-                                //Mes Matchs
-                                checkDb.getMatches(decoded.id).then((tab) => {
-                                    if (tab != "") {
-                                        const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
-                                        const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE ' + sqlCondition + ';';
-                                        // console.log(`SqlCondition is : ${sqlCondition} and sql is ${sql}`);
-                                        let push = [];
-                                        checkDb.query(sql, tab)
-                                            .then((res) => {
-                                                // console.log('results from query are : ', res);
-                                                push = res;
-                                                // console.log('push is : ', push);
-                                                response.render('pages/history', {myVisits: result1, theirVisits: result2, myLikes: result3, theirLikes: result4, myMatches: push, token});
-                                            })
-                                            .catch((err) => {
-                                                console.log(`An error occured: ${err}`);
-                                            });
-                                    }
-                                    else {
-                                        response.render('pages/history', {myVisits: result1, theirVisits: result2, myLikes: result3, theirLikes: result4, myMatchesMsg: 'Vous ne possédez aucun match', token});
-                                    }
-                                }).catch((tab) => {
-                                    console.log('history match CATCH: ', tab);
-                                });
+                                    //Mes Matchs
+                                    checkDb.getMatches(decoded.id).then((tab) => {
+                                        if (tab != "") {
+                                            const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
+                                            const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE ' + sqlCondition + ';';
+                                            // console.log(`SqlCondition is : ${sqlCondition} and sql is ${sql}`);
+                                            let push = [];
+                                            checkDb.query(sql, tab)
+                                                .then((res) => {
+                                                    push = res;
+                                                    response.render('pages/history', {myVisits: result1, theirVisits: result2, myLikes: result3, theirLikes: result4, myMatches: push, token});
+                                                })
+                                                .catch((err) => {
+                                                    console.log(`An error occured: ${err}`);
+                                                });
+                                        }
+                                        else {
+                                            response.render('pages/history', {myVisits: result1, theirVisits: result2, myLikes: result3, theirLikes: result4, myMatchesMsg: 'Vous ne possédez aucun match...', token});
+                                        }
+                                    }).catch((tab) => {
+                                        console.log('history match CATCH: ', tab);
+                                    });
+
 
                             }).catch((result4) => {
                                 console.log('history catch they Liked', result4);

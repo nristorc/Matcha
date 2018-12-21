@@ -164,7 +164,7 @@ connection.query(sql_notifications, (err, result) => {
         console.error('error creating table: ' + err.stack);
         return
     }
-    console.log("Table " + configDatabase.messages_table + " created");
+    console.log("Table " + configDatabase.notifications_table + " created");
 });
 
 connection.end();

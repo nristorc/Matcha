@@ -30,6 +30,7 @@ const user = require('./utils/user');
 const history = require('./utils/history');
 const chat = require('./utils/chat');
 const tagSearch = require('./utils/tagSearch');
+const notifications = require('./utils/notifications');
 
 const port =  process.env.PORT || 3000;
 const host = 'localhost';
@@ -46,7 +47,6 @@ app.use('/public', express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* COOKIES AND SESSIONS */
-
 app.use(cookieParser());
 app.use(session({
     key: 'user_sid',
@@ -68,7 +68,6 @@ app.use(function (request, response, next) {
 });
 
 /* ROUTES */
-
 app.use('/', index);
 app.use('/login', login);
 app.use('/register', register);
@@ -83,12 +82,13 @@ app.use('/user', user);
 app.use('/history', history);
 app.use('/chat', chat);
 app.use('/tagsearch', tagSearch);
+app.use('/notifications', notifications);
 
 /* EJS */
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
-/* TEST SOCKETS */
+/* SOCKETS */
 const jwtSecret = 'ratonlaveur';
 let users = [];
 
