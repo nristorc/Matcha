@@ -228,10 +228,14 @@ router.route('/:id').get(async (request, response) => {
         if (request.body.submit === 'iLiked') {
             checkDb.updateLikes(decoded.id, parseInt(request.body.userId), 1).then(() => {
                 checkDb.getMatches(decoded.id).then((myMatches) => {
-                    u.forEach(user => {
-                        io.sockets.connected[user.socket].emit('likeMatch', {users: usersSocket, like: request.body.userId, match: myMatches});
+                    checkDb.getUser(decoded.id).then((me) => {
+                        u.forEach(user => {
+                            io.sockets.connected[user.socket].emit('likeMatch', {users: usersSocket, like: request.body.userId, match: myMatches, me});
+                        });
+                        response.json({flag: '1', getMatches: myMatches});
+                    }).catch((err) => {
+                       console.log('get my info error: ', err);
                     });
-                    response.json({flag: '1', getMatches: myMatches});
                 }).catch((myMatches) => {
                     console.log('err occured: ', myMatches);
                 })
@@ -242,12 +246,14 @@ router.route('/:id').get(async (request, response) => {
             checkDb.getMatches(decoded.id).then((myMatches) => {
                 checkDb.updateLikes(decoded.id, parseInt(request.body.userId), -1).then(() => {
                     checkDb.getLikes(decoded.id).then((liked) => {
-
-                        u.forEach(user => {
-                            io.sockets.connected[user.socket].emit('unlikeMatch', {users: usersSocket, unlike: request.body.userId, unmatch: myMatches});
+                        checkDb.getUser(decoded.id).then((me) => {
+                            u.forEach(user => {
+                                io.sockets.connected[user.socket].emit('unlikeMatch', {users: usersSocket, unlike: request.body.userId, unmatch: myMatches, me});
+                            });
+                            response.json({flag: '1', theyLikedMe: liked});
+                        }).catch((err) => {
+                            console.log('get my info error: ', err);
                         });
-                        response.json({flag: '1', theyLikedMe: liked});
-
                     });
                 }).catch(() => {
                     response.json({flag: '0'});

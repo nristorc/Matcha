@@ -403,6 +403,32 @@
         }
     }
 
+    socket.on('unmatchBlock', (msg) => {
+        var inputHidden = document.getElementById('hiddenInput')
+        if(inputHidden == null)
+            return
+        inputHidden  = inputHidden.value;
+        const chat = document.querySelector('.msg_history');
+        const noMessage = document.getElementById('noMessage');
+        const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
+        if (document.getElementById('unmatchMsg')) {
+            document.getElementById('unmatchMsg').remove();
+        }
+
+        if (noMessage) {
+            noMessage.remove();
+        }
+
+        const bloc = document.createElement('p');
+        bloc.innerText = msg.msg;
+        bloc.id = 'unmatchMsg';
+        chat.append(bloc);
+        setTimeout(() => {
+            chat.scrollTop = chat.scrollHeight + 500;
+        }, 10);
+    })
+
     socket.on('allUnreadNotif', (number) => {
         var header = document.getElementById('headerNotif');
         if (number.countNotif !== 0) {
@@ -425,6 +451,29 @@
             if (parseInt(info.like) === info.match[n]) {
                 incrementNotif();
                 matchNotif();
+                if (msgForm) {
+                    const noMatch = document.querySelector('.noMatch');
+                    if (noMatch) {
+                        noMatch.remove();
+                    }
+                    console.log(info.me[0]);
+
+                    const inboxMatch = document.querySelector('.inbox_chat');
+
+                    var newMatch = '<div class="chat_list" onclick="activeChat(this,  ' + info.me[0].id + ')">' +
+                        '<div class="chat_people">' +
+                        '<div class="chat_img">' +
+                        '<img src="' + info.me[0].profil + '" style="border-radius: 50%" alt="profil">' +
+                        '</div><div class="chat_ib"><div id="chatOnline"><h5>' + info.me[0].username;
+                    if (info.me[0].online === 'N') {
+                        newMatch += ' <i style="color: red;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>'
+                    } else if (info.me[0].online === 'Y') {
+                        newMatch += ' <i style="color: green;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>';
+                    }
+                    newMatch += '</h5></div></div></div></div>';
+
+                    inboxMatch.insertAdjacentHTML('afterbegin', newMatch);
+                }
             }
         }
     })
@@ -436,6 +485,22 @@
             if (parseInt(info.unlike) === info.unmatch[m]) {
                 incrementNotif();
                 unmatchNotif();
+
+                if (msgForm) {
+                    var inputHidden = document.getElementById('hiddenInput');
+                    if(inputHidden == null) {
+                        const unmatchUser = document.querySelector('#chatOnline .user' + info.me[0].id);
+                        const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
+                        parent.remove();
+                        return;
+                    } else if (inputHidden && (parseInt(inputHidden.value) !== info.me[0].id)) {
+                        const unmatchUser = document.querySelector('#chatOnline .user' + info.me[0].id);
+                        const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
+                        parent.remove();
+                        return;
+                    }
+                }
+
             }
         }
     })
