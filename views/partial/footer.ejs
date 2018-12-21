@@ -16,15 +16,84 @@
 
 <script>
 
+    var token = document.getElementById('token').dataset.token;
+    function decodeToken(token){
+        var playload = JSON.parse(atob(token.split('.')[1]));
+        return playload;
+
+    }
+    var user = decodeToken(token);
+
+    function readNotif(user) {
+        const formData = {
+            'userId': user,
+            'submit': 'notifRead'
+        }
+        $.ajax({
+            type		: 'POST',
+            url         : '/notifications',
+            data		: formData,
+            dataType	: 'json',
+            encode		: true
+        })
+            // .done(function(data) {
+            //     console.log(data);
+            // });
+    }
+
     var unreadAll = 0;
 
     const msgNotif = () => {
-        console.log('iceToast', iceToast);
         iceToast.setPosition('top-right');
         iceToast.setColor('pink','#05728f');
         iceToast.push({
             words: 'Vous avez reçu un nouveau message',
             bgcolor: 'pink',
+            time: 5000
+        });
+    }
+    const likeNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Un utilisateur vient de vous liker !',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+    const matchNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Vous avez un nouveau match !',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+    const unlikeNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Un utilisateur ne vous like plus...',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+    const unmatchNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Vous venez de perdre un match...',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+    const visitNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Un utilisateur a visité votre profil !',
+            bgcolor: 'blue',
             time: 5000
         });
     }
@@ -36,7 +105,6 @@
             header.innerText = 'Messagerie (' + unreadAll + ')';
         }
     }
-
     const decrementMsg = (messages = 1) => {
         unreadAll -= messages;
         var header = document.getElementById('headerMsg');
@@ -54,17 +122,8 @@
         });
     });
 
-    socket.on('allUnreadMsg', (number) => {
-        var header = document.getElementById('headerMsg');
-        if (number.countMsg !== 0) {
-            unreadAll = number.countMsg;
-            header.innerText = 'Messagerie (' + number.countMsg + ')';
-        } else {
-            header.innerText = 'Messagerie';
-        }
-    });
 
-
+    /* ONLINE USER */
     var checkOnline = document.querySelector('#checkOnline');
     var chatOnline = document.querySelector('#chatOnline');
     var histoOnline = document.querySelector('.histoOnline');
@@ -183,16 +242,18 @@
     }
 
     /* CHAT SOCKETS */
+    socket.on('allUnreadMsg', (number) => {
+        var header = document.getElementById('headerMsg');
+        if (number.countMsg !== 0) {
+            unreadAll = number.countMsg;
+            header.innerText = 'Messagerie (' + number.countMsg + ')';
+        } else {
+            header.innerText = 'Messagerie';
+        }
+    });
+
     var msgForm = document.getElementById('send-message');
     if (msgForm) {
-        var token = document.getElementById('token').dataset.token;
-        function decodeToken(token){
-            var playload = JSON.parse(atob(token.split('.')[1]));
-            return playload;
-
-        }
-        var user = decodeToken(token);
-
         msgForm.onsubmit = (e) => {
             e.preventDefault();
             var inputMessage = document.getElementById('write_msg');
@@ -261,7 +322,6 @@
             if (noMessage) {
                 noMessage.remove();
             }
-
                 if (parseInt(document.getElementById('hiddenInput').value) === msg.msg.toUser) {
                     chat.removeAttribute('style', 'text-align: center;');
                     const outgoing = document.createElement('div');
@@ -277,7 +337,6 @@
                     sentMsg.append(span);
                     outgoing.append(sentMsg);
                     chat.append(outgoing);
-                    // socket.emit('readMsg', msg);
                 }
                 else if (parseInt(document.getElementById('hiddenInput').value) === msg.msg.fromUser) {
                     chat.removeAttribute('style', 'text-align: center;');
@@ -306,7 +365,6 @@
         });
 
         socket.on('blockMessage', (msg) => {
-            // console.log('msg', msg);
             var inputHidden = document.getElementById('hiddenInput')
             if(inputHidden == null)
                 return
@@ -332,6 +390,56 @@
             }, 10);
         })
     }
+
+    /* NOTIFICATIONS */
+
+    var unreadNotifAll = 0;
+
+    const incrementNotif = () => {
+        unreadNotifAll++;
+        var header = document.getElementById('headerNotif');
+        if (unreadNotifAll !== 0) {
+            header.innerText = 'Notifications (' + unreadNotifAll + ')';
+        }
+    }
+
+    socket.on('allUnreadNotif', (number) => {
+        var header = document.getElementById('headerNotif');
+        if (number.countNotif !== 0) {
+            unreadNotifAll = number.countNotif;
+            header.innerText = 'Notifications (' + number.countNotif + ')';
+        } else {
+            header.innerText = 'Notifications';
+        }
+    });
+
+    socket.on('visit', (visits) => {
+        incrementNotif();
+        visitNotif(visits.notif[0].username);
+    });
+
+    socket.on('likeMatch', (info) => {
+        incrementNotif();
+        likeNotif();
+        for (var n = 0; n < info.match.length; n++) {
+            if (parseInt(info.like) === info.match[n]) {
+                incrementNotif();
+                matchNotif();
+            }
+        }
+    })
+
+    socket.on('unlikeMatch', (info) => {
+        incrementNotif();
+        unlikeNotif();
+        for (var m = 0; m < info.unmatch.length; m++) {
+            if (parseInt(info.unlike) === info.unmatch[m]) {
+                incrementNotif();
+                unmatchNotif();
+            }
+        }
+    })
+
 
 </script>
 

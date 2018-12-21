@@ -45,7 +45,7 @@ function checkFileType(file, callback) {
     }
 }
 
-router.get('/', async (request, response) => {
+router.route('/').get(async (request, response) => {
 
     const token = request.cookies.token;
     try {
@@ -63,6 +63,23 @@ router.get('/', async (request, response) => {
         request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
         return response.render('index');
     }
-});
+})
+    .post(async (request, response) => {
+        const select = 'SELECT unread FROM matcha.notifications WHERE `to` = ? AND unread = 1';
+        checkDb.query(select, [parseInt(request.body.userId)]).then((result) => {
+            if (result && result != '') {
+                const update = 'UPDATE matcha.notifications SET unread = null WHERE `to` = ? AND unread = 1';
+                checkDb.query(update, [parseInt(request.body.userId)]).then(() => {
+
+                }).catch((err) => {
+                    console.log('error on update notifcations unread ', err);
+                })
+            } else {
+                console.log('pas de result')
+            }
+        }).catch((err) => {
+            console.log('error on select notifcations unread ', err);
+        })
+    });
 
 module.exports = router;

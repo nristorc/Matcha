@@ -1,7 +1,7 @@
-const express = require('express');
+var express = require('express');
 const app = express();
 const server = require('http').createServer(app);
-const io = require('socket.io').listen(server, {pingInterval: 1000, pingTimeout: 5000});
+io = require('socket.io').listen(server, {pingInterval: 1000, pingTimeout: 5000});
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
@@ -67,6 +67,9 @@ app.use(function (request, response, next) {
     next();
 });
 
+// app.locals.io = io;
+usersSocket = [];
+
 /* ROUTES */
 app.use('/', index);
 app.use('/login', login);
@@ -84,13 +87,14 @@ app.use('/chat', chat);
 app.use('/tagsearch', tagSearch);
 app.use('/notifications', notifications);
 
+
 /* EJS */
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
 /* SOCKETS */
 const jwtSecret = 'ratonlaveur';
-let users = [];
+// let usersSocket = [];
 
 io.sockets.on('connection', (socket) => {
     let currentUser = null;
@@ -104,20 +108,25 @@ io.sockets.on('connection', (socket) => {
                 id: decoded.id,
                 count: 1
             };
-            let user = users.find(u => u.id === currentUser.id);
+            let user = usersSocket.find(u => u.id === currentUser.id);
             if (user) {
                 user.count++;
             } else {
                 currentUser.socket = socket.id;
-                users.push(currentUser);
+                usersSocket.push(currentUser);
 
                 const getUnreadMessages = 'SELECT count(unread) as allUnread FROM matcha.messages WHERE to_user_id = ?';
                 checkDb.query(getUnreadMessages, [decoded.id]).then((result) => {
                     if (result) {
-                        socket.broadcast.emit('users.new', {user: currentUser});
-                        socket.emit('allUnreadMsg', {countMsg: result[0].allUnread});
+                        const getUnreadNotifications = 'SELECT count(unread) as allUnread FROM matcha.notifications WHERE `to` = ?';
+                        checkDb.query(getUnreadNotifications, [decoded.id]).then((result1) => {
+                            if (result1) {
+                                socket.broadcast.emit('users.new', {user: currentUser});
+                                socket.emit('allUnreadMsg', {countMsg: result[0].allUnread});
+                                socket.emit('allUnreadNotif', {countNotif: result1[0].allUnread});
+                            }
+                        });
                     }
-                    // console.log('result all unread', result);
                 }).catch((err) => {
                     console.log('error while trying to get all unread messages from a user: ', err);
                 });
@@ -136,31 +145,30 @@ io.sockets.on('connection', (socket) => {
             checkDb.query(checkBlock, [info.toUser]).then((block) => {
                 if (block[0] && block[0].reported_id === info.fromUser) {
 
-                        var u = users.reduce((acc, elem) => {
+                        var u = usersSocket.reduce((acc, elem) => {
                             if (elem.id == info.toUser) {
                                 acc.push(elem);
                             }
                             return acc;
                         }, []);
-                        // console.log('u',u[0]);
-                        socket.emit('blockMessage', {users, msg: "Cet utilisateur vous a bloqué, vous ne pouvez plus lui envoyer de message"});
+                        socket.emit('blockMessage', {users: usersSocket, msg: "Cet utilisateur vous a bloqué, vous ne pouvez plus lui envoyer de message"});
                         u.forEach(user => {
-                            io.sockets.connected[user.socket].emit('sendingMessage', {users, msg: info, date: new Date()});
+                            io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
                         })
 
                 } else {
                     const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?, unread = 1';
                     checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
                         if (result) {
-                            var u = users.reduce((acc, elem) => {
+                            var u = usersSocket.reduce((acc, elem) => {
                                 if (elem.id == info.toUser) {
                                     acc.push(elem);
                                 }
                                 return acc;
                             }, []);
-                            socket.emit('sendingMessage', {users, msg: info, date: new Date()});
+                            socket.emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
                             u.forEach(user => {
-                                io.sockets.connected[user.socket].emit('sendingMessage', {users, msg: info, date: new Date()});
+                                io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
                             })
                         }
                     }).catch((err) => {
@@ -174,14 +182,8 @@ io.sockets.on('connection', (socket) => {
     });
 
     socket.on('readMsg', (msg) => {
-        // console.log('read');
-        // console.log('msg.msg : ', msg.msg);
         const updateRead = 'UPDATE matcha.messages SET unread = null WHERE from_user_id = ? AND to_user_id = ?';
-        // console.log('msg.msg.fromUser ', msg.msg.fromUser)
-        // console.log('msg.msg.toUser ', msg.msg.toUser);
         checkDb.query(updateRead, [msg.msg.fromUser, msg.msg.toUser]).then((result) => {
-            // console.log('result', result)
-            // console.log('update');
         }).catch((err) => {
             console.log('erreur on update unread message ', err);
         })
@@ -189,11 +191,11 @@ io.sockets.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         if (currentUser) {
-            let user = users.find(u => u.id === currentUser.id);
+            let user = usersSocket.find(u => u.id === currentUser.id);
             if (user) {
                 user.count--;
                 if (user.count === 0) {
-                    users = users.filter(u => u.id !== currentUser.id);
+                    usersSocket = usersSocket.filter(u => u.id !== currentUser.id);
                     socket.broadcast.emit('users.leave', {user: currentUser});
                 }
             }

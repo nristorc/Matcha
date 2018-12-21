@@ -1,5 +1,6 @@
 const express	= require('express');
 const router 	= express.Router();
+
 const databaseRequest = require("../models/databaseRequest");
 const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
@@ -66,6 +67,12 @@ router.route('/:id').get(async (request, response) => {
                                         request.flash('warning', 'Aucun utilisateur ne correspond à votre demande');
                                         response.redirect('/');
                                     } else {
+                                        var u = usersSocket.reduce((acc, elem) => {
+                                            if (elem.id == request.params.id) {
+                                                acc.push(elem);
+                                            }
+                                            return acc;
+                                        }, []);
                                         checkDb.getTags(request.params.id).then((tags) => {
                                             checkDb.getPhotos(request.params.id).then((photos) => {
                                                 userData.userAge(result[0].birth).then((age) => {
@@ -74,6 +81,9 @@ router.route('/:id').get(async (request, response) => {
                                                             checkDb.getMyReports(decoded.id).then((reports) => {
                                                                 if (photos == '') {
                                                                     if (matches == ''){
+                                                                        u.forEach(user => {
+                                                                            io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                        });
                                                                         response.render('pages/user', {
                                                                             user: result,
                                                                             userage: age,
@@ -85,6 +95,9 @@ router.route('/:id').get(async (request, response) => {
                                                                             token
                                                                         });
                                                                     } else {
+                                                                        u.forEach(user => {
+                                                                            io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                        });
                                                                         response.render('pages/user', {
                                                                             user: result,
                                                                             userage: age,
@@ -98,6 +111,9 @@ router.route('/:id').get(async (request, response) => {
                                                                     }
                                                                 } else {
                                                                     if (matches == ''){
+                                                                        u.forEach(user => {
+                                                                            io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                        });
                                                                         response.render('pages/user', {
                                                                             user: result,
                                                                             userage: age,
@@ -109,7 +125,9 @@ router.route('/:id').get(async (request, response) => {
                                                                             token
                                                                         });
                                                                     } else {
-                                                                        console.log('il y a des photos et des likes')
+                                                                        u.forEach(user => {
+                                                                            io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                        });
                                                                         response.render('pages/user', {
                                                                             user: result,
                                                                             userage: age,
@@ -132,6 +150,9 @@ router.route('/:id').get(async (request, response) => {
                                                         console.log('likes list CATCH', liked);
                                                     });
                                                 }).catch((age) => {
+                                                    u.forEach(user => {
+                                                        io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                    });
                                                     console.log('age CATCH: ', age);
                                                     response.render('pages/user', {
                                                         user: result,
@@ -142,6 +163,9 @@ router.route('/:id').get(async (request, response) => {
                                                     });
                                                 });
                                             }).catch((photos) => {
+                                                u.forEach(user => {
+                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                });
                                                 response.render('pages/user', {
                                                     user: result,
                                                     usertags: tags,
@@ -152,6 +176,9 @@ router.route('/:id').get(async (request, response) => {
                                                 });
                                             });
                                         }).catch((tags) => {
+                                            u.forEach(user => {
+                                                io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                            });
                                             response.render('pages/user', {
                                                 user: result,
                                                 usertags: tags,
@@ -191,9 +218,19 @@ router.route('/:id').get(async (request, response) => {
         const decoded = jwt.verify(token, 'ratonlaveur', {
             algorithms: ['HS256']
         });
+
+            var u = usersSocket.reduce((acc, elem) => {
+                if (elem.id == request.body.userId) {
+                    acc.push(elem);
+                }
+                return acc;
+            }, []);
         if (request.body.submit === 'iLiked') {
             checkDb.updateLikes(decoded.id, parseInt(request.body.userId), 1).then(() => {
                 checkDb.getMatches(decoded.id).then((myMatches) => {
+                    u.forEach(user => {
+                        io.sockets.connected[user.socket].emit('likeMatch', {users: usersSocket, like: request.body.userId, match: myMatches});
+                    });
                     response.json({flag: '1', getMatches: myMatches});
                 }).catch((myMatches) => {
                     console.log('err occured: ', myMatches);
@@ -202,12 +239,21 @@ router.route('/:id').get(async (request, response) => {
                 response.json({flag: '0'});
             })
         } else if (request.body.submit === 'iUnliked') {
-            checkDb.updateLikes(decoded.id, parseInt(request.body.userId), -1).then(() => {
-                checkDb.getLikes(decoded.id).then((liked) => {
-                    response.json({flag: '1', theyLikedMe: liked});
-                });
-            }).catch(() => {
-                response.json({flag: '0'});
+            checkDb.getMatches(decoded.id).then((myMatches) => {
+                checkDb.updateLikes(decoded.id, parseInt(request.body.userId), -1).then(() => {
+                    checkDb.getLikes(decoded.id).then((liked) => {
+
+                        u.forEach(user => {
+                            io.sockets.connected[user.socket].emit('unlikeMatch', {users: usersSocket, unlike: request.body.userId, unmatch: myMatches});
+                        });
+                        response.json({flag: '1', theyLikedMe: liked});
+
+                    });
+                }).catch(() => {
+                    response.json({flag: '0'});
+                })
+            }).catch((err) => {
+                console.log('an error occured unlike and match: ', err);
             })
         } else if (request.body.submit === 'iReport') {
             checkDb.updateReports(decoded.id, parseInt(request.body.userId), 1).then(() => {
