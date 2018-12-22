@@ -269,7 +269,6 @@
         socket.on('sendingMessage', (msg) => {
             var inputHidden = document.getElementById('hiddenInput')
             var user = document.querySelector('#chatOnline .user' + msg.msg.fromUser);
-
                 if(inputHidden == null) {
                     msgNotif();
                     incrementMsg();
@@ -389,6 +388,11 @@
                 chat.scrollTop = chat.scrollHeight + 500;
             }, 10);
         })
+    } else {
+        socket.on('sendingMessage', (msg) => {
+            msgNotif();
+            incrementMsg();
+        });
     }
 
     /* NOTIFICATIONS */
