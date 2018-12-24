@@ -131,7 +131,7 @@ router.route('/').get((request, response) => {
         algorithms: ['HS256']
     });
     if (request.body.latitude && request.body.longitude && request.body.city){
-        const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `city` = ?, `changed_loc` = ? WHERE users.id = ?";
+        const sql = "UPDATE matcha.users SET `latitude` = ?, `latitude` = ?, `city` = ?, `changed_loc` = ? WHERE users.id = ?";
         checkDb.query(sql, [request.body.latitude, request.body.longitude, request.body.city, request.body.change, decoded.id]).then(() => {
             console.log("update position reussi")
         }).catch((err) =>{
