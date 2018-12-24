@@ -143,6 +143,7 @@ io.sockets.on('connection', (socket) => {
         if (info.message !== '') {
             const checkBlock = 'SELECT reported_id FROM matcha.reports WHERE report_id = ? AND flag = 2';
             checkDb.query(checkBlock, [info.toUser]).then((block) => {
+                // User blocked
                 if (block[0] && block[0].reported_id === info.fromUser) {
 
                         var u = usersSocket.reduce((acc, elem) => {
@@ -157,23 +158,39 @@ io.sockets.on('connection', (socket) => {
                         })
 
                 } else {
-                    const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?, unread = 1';
-                    checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
-                        if (result) {
-                            var u = usersSocket.reduce((acc, elem) => {
-                                if (elem.id == info.toUser) {
-                                    acc.push(elem);
-                                }
-                                return acc;
-                            }, []);
-                            socket.emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
-                            u.forEach(user => {
-                                io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
-                            })
+                    // User unmatched
+                    console.log('to', info.toUser);
+                    checkDb.getSpecificMatch(info.fromUser, info.toUser).then((result) => {
+                        const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?, unread = 1';
+                        checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
+                            if (result) {
+                                var u = usersSocket.reduce((acc, elem) => {
+                                    if (elem.id == info.toUser) {
+                                        acc.push(elem);
+                                    }
+                                    return acc;
+                                }, []);
+                                socket.emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                                u.forEach(user => {
+                                    io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                                })
+                            }
+                        }).catch((err) => {
+                            console.log('an error occured: ', err);
+                        });
+                    }).catch((result) => {var u = usersSocket.reduce((acc, elem) => {
+                        if (elem.id == info.toUser) {
+                            acc.push(elem);
                         }
-                    }).catch((err) => {
-                        console.log('an error occured: ', err);
+                        return acc;
+                    }, []);
+                        socket.emit('unmatchMessage', {users: usersSocket, msg: "Vous ne matchez plus avec cet utilisateur, vous ne pouvez plus lui envoyer de message"});
+                        u.forEach(user => {
+                            io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                        });
                     });
+
+
                 }
             }).catch((err) => {
                 console.log('an error occured in chat: ', err);
