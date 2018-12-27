@@ -115,20 +115,33 @@ io.sockets.on('connection', (socket) => {
                 currentUser.socket = socket.id;
                 usersSocket.push(currentUser);
 
-                const getUnreadMessages = 'SELECT count(unread) as allUnread FROM matcha.messages WHERE to_user_id = ?';
-                checkDb.query(getUnreadMessages, [decoded.id]).then((result) => {
-                    if (result) {
-                        const getUnreadNotifications = 'SELECT count(unread) as allUnread FROM matcha.notifications WHERE `to` = ?';
-                        checkDb.query(getUnreadNotifications, [decoded.id]).then((result1) => {
-                            if (result1) {
-                                socket.broadcast.emit('users.new', {user: currentUser});
-                                socket.emit('allUnreadMsg', {countMsg: result[0].allUnread});
-                                socket.emit('allUnreadNotif', {countNotif: result1[0].allUnread});
-                            }
-                        });
-                    }
+                const getUnreadNotifications = 'SELECT count(unread) as allUnread FROM matcha.notifications WHERE `to` = ?';
+                checkDb.query(getUnreadNotifications, [decoded.id]).then((result1) => {
+                    checkDb.getMatches(decoded.id).then((tab) => {
+                        const tableau = Array.from(tab);
+                        if (tab != "") {
+                            const sqlCondition = tab.map(el => 'from_user_id = ?').join(' OR ');
+                            const sql = 'SELECT count(unread) as allUnread FROM matcha.messages WHERE (' + sqlCondition + ') AND to_user_id = ?;';
+                            tableau.push(decoded.id);
+                            checkDb.query(sql, tableau).then((result) => {
+                                if (result1) {
+                                    socket.broadcast.emit('users.new', {user: currentUser});
+                                    socket.emit('allUnreadMsg', {countMsg: result[0].allUnread});
+                                    socket.emit('allUnreadNotif', {countNotif: result1[0].allUnread});
+                                }
+                            }).catch((err) => {
+                                console.log('err in getMatches for messages and notifications: ', err);
+                            });
+                        } else {
+                            socket.broadcast.emit('users.new', {user: currentUser});
+                            socket.emit('allUnreadMsg', {countMsg: 0});
+                            socket.emit('allUnreadNotif', {countNotif: result1[0].allUnread});
+                        }
+                    }).catch((err) => {
+                        console.log('An error occured :' , err);
+                    });
                 }).catch((err) => {
-                    console.log('error while trying to get all unread messages from a user: ', err);
+                    console.log('get notifications error: ', err);
                 });
             }
         } catch (e) {
