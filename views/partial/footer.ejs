@@ -115,6 +115,16 @@
         }
     }
 
+    const incrementMsgMatch = (messages) => {
+        unreadAll += messages;
+        var header = document.getElementById('headerMsg');
+        if (unreadAll !== 0) {
+            header.innerText = 'Messagerie (' + unreadAll + ')';
+        } else {
+            header.innerText = 'Messagerie';
+        }
+    }
+
     let socket = io('http://localhost:3000');
     socket.on('connect', () => {
         socket.emit('identify', {
@@ -467,12 +477,10 @@
                 incrementNotif();
                 matchNotif();
                 if (msgForm) {
-                    console.log("je ne suis pas sur page User")
                     const noMatch = document.querySelector('.noMatch');
                     if (noMatch) {
                         noMatch.remove();
                     }
-                    // console.log(info.me[0]);
 
                     var inputHidden = document.getElementById('hiddenInput');
                     if (inputHidden && parseInt(inputHidden.value) === info.me[0].id) {
@@ -493,12 +501,28 @@
                         newMatch += '</h5></div></div></div></div>';
 
                         inboxMatch.insertAdjacentHTML('afterbegin', newMatch);
+                        if (info.messages.length !== 0) {
+                            var unread = 0;
+                            for (var k = 0; k < info.messages.length; k++) {
+                                if (info.messages[k].from_user_id === info.me[0].id) {
+                                    if (info.messages[k].unread === 1) {
+                                        unread++;
+                                    }
+                                }
+                            }
+                            if (unread !== 0) {
+                                var user = document.querySelector('#chatOnline .user' + info.me[0].id);
+                                var notRead = document.createElement('p');
+                                notRead.id = 'unreadMsg' + info.me[0].id;
+                                notRead.innerText = unread + ' message(s) non lu';
+                                user.insertAdjacentElement('afterend', notRead);
+                                incrementMsgMatch(unread);
+                            }
+                        }
                     }
                 } else if (document.getElementById('checkOnline')) {
-                    // console.log(document.getElementById('userDetails').innerText);
                     const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
                     if (document.getElementById('userDetails').innerText === getDetails){
-                        // console.log("je suis sur page User");
                         if ($('.fa-smile-wink')) {
                             $('.fa-smile-wink').remove();
                         }
@@ -507,7 +531,7 @@
                 }
             }
         }
-    })
+    });
 
     socket.on('unlikeMatch', (info) => {
         incrementNotif();
@@ -525,6 +549,18 @@
             if (parseInt(info.unlike) === info.unmatch[m]) {
                 incrementNotif();
                 unmatchNotif();
+
+                if (info.messages.length !== 0) {
+                    var unread = 0;
+                    for (var k = 0; k < info.messages.length; k++) {
+                        if (info.messages[k].from_user_id === info.me[0].id) {
+                            if (info.messages[k].unread === 1) {
+                                unread++;
+                            }
+                        }
+                    }
+                    decrementMsg(unread);
+                }
 
                 if (msgForm) {
                     var inputHidden = document.getElementById('hiddenInput');
@@ -567,10 +603,27 @@
                         }
                     }
                 }
-
             }
         }
-    })
+    });
+
+    // socket.on('unmatched', (me) => {
+    //     for (var m = 0; m < me.unmatch.length; m++) {
+    //         if (parseInt(me.unlike) === me.unmatch[m]) {
+    //             if (me.messages.length !== 0) {
+    //                 var unread = 0;
+    //                 for (var k = 0; k < me.messages.length; k++) {
+    //                     if (me.messages[k].to_user_id === me.me[0].id) {
+    //                         if (me.messages[k].unread === 1) {
+    //                             unread++;
+    //                         }
+    //                     }
+    //                 }
+    //                 decrementMsg(unread);
+    //             }
+    //         }
+    //     }
+    // });
 
 
 </script>

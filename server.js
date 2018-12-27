@@ -159,7 +159,6 @@ io.sockets.on('connection', (socket) => {
 
                 } else {
                     // User unmatched
-                    // console.log('to', info.toUser);
                     checkDb.getSpecificMatch(info.fromUser, info.toUser).then((result) => {
                         const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?, unread = 1';
                         checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
