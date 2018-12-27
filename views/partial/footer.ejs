@@ -115,6 +115,16 @@
         }
     }
 
+    const incrementMsgMatch = (messages) => {
+        unreadAll += messages;
+        var header = document.getElementById('headerMsg');
+        if (unreadAll !== 0) {
+            header.innerText = 'Messagerie (' + unreadAll + ')';
+        } else {
+            header.innerText = 'Messagerie';
+        }
+    }
+
     let socket = io('http://localhost:3000');
     socket.on('connect', () => {
         socket.emit('identify', {
@@ -285,7 +295,7 @@
                         var notRead = document.createElement('p');
                         notRead.id = 'unreadMsg' + msg.msg.fromUser;
                         notRead.innerText = '1 message(s) non lu';
-                        console.log('user1', user);
+                        // console.log('user1', user);
                         user.insertAdjacentElement('afterend', notRead);
                     }
                     return
@@ -307,7 +317,7 @@
                             var notRead2 = document.createElement('p');
                             notRead2.id = 'unreadMsg' + msg.msg.fromUser;
                             notRead2.innerText = '1 message(s) non lu';
-                            console.log('user1', user);
+                            // console.log('user1', user);
                             user.insertAdjacentElement('afterend', notRead2);
                         }
                         return
@@ -407,31 +417,32 @@
         }
     }
 
-    socket.on('unmatchBlock', (msg) => {
-        var inputHidden = document.getElementById('hiddenInput')
-        if(inputHidden == null)
-            return
-        inputHidden  = inputHidden.value;
-        const chat = document.querySelector('.msg_history');
-        const noMessage = document.getElementById('noMessage');
-        const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-
-        if (document.getElementById('unmatchMsg')) {
-            document.getElementById('unmatchMsg').remove();
-        }
-
-        if (noMessage) {
-            noMessage.remove();
-        }
-
-        const bloc = document.createElement('p');
-        bloc.innerText = msg.msg;
-        bloc.id = 'unmatchMsg';
-        chat.append(bloc);
-        setTimeout(() => {
-            chat.scrollTop = chat.scrollHeight + 500;
-        }, 10);
-    })
+    // socket.on('unmatchBlock', (msg) => {
+    //     console.log("unmatch de l'utilisateur");
+    //     var inputHidden = document.getElementById('hiddenInput')
+    //     if(inputHidden == null)
+    //         return
+    //     inputHidden  = inputHidden.value;
+    //     const chat = document.querySelector('.msg_history');
+    //     const noMessage = document.getElementById('noMessage');
+    //     const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    //
+    //     if (document.getElementById('unmatchMsg')) {
+    //         document.getElementById('unmatchMsg').remove();
+    //     }
+    //
+    //     if (noMessage) {
+    //         noMessage.remove();
+    //     }
+    //
+    //     const bloc = document.createElement('p');
+    //     bloc.innerText = msg.msg;
+    //     bloc.id = 'unmatchMsg';
+    //     chat.append(bloc);
+    //     setTimeout(() => {
+    //         chat.scrollTop = chat.scrollHeight + 500;
+    //     }, 10);
+    // })
 
     socket.on('allUnreadNotif', (number) => {
         var header = document.getElementById('headerNotif');
@@ -451,63 +462,170 @@
     socket.on('likeMatch', (info) => {
         incrementNotif();
         likeNotif();
+
+        if (document.getElementById('checkOnline')) {
+            const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+            if (document.getElementById('userDetails').innerText === getDetails){
+                if ($('.fa-thumbs-up')) {
+                    $('.fa-thumbs-up').append('<span><i class="far fa-smile-wink" style="color: rgb(255, 0, 100); font-size: xx-large; margin-left: 10px"></i></span>');
+                }
+            }
+        }
+
+        if (info.messages.length !== 0) {
+            var unread = 0;
+            for (var k = 0; k < info.messages.length; k++) {
+                if (info.messages[k].from_user_id === info.me[0].id) {
+                    if (info.messages[k].unread === 1) {
+                        unread++;
+                    }
+                }
+            }
+        }
+
+
         for (var n = 0; n < info.match.length; n++) {
             if (parseInt(info.like) === info.match[n]) {
                 incrementNotif();
                 matchNotif();
+                incrementMsgMatch(unread);
                 if (msgForm) {
                     const noMatch = document.querySelector('.noMatch');
                     if (noMatch) {
                         noMatch.remove();
                     }
-                    console.log(info.me[0]);
 
-                    const inboxMatch = document.querySelector('.inbox_chat');
+                    var inputHidden = document.getElementById('hiddenInput');
+                    if (inputHidden && parseInt(inputHidden.value) === info.me[0].id) {
 
-                    var newMatch = '<div class="chat_list" onclick="activeChat(this,  ' + info.me[0].id + ')">' +
-                        '<div class="chat_people">' +
-                        '<div class="chat_img">' +
-                        '<img src="' + info.me[0].profil + '" style="border-radius: 50%" alt="profil">' +
-                        '</div><div class="chat_ib"><div id="chatOnline"><h5>' + info.me[0].username;
-                    if (info.me[0].online === 'N') {
-                        newMatch += ' <i style="color: red;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>'
-                    } else if (info.me[0].online === 'Y') {
-                        newMatch += ' <i style="color: green;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>';
+                    } else {
+                        const inboxMatch = document.querySelector('.inbox_chat');
+
+                        var newMatch = '<div class="chat_list" onclick="activeChat(this,  ' + info.me[0].id + ')">' +
+                            '<div class="chat_people">' +
+                            '<div class="chat_img">' +
+                            '<img src="' + info.me[0].profil + '" style="border-radius: 50%" alt="profil">' +
+                            '</div><div class="chat_ib"><div id="chatOnline"><h5>' + info.me[0].username;
+                        if (info.me[0].online === 'N') {
+                            newMatch += ' <i style="color: red;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>'
+                        } else if (info.me[0].online === 'Y') {
+                            newMatch += ' <i style="color: green;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>';
+                        }
+                        newMatch += '</h5></div></div></div></div>';
+
+                        inboxMatch.insertAdjacentHTML('afterbegin', newMatch);
+                        if (unread !== 0) {
+                            var user = document.querySelector('#chatOnline .user' + info.me[0].id);
+                            var notRead = document.createElement('p');
+                            notRead.id = 'unreadMsg' + info.me[0].id;
+                            notRead.innerText = unread + ' message(s) non lu';
+                            user.insertAdjacentElement('afterend', notRead);
+                        }
                     }
-                    newMatch += '</h5></div></div></div></div>';
-
-                    inboxMatch.insertAdjacentHTML('afterbegin', newMatch);
+                } else if (document.getElementById('checkOnline')) {
+                    const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+                    if (document.getElementById('userDetails').innerText === getDetails){
+                        if ($('.fa-smile-wink')) {
+                            $('.fa-smile-wink').remove();
+                        }
+                        $('#likeAndMatch').append('<span><i class="fas fa-heartbeat" style="color: red; font-size: xx-large; margin-left: 10px"></i></span>');
+                    }
                 }
             }
         }
-    })
+    });
 
     socket.on('unlikeMatch', (info) => {
         incrementNotif();
         unlikeNotif();
+        if (document.getElementById('checkOnline')) {
+            const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+            if (document.getElementById('userDetails').innerText === getDetails){
+                if ($('.fa-smile-wink')) {
+                    $('.fa-smile-wink').remove();
+                }
+            }
+        }
+
         for (var m = 0; m < info.unmatch.length; m++) {
             if (parseInt(info.unlike) === info.unmatch[m]) {
                 incrementNotif();
                 unmatchNotif();
 
+                if (info.messages.length !== 0) {
+                    var unread = 0;
+                    for (var k = 0; k < info.messages.length; k++) {
+                        if (info.messages[k].from_user_id === info.me[0].id) {
+                            if (info.messages[k].unread === 1) {
+                                unread++;
+                            }
+                        }
+                    }
+                    decrementMsg(unread);
+                }
+
                 if (msgForm) {
                     var inputHidden = document.getElementById('hiddenInput');
+                    var myMatches = document.getElementsByClassName('chat_list');
+                    // console.log('start',myMatches.length);
                     if(inputHidden == null) {
                         const unmatchUser = document.querySelector('#chatOnline .user' + info.me[0].id);
                         const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
                         parent.remove();
+                        if (myMatches.length === 0) {
+                            const noMatch = document.createElement('div');
+                            noMatch.setAttribute('class', 'noMatch');
+                            const p = document.createElement('p');
+                            p.innerText = 'Vous ne possédez aucun match...';
+                            noMatch.append(p);
+                            document.querySelector('.inbox_chat').append(noMatch);
+                        }
                         return;
                     } else if (inputHidden && (parseInt(inputHidden.value) !== info.me[0].id)) {
                         const unmatchUser = document.querySelector('#chatOnline .user' + info.me[0].id);
                         const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
                         parent.remove();
+                        // if (myMatches.length === 0) {
+                        //     console.log('2')
+                            // const noMatch = document.createElement('div');
+                            // noMatch.setAttribute('class', 'noMatch');
+                            // const p = document.createElement('p');
+                            // p.innerText = 'Vous ne possédez aucun match...';
+                            // noMatch.append(p);
+                            // document.querySelector('inbox_chat').append(noMatch);
+                        // }
                         return;
                     }
+                } else if (document.getElementById('checkOnline')) {
+                    // console.log(document.getElementById('userDetails').innerText);
+                    const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+                    if (document.getElementById('userDetails').innerText === getDetails){
+                        if ($('.fa-heartbeat')) {
+                            $('.fa-heartbeat').remove();
+                        }
+                    }
                 }
-
             }
         }
-    })
+    });
+
+    // socket.on('unmatched', (me) => {
+    //     for (var m = 0; m < me.unmatch.length; m++) {
+    //         if (parseInt(me.unlike) === me.unmatch[m]) {
+    //             if (me.messages.length !== 0) {
+    //                 var unread = 0;
+    //                 for (var k = 0; k < me.messages.length; k++) {
+    //                     if (me.messages[k].to_user_id === me.me[0].id) {
+    //                         if (me.messages[k].unread === 1) {
+    //                             unread++;
+    //                         }
+    //                     }
+    //                 }
+    //                 decrementMsg(unread);
+    //             }
+    //         }
+    //     }
+    // });
 
 
 </script>

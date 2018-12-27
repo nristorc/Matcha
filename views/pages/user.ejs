@@ -177,6 +177,21 @@
                             if ($('.fa-smile-wink')) {
                                 $('.fa-smile-wink').remove();
                             }
+                            if (data.messages) {
+                                if (data.messages.length !== 0) {
+                                    var unread = 0;
+                                    for (var k = 0; k < data.messages.length; k++) {
+                                        if (data.messages[k].from_user_id === userId) {
+                                            if (data.messages[k].unread === 1) {
+                                                unread++;
+                                            }
+                                        }
+                                    }
+                                    if (unread !== 0) {
+                                        incrementMsgMatch(unread);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -198,7 +213,6 @@
             encode		: true
         })
             .done(function(data) {
-                console.log('data unlike: ', data);
                 if (data.flag === '1') {
                     $('.fa-thumbs-up').attr('class', 'far fa-thumbs-up');
                     $('.fa-thumbs-up').attr('style', 'font-size: xx-large; margin-left: 10px');
@@ -206,6 +220,21 @@
 
                     if ($('.fa-heartbeat')) {
                         $('.fa-heartbeat').remove();
+                        if (data.messages) {
+                            if (data.messages.length !== 0) {
+                                var unread = 0;
+                                for (var k = 0; k < data.messages.length; k++) {
+                                    if (data.messages[k].from_user_id === userId) {
+                                        if (data.messages[k].unread === 1) {
+                                            unread++;
+                                        }
+                                    }
+                                }
+                                if (unread !== 0) {
+                                    decrementMsg(unread);
+                                }
+                            }
+                        }
                     }
                     for (var a = 0; a < data.theyLikedMe.length; a++){
                         if (data.theyLikedMe && data.theyLikedMe[a].user_id === userId) {
