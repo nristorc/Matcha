@@ -7,6 +7,7 @@ const str = require('../models/str');
 const fs = require('fs');
 const hogan = require('hogan.js');
 const random = new str();
+const ipstack = require('ipstack');
 
 class DatabaseRequest {
 
@@ -381,12 +382,58 @@ class DatabaseRequest {
         }
     }
 
-    async getAllUsers(orientation, filter, sort, tags, user_tags){
+    async getPosition(user_id){
         try {
             return new Promise((resolve, reject) => {
+                const sql = "SELECT `users`.`latitude`, `users`.`longitude` FROM matcha.users WHERE id = ?";
+                this.query(sql, user_id).then((position) => {
+                    if (position){
+                        resolve(position);
+                    } else {
+                        reject('no position found');
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+// -------------------------ALGO PONDERE-------------------------
+    // SELECT *, COUNT(`tmp`.`id`), 
+    // (6371 * ACOS(COS(RADIANS(48.792001)) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS(2.3985099999999875)) + SIN(RADIANS(48.792001)) * SIN(RADIANS(`latitude`)))) AS `loc`, 
+    // (1000 / LN((6371 * ACOS(COS(RADIANS(48.792001)) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS(2.3985099999999875)) + SIN(RADIANS(48.792001)) * SIN(RADIANS(`latitude`)))) + 1.1) + COUNT(`tmp`.`id`) * 1000 + (`popularity` + 100)) AS 'score' FROM (
+    //     SELECT `users`.* 
+    //     FROM matcha.users 
+    //     WHERE registerToken = 'NULL' 
+    //     AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) 
+    //     AND `users`.`id` !=1 AND `users`.`id` !=3 AND `users`.`id` !=2
+        
+    //     UNION ALL 
+        
+    //     SELECT `users`.* 
+    //     FROM `matcha`.`users` INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` WHERE (`tags`.`tag` = "cacahouete") AND registerToken = 'NULL' AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) 
+    //     AND `users`.`id` !=1 
+        
+    // ) AS `tmp` 
+    // GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline`, `tmp`.`city`, `tmp`.`latitude`, `tmp`.`longitude`, `tmp`.`changed_loc`
+    // ORDER BY `score` DESC
+
+    async getAllUsers(orientation, filter, sort, tags, user_tags, user_position, reports){
+        try {
+            return new Promise((resolve, reject) => {
+                var location = "";
+                location = "(6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`latitude`))))";
+                // location = ", (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`latitude`)) * COS(RADIANS(`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`latitude`)))) AS `loc` ";
+                var block = "";
+                for (var r=0; r < reports.length; r++){
+                    block = block.concat(" AND `users`.`id` != " + reports[r].reported_id);
+                }
 				var sql;
-				var secretSauce =  ", `popularity` DESC"; //A COMPLETER
-				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline` ";
+				var secretSauce = "(1000 / LN(" + location + "+ 1.1) + COUNT(`tmp`.`id`) * 1000 + (`popularity` + 100))";
+				// var secretSauce = " COUNT(`tmp`.`id`) DESC, `popularity` DESC, `loc` ASC ";
+				var groupBy = " GROUP BY `tmp`.`id`, `tmp`.`email`, `tmp`.`firstname`, `tmp`.`lastname`, `tmp`.`username`, `tmp`.`password`, `tmp`.`created_at`, `tmp`.`registerToken`, `tmp`.`active`, `tmp`.`resetToken`, `tmp`.`reset_at`, `tmp`.`birth`, `tmp`.`gender`, `tmp`.`orientation`, `tmp`.`description`, `tmp`.`popularity`, `tmp`.`profil`, `tmp`.`online`, `tmp`.`lastOnline`, `tmp`.`city`, `tmp`.`latitude`, `tmp`.`longitude`, `tmp`.`changed_loc` ";
 		// ---------- structure de requete generique ----------
 
 					// SELECT *, COUNT(`tmp`.`id`) FROM (
@@ -411,9 +458,9 @@ class DatabaseRequest {
 
 		// -------------------------------------------------------
 			if (!tags){
-				sql = "SELECT *, COUNT(`tmp`.`id`) FROM (SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL' ";
+				sql = "SELECT *, COUNT(`tmp`.`id`), " + location + " AS `loc`," + secretSauce + " AS 'score' FROM (SELECT `users`.* FROM matcha.users WHERE registerToken = 'NULL' ";
 				if (orientation){
-					sql = sql.concat(orientation);
+					sql = sql.concat(orientation + block);
 					if (filter){
 						sql = sql.concat(filter);
 					}
@@ -434,7 +481,7 @@ class DatabaseRequest {
 					}
 				}
 				if (orientation){
-					sql = sql.concat("registerToken = 'NULL' " + orientation);
+					sql = sql.concat("registerToken = 'NULL' " + orientation + block);
 					if (filter){
 						sql = sql.concat(filter);
 					}
@@ -488,9 +535,9 @@ class DatabaseRequest {
 			else if (tags){
 				// console.log("tags: ", tags);
 				// console.log("sort: ", sort);
-				sql = "SELECT *, COUNT(`tmp`.`id`) FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
+				sql = "SELECT *, COUNT(`tmp`.`id`), " + location + " AS `loc`," + secretSauce + " AS 'score' FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ";
 				if (orientation){
-					sql = sql.concat(orientation);
+					sql = sql.concat(orientation + block);
 					if (filter){
 						sql = sql.concat(filter);
 					}
@@ -499,7 +546,7 @@ class DatabaseRequest {
                     // console.log("------------TAGS-------------", tags);
 					sql = sql.concat(" UNION ALL SELECT `g`.* FROM (SELECT `users`.* FROM matcha.users" + tags + "AND registerToken = 'NULL' ");
 					if (orientation){
-						sql = sql.concat(orientation);
+						sql = sql.concat(orientation + block);
 						if (filter){
 							sql = sql.concat(filter);
 						}
@@ -525,9 +572,9 @@ class DatabaseRequest {
 			if (sort && sort != "tag"){
 				sql = sql.concat(sort + ", ");
 			}
-            sql = sql.concat("COUNT(`tmp`.`id`) DESC", secretSauce);
+            sql = sql.concat(" `score` DESC");
             
-			// console.log("SQL = ", sql);
+			console.log("SQL = ", sql);
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);
@@ -932,6 +979,31 @@ class DatabaseRequest {
                 }).catch((result) => {
                     console.log('catch', result);
                 })
+            });
+        }
+         catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    async forceGeo(ip, user_id) {
+        try {
+            return new Promise((resolve, reject) => {
+				console.log(ip);
+
+                this.query("SELECT `changed_loc` FROM matcha.users WHERE `id` = ?", [user_id]).then((loc) => {
+					if (loc[0].changed_loc == "E"){
+						ipstack(ip,"31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
+							const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `changed_loc` = ? WHERE users.id = ?";
+							this.query(sql, [response.latitude, response.longitude, "E", user_id]).then(() => {
+								console.log("geoloc forcee reussie");
+								});
+							});
+                        };
+                }).catch((err) => {
+					console.log(err);
+				});
             });
         }
          catch (error) {

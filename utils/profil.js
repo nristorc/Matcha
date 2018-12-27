@@ -44,6 +44,12 @@ function checkFileType(file, callback) {
         callback({message: "Image corrompue !"});
     }
 }
+var googleMapsClient = require('@google/maps').createClient({
+	key: 'AIzaSyBeGqsazfzYjC4__DuVZ-pB6Hik52ciaNI'
+	});
+
+const publicIp = require('public-ip');
+const ipstack = require('ipstack')
 
 router.route('/').get((request, response) => {
     const token = request.cookies.token;
@@ -51,6 +57,25 @@ router.route('/').get((request, response) => {
     const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
+
+    // var ip = request.headers['x-forwarded-for'] || 
+    // request.connection.remoteAddress || 
+    // request.socket.remoteAddress ||
+    // (request.connection.socket ? request.connection.socket.remoteAddress : null);
+    // console.log("adresse IP: ", ip);
+
+    publicIp.v4().then(ip => {
+        checkDb.forceGeo(ip, decoded.id).then((geoloc) => {
+            console.log(geoloc);
+        }).catch((err) => {
+            console.log(err);
+        });
+    
+
+        // http://api.ipstack.com/134.201.250.155 ? access_key = "31f49d56e09d0468b0ac0349dfdb75fe"
+
+    });
+    
     checkDb.getUser(decoded.username).then((user) => {
         checkDb.getTags(decoded.id).then((tags) => {
             checkDb.getPhotos(decoded.id).then((photos) => {
@@ -105,7 +130,15 @@ router.route('/').get((request, response) => {
     const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
-
+    if (request.body.latitude && request.body.longitude && request.body.city){
+        const sql = "UPDATE matcha.users SET `latitude` = ?, `latitude` = ?, `city` = ?, `changed_loc` = ? WHERE users.id = ?";
+        checkDb.query(sql, [request.body.latitude, request.body.longitude, request.body.city, request.body.change, decoded.id]).then(() => {
+            console.log("update position reussi")
+        }).catch((err) =>{
+            console.log(err);
+        });
+        // console.log("POST", request.body);
+    }
 
     if (request.body.submit === 'modifyParams') {
         const data = {

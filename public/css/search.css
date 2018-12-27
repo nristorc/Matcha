@@ -201,7 +201,8 @@ a:hover {
     color: pink;
     background-color: rgb(255, 0, 100) !important;
     border:none;
-    cursor: auto;   
+    cursor: auto;
+    /* outline: none !important; */
 }
 
 .slider .slider-handle.round {
