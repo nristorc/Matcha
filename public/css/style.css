@@ -248,8 +248,13 @@ button:focus {
 #rowPic {
     background: none;
     border: none;
+    margin-top: 10%;
 }
 .photos{
     background: none;
     border: none;
+}
+
+.media {
+    margin-top: 5%;
 }

@@ -26,7 +26,10 @@ a:hover {
 }
 
 .scroll {
-	margin-top: 100px;
+    margin-top: 100px;
+    flex-wrap: wrap;
+    display: inline-flex;
+    max-width: none !important;
 }
 
 .popularity-search-1 {
@@ -179,6 +182,7 @@ a:hover {
 
 .search-col {
     padding: 30px;
+    margin: 30px;
 }
 
 .desc-search {
