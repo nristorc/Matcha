@@ -32,8 +32,10 @@ class Sort{
     //     });
 	// }
 
-    async searchParamsCheck(filter, sort){
+    async searchParamsCheck(filter, sort, user_position){
         return new Promise((resolve, reject) => {
+			// console.log("user_position.latitude", user_position[0].latitude);
+			// console.log("user_position.longitude", user_position[0].longitude);
 			var reqSort;
 			var reqFilter;
 			var reqTag;
@@ -47,7 +49,7 @@ class Sort{
 				} else if (sort == "ageDesc"){
 					reqSort = "`birth` DESC";
 				} else if (sort == "loc"){
-					reqSort = "`birth` DESC";
+					reqSort = "`loc` ASC";
 				} else if (sort == "tag"){
 					reqSort = "tag";
 				} else {
@@ -73,8 +75,15 @@ class Sort{
 				var popMax = popFilter.substring(popFilter.indexOf(",")+1);
 				var locMin = locFilter.substring(0, locFilter.indexOf(","));
 				var locMax = locFilter.substring(locFilter.indexOf(",")+1);
-				reqFilter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + 
-				"\" AND `popularity` BETWEEN " + popMin + " AND " + popMax;
+				if (locMax == 100){
+					reqFilter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + 
+					"\" AND `popularity` BETWEEN " + popMin + " AND " + popMax +
+					" AND (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`users`.`latitude`)) * COS(RADIANS(`users`.`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`users`.`latitude`))) > " + locMin + ")";
+				} else {
+					reqFilter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + 
+					"\" AND `popularity` BETWEEN " + popMin + " AND " + popMax +
+					" AND (6371 * ACOS(COS(RADIANS(" + user_position[0].latitude + ")) * COS(RADIANS(`users`.`latitude`)) * COS(RADIANS(`users`.`longitude`) - RADIANS("+user_position[0].longitude+")) + SIN(RADIANS("+user_position[0].latitude+")) * SIN(RADIANS(`users`.`latitude`))) BETWEEN " + locMin + " AND " + locMax + ")";
+				}
 				if (tagFilter != ""){
 					tagFilter = tagFilter.split(',');
 					reqTag = " INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id`";

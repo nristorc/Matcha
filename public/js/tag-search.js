@@ -70,7 +70,7 @@ $(function () {
             var k = e.which || e.key
             if(/^(9)$/.test(k)) {
                 $(this).value = ""
-                console.log("Tabulation catch:" + k)
+                // console.log("Tabulation catch:" + k)
                 e.preventDefault()
             }
 		})

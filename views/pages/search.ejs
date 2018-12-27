@@ -43,7 +43,7 @@
 			locMin = 1;
 		}
 		if (!locMax){
-			locMax = 50;
+			locMax = 100;
 		}
 		%>
 		<div class="accordion" id="accordionExample">
@@ -76,9 +76,9 @@
 					<div class="d-flex bd-highlight">
 						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:right;">1km</div>
 						<div class="p-2 flex-fill bd-highlight">
-							<input id="slideLoc" type="text" class="span2" value="" data-slider-min="1" data-slider-max="50" data-slider-step="1" data-slider-value="[<%=locMin%>,<%=locMax%>]" data-slider-handle="round"/>
+							<input id="slideLoc" type="text" class="span2" value="" data-slider-min="1" data-slider-max="100" data-slider-step="1" data-slider-value="[<%=locMin%>,<%=locMax%>]" data-slider-handle="round"/>
 						</div>
-						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">50km+</div>
+						<div class="p-2 flex-fill bd-highlight" style="width: 80px; text-align:left;">100km+</div>
 					</div>
 
 				<!-- Tags module -->
@@ -102,8 +102,6 @@
 </nav>
 
 <%}%>
-
-<!-- Block check -->
 
 <!-- Results -->
 <div class="scroll" id="scroll">
@@ -188,7 +186,6 @@
 			}
 			if (like === 1 && liked === 1){ %>
 				<script>
-					// getscript
 					document.getElementById("matched<%=users[x]['id']%>").style.display = "flex";
 					document.getElementById("oklikeSearch-<%=users[x]['id']%>").style.display = "none";
 					document.getElementById("unlikeSearch-<%=users[x]['id']%>").style.display = "flex";
@@ -227,12 +224,6 @@
 <script src="./public/js/scroll.js"></script>
 <script src="./public/js/like.js"></script>
 <script src="./public/js/tag-search.js"></script>
-<!-- <script src="./public/js/location.js"></script> -->
-<!-- <script>
-
-	const iplocation = require("iplocation").default;
-	console.log(iplocation);
-</script> -->
 
 
 <% } %>
