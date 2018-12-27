@@ -528,15 +528,34 @@
 
                 if (msgForm) {
                     var inputHidden = document.getElementById('hiddenInput');
+                    var myMatches = document.getElementsByClassName('chat_list');
+                    // console.log('start',myMatches.length);
                     if(inputHidden == null) {
                         const unmatchUser = document.querySelector('#chatOnline .user' + info.me[0].id);
                         const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
                         parent.remove();
+                        if (myMatches.length === 0) {
+                            const noMatch = document.createElement('div');
+                            noMatch.setAttribute('class', 'noMatch');
+                            const p = document.createElement('p');
+                            p.innerText = 'Vous ne possédez aucun match...';
+                            noMatch.append(p);
+                            document.querySelector('.inbox_chat').append(noMatch);
+                        }
                         return;
                     } else if (inputHidden && (parseInt(inputHidden.value) !== info.me[0].id)) {
                         const unmatchUser = document.querySelector('#chatOnline .user' + info.me[0].id);
                         const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
                         parent.remove();
+                        // if (myMatches.length === 0) {
+                        //     console.log('2')
+                            // const noMatch = document.createElement('div');
+                            // noMatch.setAttribute('class', 'noMatch');
+                            // const p = document.createElement('p');
+                            // p.innerText = 'Vous ne possédez aucun match...';
+                            // noMatch.append(p);
+                            // document.querySelector('inbox_chat').append(noMatch);
+                        // }
                         return;
                     }
                 } else if (document.getElementById('checkOnline')) {
