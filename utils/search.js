@@ -85,13 +85,10 @@ router.route('/').get((request, response) => {
                 resSort.searchParamsCheck(request.query.filter, request.query.sort, user_position).then((searchPref) => {
                     checkDb.setOrientation(decoded.id).then((orientation) => {
                         checkDb.getTags(decoded.id).then((user_tags) => {
-                            checkDb.getMyReports(decoded.id).then((reports) => {
+                            checkDb.getMyBlocks(decoded.id).then((reports) => {
                                 checkDb.getAllUsers(orientation, searchPref['reqFilter'], searchPref['reqSort'], searchPref['reqTag'], user_tags, user_position, reports).then((users) => {
-                                    // console.log("----------REPORTS------------", reports, "------------------------");
-                                    // console.log("index : ", request.query.index);
                                     if (!request.query.index) {
                                         checkDb.getLikes(decoded.id).then((likes) => {
-                                            // console.log("request.query.tag", request.query);
                                             response.render('pages/search', {
                                                 users: users,
                                                 index: 0,
@@ -211,9 +208,19 @@ router.route('/').get((request, response) => {
             var userLiked =  data.substring(13, data.length);
             if (likeAction == "oklikeSearch"){
                 checkDb.updateLikes(decoded.id, userLiked, 1).then((update) => {
+                    checkDb.getMatches(decoded.id).then((myMatches) => {
+                        response.json({getMatches: myMatches});
+                    }).catch((myMatches) => {
+                        console.log('err occured: ', myMatches);
+                    });
                 });
             } else if (likeAction == "unlikeSearch"){
-                checkDb.updateLikes(decoded.id, userLiked, -1).then((update) => {
+                checkDb.getMatches(decoded.id).then((myMatches) => {
+                    checkDb.updateLikes(decoded.id, userLiked, -1).then((update) => {
+                        response.json({getMatches: myMatches});
+                    });
+                }).catch((myMatches) => {
+                    console.log('err occured: ', myMatches);
                 });
             }
         }

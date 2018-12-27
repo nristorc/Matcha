@@ -743,6 +743,24 @@ class DatabaseRequest {
         }
     }
 
+    async getMyBlocks(params){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.reports WHERE report_id = ? and flag = ?";
+                this.query(sql, [params, 2]).then((reports) => {
+                    if (reports){
+                        resolve(reports);
+                    } else {
+                        reject(reports);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     getSpecificMatch(iLike, userLiked) {
         try {
             return new Promise((resolve, reject) => {
