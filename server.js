@@ -153,13 +153,13 @@ io.sockets.on('connection', (socket) => {
                             return acc;
                         }, []);
                         socket.emit('blockMessage', {users: usersSocket, msg: "Cet utilisateur vous a bloqué, vous ne pouvez plus lui envoyer de message"});
-                        u.forEach(user => {
-                            io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
-                        })
+                        // u.forEach(user => {
+                        //     io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                        // })
 
                 } else {
                     // User unmatched
-                    console.log('to', info.toUser);
+                    // console.log('to', info.toUser);
                     checkDb.getSpecificMatch(info.fromUser, info.toUser).then((result) => {
                         const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?, unread = 1';
                         checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
@@ -184,10 +184,10 @@ io.sockets.on('connection', (socket) => {
                         }
                         return acc;
                     }, []);
-                        socket.emit('unmatchMessage', {users: usersSocket, msg: "Vous ne matchez plus avec cet utilisateur, vous ne pouvez plus lui envoyer de message"});
-                        u.forEach(user => {
-                            io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
-                        });
+                        socket.emit('blockMessage', {users: usersSocket, msg: "Vous ne matchez plus avec cet utilisateur, vous ne pouvez plus lui envoyer de message"});
+                        // u.forEach(user => {
+                        //     io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                        // });
                     });
 
 

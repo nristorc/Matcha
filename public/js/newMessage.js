@@ -44,8 +44,8 @@ let iceToast = {
   },
   push: function(xx){
 
-    console.log('push');
-    console.log('xx', xx);
+    // console.log('push');
+    // console.log('xx', xx);
     // create the ul box if on the first push
     if (!this.domToastBox) {
       this.initDom()
@@ -81,8 +81,8 @@ let iceToast = {
 
     // remove li in the dom
 
-      console.log('ul', ul);
-      console.log('li', li);
+      // console.log('ul', ul);
+      // console.log('li', li);
 
     this.remove(ul,li,time)
     

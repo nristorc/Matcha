@@ -285,7 +285,7 @@
                         var notRead = document.createElement('p');
                         notRead.id = 'unreadMsg' + msg.msg.fromUser;
                         notRead.innerText = '1 message(s) non lu';
-                        console.log('user1', user);
+                        // console.log('user1', user);
                         user.insertAdjacentElement('afterend', notRead);
                     }
                     return
@@ -307,7 +307,7 @@
                             var notRead2 = document.createElement('p');
                             notRead2.id = 'unreadMsg' + msg.msg.fromUser;
                             notRead2.innerText = '1 message(s) non lu';
-                            console.log('user1', user);
+                            // console.log('user1', user);
                             user.insertAdjacentElement('afterend', notRead2);
                         }
                         return
@@ -407,31 +407,32 @@
         }
     }
 
-    socket.on('unmatchBlock', (msg) => {
-        var inputHidden = document.getElementById('hiddenInput')
-        if(inputHidden == null)
-            return
-        inputHidden  = inputHidden.value;
-        const chat = document.querySelector('.msg_history');
-        const noMessage = document.getElementById('noMessage');
-        const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-
-        if (document.getElementById('unmatchMsg')) {
-            document.getElementById('unmatchMsg').remove();
-        }
-
-        if (noMessage) {
-            noMessage.remove();
-        }
-
-        const bloc = document.createElement('p');
-        bloc.innerText = msg.msg;
-        bloc.id = 'unmatchMsg';
-        chat.append(bloc);
-        setTimeout(() => {
-            chat.scrollTop = chat.scrollHeight + 500;
-        }, 10);
-    })
+    // socket.on('unmatchBlock', (msg) => {
+    //     console.log("unmatch de l'utilisateur");
+    //     var inputHidden = document.getElementById('hiddenInput')
+    //     if(inputHidden == null)
+    //         return
+    //     inputHidden  = inputHidden.value;
+    //     const chat = document.querySelector('.msg_history');
+    //     const noMessage = document.getElementById('noMessage');
+    //     const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    //
+    //     if (document.getElementById('unmatchMsg')) {
+    //         document.getElementById('unmatchMsg').remove();
+    //     }
+    //
+    //     if (noMessage) {
+    //         noMessage.remove();
+    //     }
+    //
+    //     const bloc = document.createElement('p');
+    //     bloc.innerText = msg.msg;
+    //     bloc.id = 'unmatchMsg';
+    //     chat.append(bloc);
+    //     setTimeout(() => {
+    //         chat.scrollTop = chat.scrollHeight + 500;
+    //     }, 10);
+    // })
 
     socket.on('allUnreadNotif', (number) => {
         var header = document.getElementById('headerNotif');
@@ -451,32 +452,58 @@
     socket.on('likeMatch', (info) => {
         incrementNotif();
         likeNotif();
+
+        if (document.getElementById('checkOnline')) {
+            const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+            if (document.getElementById('userDetails').innerText === getDetails){
+                if ($('.fa-thumbs-up')) {
+                    $('.fa-thumbs-up').append('<span><i class="far fa-smile-wink" style="color: rgb(255, 0, 100); font-size: xx-large; margin-left: 10px"></i></span>');
+                }
+            }
+        }
+
         for (var n = 0; n < info.match.length; n++) {
             if (parseInt(info.like) === info.match[n]) {
                 incrementNotif();
                 matchNotif();
                 if (msgForm) {
+                    console.log("je ne suis pas sur page User")
                     const noMatch = document.querySelector('.noMatch');
                     if (noMatch) {
                         noMatch.remove();
                     }
-                    console.log(info.me[0]);
+                    // console.log(info.me[0]);
 
-                    const inboxMatch = document.querySelector('.inbox_chat');
+                    var inputHidden = document.getElementById('hiddenInput');
+                    if (inputHidden && parseInt(inputHidden.value) === info.me[0].id) {
 
-                    var newMatch = '<div class="chat_list" onclick="activeChat(this,  ' + info.me[0].id + ')">' +
-                        '<div class="chat_people">' +
-                        '<div class="chat_img">' +
-                        '<img src="' + info.me[0].profil + '" style="border-radius: 50%" alt="profil">' +
-                        '</div><div class="chat_ib"><div id="chatOnline"><h5>' + info.me[0].username;
-                    if (info.me[0].online === 'N') {
-                        newMatch += ' <i style="color: red;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>'
-                    } else if (info.me[0].online === 'Y') {
-                        newMatch += ' <i style="color: green;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>';
+                    } else {
+                        const inboxMatch = document.querySelector('.inbox_chat');
+
+                        var newMatch = '<div class="chat_list" onclick="activeChat(this,  ' + info.me[0].id + ')">' +
+                            '<div class="chat_people">' +
+                            '<div class="chat_img">' +
+                            '<img src="' + info.me[0].profil + '" style="border-radius: 50%" alt="profil">' +
+                            '</div><div class="chat_ib"><div id="chatOnline"><h5>' + info.me[0].username;
+                        if (info.me[0].online === 'N') {
+                            newMatch += ' <i style="color: red;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>'
+                        } else if (info.me[0].online === 'Y') {
+                            newMatch += ' <i style="color: green;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>';
+                        }
+                        newMatch += '</h5></div></div></div></div>';
+
+                        inboxMatch.insertAdjacentHTML('afterbegin', newMatch);
                     }
-                    newMatch += '</h5></div></div></div></div>';
-
-                    inboxMatch.insertAdjacentHTML('afterbegin', newMatch);
+                } else if (document.getElementById('checkOnline')) {
+                    // console.log(document.getElementById('userDetails').innerText);
+                    const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+                    if (document.getElementById('userDetails').innerText === getDetails){
+                        // console.log("je suis sur page User");
+                        if ($('.fa-smile-wink')) {
+                            $('.fa-smile-wink').remove();
+                        }
+                        $('#likeAndMatch').append('<span><i class="fas fa-heartbeat" style="color: red; font-size: xx-large; margin-left: 10px"></i></span>');
+                    }
                 }
             }
         }
@@ -485,6 +512,15 @@
     socket.on('unlikeMatch', (info) => {
         incrementNotif();
         unlikeNotif();
+        if (document.getElementById('checkOnline')) {
+            const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+            if (document.getElementById('userDetails').innerText === getDetails){
+                if ($('.fa-smile-wink')) {
+                    $('.fa-smile-wink').remove();
+                }
+            }
+        }
+
         for (var m = 0; m < info.unmatch.length; m++) {
             if (parseInt(info.unlike) === info.unmatch[m]) {
                 incrementNotif();
@@ -502,6 +538,14 @@
                         const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
                         parent.remove();
                         return;
+                    }
+                } else if (document.getElementById('checkOnline')) {
+                    // console.log(document.getElementById('userDetails').innerText);
+                    const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+                    if (document.getElementById('userDetails').innerText === getDetails){
+                        if ($('.fa-heartbeat')) {
+                            $('.fa-heartbeat').remove();
+                        }
                     }
                 }
 
