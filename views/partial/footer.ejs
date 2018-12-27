@@ -472,10 +472,23 @@
             }
         }
 
+        if (info.messages.length !== 0) {
+            var unread = 0;
+            for (var k = 0; k < info.messages.length; k++) {
+                if (info.messages[k].from_user_id === info.me[0].id) {
+                    if (info.messages[k].unread === 1) {
+                        unread++;
+                    }
+                }
+            }
+        }
+
+
         for (var n = 0; n < info.match.length; n++) {
             if (parseInt(info.like) === info.match[n]) {
                 incrementNotif();
                 matchNotif();
+                incrementMsgMatch(unread);
                 if (msgForm) {
                     const noMatch = document.querySelector('.noMatch');
                     if (noMatch) {
@@ -501,23 +514,12 @@
                         newMatch += '</h5></div></div></div></div>';
 
                         inboxMatch.insertAdjacentHTML('afterbegin', newMatch);
-                        if (info.messages.length !== 0) {
-                            var unread = 0;
-                            for (var k = 0; k < info.messages.length; k++) {
-                                if (info.messages[k].from_user_id === info.me[0].id) {
-                                    if (info.messages[k].unread === 1) {
-                                        unread++;
-                                    }
-                                }
-                            }
-                            if (unread !== 0) {
-                                var user = document.querySelector('#chatOnline .user' + info.me[0].id);
-                                var notRead = document.createElement('p');
-                                notRead.id = 'unreadMsg' + info.me[0].id;
-                                notRead.innerText = unread + ' message(s) non lu';
-                                user.insertAdjacentElement('afterend', notRead);
-                                incrementMsgMatch(unread);
-                            }
+                        if (unread !== 0) {
+                            var user = document.querySelector('#chatOnline .user' + info.me[0].id);
+                            var notRead = document.createElement('p');
+                            notRead.id = 'unreadMsg' + info.me[0].id;
+                            notRead.innerText = unread + ' message(s) non lu';
+                            user.insertAdjacentElement('afterend', notRead);
                         }
                     }
                 } else if (document.getElementById('checkOnline')) {
