@@ -13,5 +13,6 @@ module.exports = {
     'likes_table' : 'likes',
     'visits_table' : 'visits',
     'reports_table' : 'reports',
-    'messages_table': 'messages'
+    'messages_table': 'messages',
+    'notifications_table': 'notifications'
 };

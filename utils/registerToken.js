@@ -57,8 +57,6 @@ router.route('/:registerToken').get((request, response) => {
             const jwtId = Math.random().toString(36).substring(7);
             var payload = {
                 'id': user.id,
-                'username': user.username,
-                'email': user.email,
                 jwtId
             };
             jwt.sign(payload, secret, {

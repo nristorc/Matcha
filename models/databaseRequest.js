@@ -199,9 +199,7 @@ class DatabaseRequest {
     async updateProfilPic(path, id){
         try {
             return new Promise((resolve, reject) => {
-                //console.log('3.1 - je rentre dans Update Profil')
                 this.query(`UPDATE matcha.users SET profil = ? WHERE id = ?`, [path, id]).then((result) => {
-                    //console.log('3.2 - result Update fonction: ', result);
                     resolve(result);
                 }).catch((result) => {
                     reject(result);
@@ -367,7 +365,7 @@ class DatabaseRequest {
     async getUser(params){
         try {
             return new Promise((resolve, reject) => {
-                const sql = "SELECT * FROM matcha.users WHERE username = ?";
+                const sql = "SELECT * FROM matcha.users WHERE id = ?";
                 this.query(sql, params).then((user) => {
                     if (user){
                         resolve(user);
@@ -745,6 +743,29 @@ class DatabaseRequest {
         }
     }
 
+    getSpecificMatch(iLike, userLiked) {
+        try {
+            return new Promise((resolve, reject) => {
+
+                const sql = 'SELECT user_id, user_liked FROM matcha.likes WHERE (user_id = ? AND user_liked = ?) OR (user_id = ? AND user_liked = ?)';
+                console.log(sql);
+                this.query(sql, [iLike, userLiked, userLiked, iLike]).then((exist) => {
+                    if (exist && exist[0] && exist[1]) {
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                }).catch((exist)=> {
+                    console.log('catch existe', exist)
+                    return(false);
+                });
+            })
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+
     async getMatches(user_id){
         try{
             return new Promise ((resolve, reject) => {
@@ -850,22 +871,54 @@ class DatabaseRequest {
         }
 	}
 
+	async updateNotifications(fromUser, toUser, flag) {
+        try {
+            return new Promise((resolve, reject) => {
+                this.query("INSERT INTO matcha.notifications SET `from` = ?, `to` = ?, `flag` = ?, `date` = NOW()",
+                    [fromUser, toUser, flag]).then((result) => {
+                        if (result) {
+                            resolve();
+                        } else {
+                            reject();
+                        }
+                }).catch((err)=> {
+                    console.log('catch update notifications', err);
+                    return(false);
+                });
+            })
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+
     async updateLikes(user_id, id, bool){
         try {
             return new Promise((resolve, reject) => {
-                console.log("j'arrive")
                 this.query("SELECT `user_id` FROM matcha.likes WHERE `user_id` = ? AND user_liked = ?", [user_id, id]).then((exist) => {
-                    console.log("1- je checke si like deja existant")
                     if (exist == ""){
-                        console.log("2- je checke si c'est bien un ajout")
                         if (bool == 1){
-                            this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`, `liked_at`) VALUES (?, ?, NOW())", [user_id, id]).then(() => {
-                                console.log("3- j'ai update la db")
-                                this.updatePop(id, 1).then(() => {
-                                    console.log("4- j'update la popularite")
-                                    resolve();
-                                }).catch((err) => {
-                                    console.log(err);
+                            this.updateNotifications(user_id, id, 1).then(() => {
+                                this.query("INSERT INTO matcha.likes(`user_id`, `user_liked`, `liked_at`) VALUES (?, ?, NOW())", [user_id, id]).then(() => {
+                                    this.getSpecificMatch(user_id, id).then(() => {
+                                        this.updateNotifications(user_id, id, 2).then(() => {
+                                            this.updatePop(id, 1).then(() => {
+                                                resolve();
+                                            }).catch((err) => {
+                                                console.log(err);
+                                            });
+                                        }).catch((err) => {
+                                            console.log('update notif avec match: ', err);
+                                        });
+                                    }).catch(() => {
+                                        this.updatePop(id, 1).then(() => {
+                                            resolve();
+                                        }).catch((err) => {
+                                            console.log(err);
+                                        });
+                                    });
+                                }).catch(() => {
+                                    reject();
                                 });
                             }).catch(() => {
                                 reject();
@@ -877,9 +930,26 @@ class DatabaseRequest {
                         if (bool == 1){
                             reject();
                         } else if (bool == -1) {
-                            this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
-                                this.updatePop(id, 2);
-                                resolve();
+                            this.updateNotifications(user_id, id, 3).then(() => {
+                                this.getSpecificMatch(user_id, id).then(() => {
+                                        this.updateNotifications(user_id, id, 4).then(() => {
+                                            this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
+                                                this.updatePop(id, 2);
+                                                resolve();
+                                            }).catch(() => {
+                                                reject();
+                                            });
+                                        }).catch((err) => {
+                                            console.log('error while unmatch notification: ', err);
+                                        })
+                                }).catch((err) => {
+                                    this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
+                                        this.updatePop(id, 2);
+                                        resolve();
+                                    }).catch(() => {
+                                        reject();
+                                    });
+                                });
                             }).catch(() => {
                                 reject();
                             });
@@ -899,7 +969,7 @@ class DatabaseRequest {
     async updateReports(id, reported, flag){
         try {
             return new Promise((resolve, reject) => {
-                this.query("SELECT `report_id` FROM matcha.reports WHERE `report_id` = ? AND reported_id = ?", [id, reported]).then((exist) => {
+                this.query("SELECT `report_id` FROM matcha.reports WHERE `report_id` = ? AND reported_id = ? AND flag = ?", [id, reported, flag]).then((exist) => {
                     if (exist == ""){
                         if (flag == 1){
                             this.query("INSERT INTO matcha.reports(`report_id`, `reported_id`, `reported_at`, `flag`) VALUES (?, ?, NOW(), ?)", [id, reported, flag]).then(() => {
@@ -912,12 +982,6 @@ class DatabaseRequest {
                                 reject();
                             });
                         } else if (flag == 2) {
-                            reject();
-                        }
-                    } else {
-                        if (flag == 1){
-                            reject();
-                        } else if (flag == 2) {
                             this.query("INSERT INTO matcha.reports(`report_id`, `reported_id`, `reported_at`, `flag`) VALUES (?, ?, NOW(), ?)", [id, reported, flag]).then(() => {
                                 this.updatePop(id, 3);
                                 resolve();
@@ -925,9 +989,11 @@ class DatabaseRequest {
                                 reject();
                             });
                         }
+                    } else {
+                            reject();
                     }
                 }).catch((exist)=> {
-                    console.log('catch existe', exist)
+                    console.log('catch existe', exist);
                     return(false);
                 });
             })

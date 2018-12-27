@@ -5,10 +5,115 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 <script type="text/javascript" src="/js/search.js"></script>
+<script src="/js/newMessage.js"></script>
+
+<!--NOTIFICATIONS-->
+<script>
+
+</script>
 
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
+
+    var token = document.getElementById('token').dataset.token;
+    function decodeToken(token){
+        var playload = JSON.parse(atob(token.split('.')[1]));
+        return playload;
+
+    }
+    var user = decodeToken(token);
+
+    function readNotif(user) {
+        const formData = {
+            'userId': user,
+            'submit': 'notifRead'
+        }
+        $.ajax({
+            type		: 'POST',
+            url         : '/notifications',
+            data		: formData,
+            dataType	: 'json',
+            encode		: true
+        })
+            // .done(function(data) {
+            //     console.log(data);
+            // });
+    }
+
+    var unreadAll = 0;
+
+    const msgNotif = () => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('pink','#05728f');
+        iceToast.push({
+            words: 'Vous avez reçu un nouveau message',
+            bgcolor: 'pink',
+            time: 5000
+        });
+    }
+    const likeNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Un utilisateur vient de vous liker !',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+    const matchNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Vous avez un nouveau match !',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+    const unlikeNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Un utilisateur ne vous like plus...',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+    const unmatchNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Vous venez de perdre un match...',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+    const visitNotif = (username) => {
+        iceToast.setPosition('top-right');
+        iceToast.setColor('blue','#05728f');
+        iceToast.push({
+            words: 'Un utilisateur a visité votre profil !',
+            bgcolor: 'blue',
+            time: 5000
+        });
+    }
+
+    const incrementMsg = () => {
+        unreadAll++;
+        var header = document.getElementById('headerMsg');
+        if (unreadAll !== 0) {
+            header.innerText = 'Messagerie (' + unreadAll + ')';
+        }
+    }
+    const decrementMsg = (messages = 1) => {
+        unreadAll -= messages;
+        var header = document.getElementById('headerMsg');
+        if (unreadAll !== 0) {
+            header.innerText = 'Messagerie (' + unreadAll + ')';
+        } else {
+            header.innerText = 'Messagerie';
+        }
+    }
 
     let socket = io('http://localhost:3000');
     socket.on('connect', () => {
@@ -17,6 +122,8 @@
         });
     });
 
+
+    /* ONLINE USER */
     var checkOnline = document.querySelector('#checkOnline');
     var chatOnline = document.querySelector('#chatOnline');
     var histoOnline = document.querySelector('.histoOnline');
@@ -63,13 +170,17 @@
     }
 
     const onlineChatPage = (user) => {
-        if (document.querySelector('#chatOnline .user' + user.id).style.color === 'red') {
-            document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: green;');
+        if (user && document.querySelector('#chatOnline .user' + user.id)) {
+            if (document.querySelector('#chatOnline .user' + user.id).style.color === 'red') {
+                document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: green;');
+            }
         }
     }
     const offlineChatPage = (user) => {
-        if (document.querySelector('#chatOnline .user' + user.id).style.color === 'green') {
-            document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: red;');
+        if (user && document.querySelector('#chatOnline .user' + user.id)) {
+            if (document.querySelector('#chatOnline .user' + user.id).style.color === 'green') {
+                document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: red;');
+            }
         }
     }
     if (chatOnline) {
@@ -83,13 +194,17 @@
     }
 
     const onlineHistoPage = (user) => {
-        if (document.querySelector('.histoOnline .user' + user.id).style.color === 'red') {
-            document.querySelector('.histoOnline .user' + user.id).setAttribute('style', 'color: green;');
+        if (user && document.querySelector('.histoOnline .user' + user.id)) {
+            if (document.querySelector('.histoOnline .user' + user.id).style.color === 'red') {
+                document.querySelector('.histoOnline .user' + user.id).setAttribute('style', 'color: green;');
+            }
         }
     }
     const offlineHistoPage = (user) => {
-        if (document.querySelector('.histoOnline .user' + user.id).style.color === 'green') {
-            document.querySelector('.histoOnline .user' + user.id).setAttribute('style', 'color: red;');
+        if (user && document.querySelector('.histoOnline .user' + user.id)) {
+            if (document.querySelector('.histoOnline .user' + user.id).style.color === 'green') {
+                document.querySelector('.histoOnline .user' + user.id).setAttribute('style', 'color: red;');
+            }
         }
     }
     if (histoOnline) {
@@ -103,13 +218,17 @@
     }
 
     const onlineSearchPage = (user) => {
-        if (document.querySelector('#searchOnline .user' + user.id).style.color === 'red') {
-            document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: green;');
+        if (user) {
+            if (document.querySelector('#searchOnline .user' + user.id).style.color === 'red') {
+                document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: green;');
+            }
         }
     }
     const offlineSearchPage = (user) => {
-        if (document.querySelector('#searchOnline .user' + user.id).style.color === 'green') {
-            document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: red;');
+        if (user) {
+            if (document.querySelector('#searchOnline .user' + user.id).style.color === 'green') {
+                document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: red;');
+            }
         }
     }
     if (searchOnline) {
@@ -122,20 +241,19 @@
         })
     }
 
-    // Chat
-    // const msgHistory = document.getElementsByClassName('.msg_history');
-    var msgForm = document.getElementById('send-message');
-    // var button = document.getElementsByClassName('msg_send_btn');
-    if (msgForm) {
-
-        var token = document.getElementById('token').dataset.token;
-        function decodeToken(token){
-            var playload = JSON.parse(atob(token.split('.')[1]));
-            return playload;
-
+    /* CHAT SOCKETS */
+    socket.on('allUnreadMsg', (number) => {
+        var header = document.getElementById('headerMsg');
+        if (number.countMsg !== 0) {
+            unreadAll = number.countMsg;
+            header.innerText = 'Messagerie (' + number.countMsg + ')';
+        } else {
+            header.innerText = 'Messagerie';
         }
-        var user = decodeToken(token);
+    });
 
+    var msgForm = document.getElementById('send-message');
+    if (msgForm) {
         msgForm.onsubmit = (e) => {
             e.preventDefault();
             var inputMessage = document.getElementById('write_msg');
@@ -148,73 +266,249 @@
             inputMessage.focus();
         }
 
-        socket.on('displayMsg', (msg, date) => {
-            var inputHidden = document.getElementById('hiddenInput').value;
+        socket.on('sendingMessage', (msg) => {
+            var inputHidden = document.getElementById('hiddenInput')
+            var user = document.querySelector('#chatOnline .user' + msg.msg.fromUser);
+                if(inputHidden == null) {
+                    msgNotif();
+                    incrementMsg();
+                    var unread = document.getElementById('unreadMsg' + msg.msg.fromUser);
+                    var count = unread;
+                    if (count) {
+                        count = count.innerText.split(' ');
+                        count = count[0];
+                        count = parseInt(count);
+                        count++;
+                        unread.innerText = count + ' message(s) non lu';
+                    }
+                    else {
+                        var notRead = document.createElement('p');
+                        notRead.id = 'unreadMsg' + msg.msg.fromUser;
+                        notRead.innerText = '1 message(s) non lu';
+                        console.log('user1', user);
+                        user.insertAdjacentElement('afterend', notRead);
+                    }
+                    return
+
+                } else if (inputHidden && (parseInt(inputHidden.value) !== msg.msg.fromUser)) {
+                    if (user) {
+                        msgNotif();
+                        incrementMsg();
+                        var unread2 = document.getElementById('unreadMsg' + msg.msg.fromUser);
+                        var count2 = unread2;
+                        if (count2) {
+                            count2 = count2.innerText.split(' ');
+                            count2 = count2[0];
+                            count2 = parseInt(count2);
+                            count2++;
+                            unread2.innerText = count2 + ' message(s) non lu';
+                        }
+                        else {
+                            var notRead2 = document.createElement('p');
+                            notRead2.id = 'unreadMsg' + msg.msg.fromUser;
+                            notRead2.innerText = '1 message(s) non lu';
+                            console.log('user1', user);
+                            user.insertAdjacentElement('afterend', notRead2);
+                        }
+                        return
+                    }
+                }
+            inputHidden  = inputHidden.value;
             const chat = document.querySelector('.msg_history');
             const noMessage = document.getElementById('noMessage');
             const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-            // var sentMsg = document.getElementsByClassName('sent_msg');
-
-            // console.log(typeof info);
 
             if (noMessage) {
-                console.log('il ny avait pas de message, maintenant oui');
                 noMessage.remove();
             }
-            if (parseInt(inputHidden) === msg.to_user_id) {
-                console.log('outgoing message: de ma part')
-                // const outgoing = document.createElement('div');
-                // outgoing.setAttribute('class', 'outgoing_msg');
-                // const sentMsg = document.createElement('div');
-                // sentMsg.setAttribute('class', 'sent_msg');
+                if (parseInt(document.getElementById('hiddenInput').value) === msg.msg.toUser) {
+                    chat.removeAttribute('style', 'text-align: center;');
+                    const outgoing = document.createElement('div');
+                    outgoing.setAttribute('class', 'outgoing_msg');
+                    const sentMsg = document.createElement('div');
+                    sentMsg.setAttribute('class', 'sent_msg');
+                    const p = document.createElement('p');
+                    p.innerText = msg.msg.message;
+                    const span = document.createElement('span');
+                    span.setAttribute('class', 'time_date')
+                    span.innerText = new Date(msg.date).toLocaleDateString('fr-FR', options);
+                    sentMsg.append(p);
+                    sentMsg.append(span);
+                    outgoing.append(sentMsg);
+                    chat.append(outgoing);
+                }
+                else if (parseInt(document.getElementById('hiddenInput').value) === msg.msg.fromUser) {
+                    chat.removeAttribute('style', 'text-align: center;');
+                    const incoming = document.createElement('div');
+                    incoming.setAttribute('class', 'incoming_msg');
+                    const receivedMsg = document.createElement('div');
+                    receivedMsg.setAttribute('class', 'received_msg');
+                    const receivedMsgWith = document.createElement('div');
+                    receivedMsgWith.setAttribute('class', 'received_withd_msg');
+                    const p = document.createElement('p');
+                    p.innerText = msg.msg.message;
+                    const span = document.createElement('span');
+                    span.setAttribute('class', 'time_date')
+                    span.innerText = new Date(msg.date).toLocaleDateString('fr-FR', options);
+                    receivedMsgWith.append(p);
+                    receivedMsgWith.append(span);
+                    receivedMsg.append(receivedMsgWith);
+                    incoming.append(receivedMsg);
+                    chat.append(incoming);
+                    socket.emit('readMsg', msg);
+                }
+                setTimeout(() => {
+                    chat.scrollTop = chat.scrollHeight + 500;
+                }, 10);
 
-                // const p = document.createElement('p');
-                // p.innerText = info.message;
-                // const span = document.createElement('span');
-                // span.setAttribute('class', 'time_date')
-                // span.innerText = date.toLocaleDateString('fr-FR', options);
-                // sentMsg.append(p);
-                // sentMsg.append(span);
-                // outgoing.append(sentMsg);
-                // chat.append(outgoing);
+        });
 
-            } else if (parseInt(inputHidden) === msg.from_user_id) {
-                console.log('incoming message: pour moi')
-                // const incoming = document.createElement('div');
-                // incoming.setAttribute('class', 'incoming_msg');
-                // const receivedMsg = document.createElement('div');
-                // receivedMsg.setAttribute('class', 'received_msg');
-                // const receivedMsgWith = document.createElement('div');
-                // receivedMsgWith.setAttribute('class', 'received_withd_msg');
-                // const p = document.createElement('p');
-                // p.innerText = info.message;
-                // const span = document.createElement('span');
-                // span.setAttribute('class', 'time_date')
-                // span.innerText = date.toLocaleDateString('fr-FR', options);
-                // receivedMsgWith.append(p);
-                // receivedMsgWith.append(span);
-                // receivedMsg.append(receivedMsgWith);
-                // incoming.append(receivedMsg);
-                // chat.append(incoming);
+        socket.on('blockMessage', (msg) => {
+            var inputHidden = document.getElementById('hiddenInput')
+            if(inputHidden == null)
+                return
+            inputHidden  = inputHidden.value;
+            const chat = document.querySelector('.msg_history');
+            const noMessage = document.getElementById('noMessage');
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
+            if (document.getElementById('blockedMsg')) {
+                document.getElementById('blockedMsg').remove();
             }
-            // setTimeout(() => {
-            //     chat.scrollTop = chat.scrollHeight + 500;
-            // }, 10);
 
-                // while (chat.firstChild) {
-                //     chat.removeChild(chat.firstChild);
-                // }
+            if (noMessage) {
+                noMessage.remove();
+            }
 
-                // for (var x = 0; x < data.length; x++) {
-            // chat.removeAttribute('style', 'text-align: center;');
-                //     if (data[x].to_user_id === userId) {
-
-                //     } else if (data[x].from_user_id === userId) {
-                //
-                //     }
-
+            const bloc = document.createElement('p');
+            bloc.innerText = msg.msg;
+            bloc.id = 'blockedMsg';
+            chat.append(bloc);
+            setTimeout(() => {
+                chat.scrollTop = chat.scrollHeight + 500;
+            }, 10);
         })
+    } else {
+        socket.on('sendingMessage', (msg) => {
+            msgNotif();
+            incrementMsg();
+        });
     }
+
+    /* NOTIFICATIONS */
+
+    var unreadNotifAll = 0;
+
+    const incrementNotif = () => {
+        unreadNotifAll++;
+        var header = document.getElementById('headerNotif');
+        if (unreadNotifAll !== 0) {
+            header.innerText = 'Notifications (' + unreadNotifAll + ')';
+        }
+    }
+
+    socket.on('unmatchBlock', (msg) => {
+        var inputHidden = document.getElementById('hiddenInput')
+        if(inputHidden == null)
+            return
+        inputHidden  = inputHidden.value;
+        const chat = document.querySelector('.msg_history');
+        const noMessage = document.getElementById('noMessage');
+        const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
+        if (document.getElementById('unmatchMsg')) {
+            document.getElementById('unmatchMsg').remove();
+        }
+
+        if (noMessage) {
+            noMessage.remove();
+        }
+
+        const bloc = document.createElement('p');
+        bloc.innerText = msg.msg;
+        bloc.id = 'unmatchMsg';
+        chat.append(bloc);
+        setTimeout(() => {
+            chat.scrollTop = chat.scrollHeight + 500;
+        }, 10);
+    })
+
+    socket.on('allUnreadNotif', (number) => {
+        var header = document.getElementById('headerNotif');
+        if (number.countNotif !== 0) {
+            unreadNotifAll = number.countNotif;
+            header.innerText = 'Notifications (' + number.countNotif + ')';
+        } else {
+            header.innerText = 'Notifications';
+        }
+    });
+
+    socket.on('visit', (visits) => {
+        incrementNotif();
+        visitNotif(visits.notif[0].username);
+    });
+
+    socket.on('likeMatch', (info) => {
+        incrementNotif();
+        likeNotif();
+        for (var n = 0; n < info.match.length; n++) {
+            if (parseInt(info.like) === info.match[n]) {
+                incrementNotif();
+                matchNotif();
+                if (msgForm) {
+                    const noMatch = document.querySelector('.noMatch');
+                    if (noMatch) {
+                        noMatch.remove();
+                    }
+                    console.log(info.me[0]);
+
+                    const inboxMatch = document.querySelector('.inbox_chat');
+
+                    var newMatch = '<div class="chat_list" onclick="activeChat(this,  ' + info.me[0].id + ')">' +
+                        '<div class="chat_people">' +
+                        '<div class="chat_img">' +
+                        '<img src="' + info.me[0].profil + '" style="border-radius: 50%" alt="profil">' +
+                        '</div><div class="chat_ib"><div id="chatOnline"><h5>' + info.me[0].username;
+                    if (info.me[0].online === 'N') {
+                        newMatch += ' <i style="color: red;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>'
+                    } else if (info.me[0].online === 'Y') {
+                        newMatch += ' <i style="color: green;" class="fas fa-circle fa-xs user' + info.me[0].id + '"></i>';
+                    }
+                    newMatch += '</h5></div></div></div></div>';
+
+                    inboxMatch.insertAdjacentHTML('afterbegin', newMatch);
+                }
+            }
+        }
+    })
+
+    socket.on('unlikeMatch', (info) => {
+        incrementNotif();
+        unlikeNotif();
+        for (var m = 0; m < info.unmatch.length; m++) {
+            if (parseInt(info.unlike) === info.unmatch[m]) {
+                incrementNotif();
+                unmatchNotif();
+
+                if (msgForm) {
+                    var inputHidden = document.getElementById('hiddenInput');
+                    if(inputHidden == null) {
+                        const unmatchUser = document.querySelector('#chatOnline .user' + info.me[0].id);
+                        const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
+                        parent.remove();
+                        return;
+                    } else if (inputHidden && (parseInt(inputHidden.value) !== info.me[0].id)) {
+                        const unmatchUser = document.querySelector('#chatOnline .user' + info.me[0].id);
+                        const parent = unmatchUser.parentElement.parentElement.parentElement.parentElement.parentElement;
+                        parent.remove();
+                        return;
+                    }
+                }
+
+            }
+        }
+    })
+
 
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeGqsazfzYjC4__DuVZ-pB6Hik52ciaNI&libraries=places&callback=initAutocomplete"

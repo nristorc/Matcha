@@ -1,7 +1,7 @@
-const express = require('express');
+var express = require('express');
 const app = express();
 const server = require('http').createServer(app);
-const io = require('socket.io').listen(server, {pingInterval: 1000, pingTimeout: 5000});
+io = require('socket.io').listen(server, {pingInterval: 1000, pingTimeout: 5000});
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
@@ -30,6 +30,7 @@ const user = require('./utils/user');
 const history = require('./utils/history');
 const chat = require('./utils/chat');
 const tagSearch = require('./utils/tagSearch');
+const notifications = require('./utils/notifications');
 
 const port =  process.env.PORT || 3000;
 const host = 'localhost';
@@ -46,7 +47,6 @@ app.use('/public', express.static('public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* COOKIES AND SESSIONS */
-
 app.use(cookieParser());
 app.use(session({
     key: 'user_sid',
@@ -67,8 +67,10 @@ app.use(function (request, response, next) {
     next();
 });
 
-/* ROUTES */
+// app.locals.io = io;
+usersSocket = [];
 
+/* ROUTES */
 app.use('/', index);
 app.use('/login', login);
 app.use('/register', register);
@@ -83,14 +85,16 @@ app.use('/user', user);
 app.use('/history', history);
 app.use('/chat', chat);
 app.use('/tagsearch', tagSearch);
+app.use('/notifications', notifications);
+
 
 /* EJS */
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
-/* TEST SOCKETS */
+/* SOCKETS */
 const jwtSecret = 'ratonlaveur';
-let users = [];
+// let usersSocket = [];
 
 io.sockets.on('connection', (socket) => {
     let currentUser = null;
@@ -102,16 +106,30 @@ io.sockets.on('connection', (socket) => {
             });
             currentUser = {
                 id: decoded.id,
-                username: decoded.username,
                 count: 1
             };
-            let user = users.find(u => u.id === currentUser.id);
+            let user = usersSocket.find(u => u.id === currentUser.id);
             if (user) {
                 user.count++;
             } else {
-                users.push(currentUser);
-                socket.broadcast.emit('users.new', {user: currentUser});
-                console.log('user connected');
+                currentUser.socket = socket.id;
+                usersSocket.push(currentUser);
+
+                const getUnreadMessages = 'SELECT count(unread) as allUnread FROM matcha.messages WHERE to_user_id = ?';
+                checkDb.query(getUnreadMessages, [decoded.id]).then((result) => {
+                    if (result) {
+                        const getUnreadNotifications = 'SELECT count(unread) as allUnread FROM matcha.notifications WHERE `to` = ?';
+                        checkDb.query(getUnreadNotifications, [decoded.id]).then((result1) => {
+                            if (result1) {
+                                socket.broadcast.emit('users.new', {user: currentUser});
+                                socket.emit('allUnreadMsg', {countMsg: result[0].allUnread});
+                                socket.emit('allUnreadNotif', {countNotif: result1[0].allUnread});
+                            }
+                        });
+                    }
+                }).catch((err) => {
+                    console.log('error while trying to get all unread messages from a user: ', err);
+                });
             }
         } catch (e) {
             throw e.message;
@@ -122,30 +140,80 @@ io.sockets.on('connection', (socket) => {
      * Nouveaux Messages Chat
      */
     socket.on('newMsg', (info) => {
-        console.log('info message', info);
         if (info.message !== '') {
-            const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?';
-            checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
-                if (result) {
-                    socket.emit('displayMsg', {msg: info, date: new Date()});
+            const checkBlock = 'SELECT reported_id FROM matcha.reports WHERE report_id = ? AND flag = 2';
+            checkDb.query(checkBlock, [info.toUser]).then((block) => {
+                // User blocked
+                if (block[0] && block[0].reported_id === info.fromUser) {
+
+                        var u = usersSocket.reduce((acc, elem) => {
+                            if (elem.id == info.toUser) {
+                                acc.push(elem);
+                            }
+                            return acc;
+                        }, []);
+                        socket.emit('blockMessage', {users: usersSocket, msg: "Cet utilisateur vous a bloqué, vous ne pouvez plus lui envoyer de message"});
+                        u.forEach(user => {
+                            io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                        })
+
+                } else {
+                    // User unmatched
+                    console.log('to', info.toUser);
+                    checkDb.getSpecificMatch(info.fromUser, info.toUser).then((result) => {
+                        const newMsg = 'INSERT INTO matcha.messages SET from_user_id = ?, to_user_id = ?, message = ?, unread = 1';
+                        checkDb.query(newMsg, [info.fromUser, info.toUser, info.message]).then((result) => {
+                            if (result) {
+                                var u = usersSocket.reduce((acc, elem) => {
+                                    if (elem.id == info.toUser) {
+                                        acc.push(elem);
+                                    }
+                                    return acc;
+                                }, []);
+                                socket.emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                                u.forEach(user => {
+                                    io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                                })
+                            }
+                        }).catch((err) => {
+                            console.log('an error occured: ', err);
+                        });
+                    }).catch((result) => {var u = usersSocket.reduce((acc, elem) => {
+                        if (elem.id == info.toUser) {
+                            acc.push(elem);
+                        }
+                        return acc;
+                    }, []);
+                        socket.emit('unmatchMessage', {users: usersSocket, msg: "Vous ne matchez plus avec cet utilisateur, vous ne pouvez plus lui envoyer de message"});
+                        u.forEach(user => {
+                            io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
+                        });
+                    });
+
+
                 }
             }).catch((err) => {
-                console.log('an error occured: ', err);
+                console.log('an error occured in chat: ', err);
             });
         }
     });
 
+    socket.on('readMsg', (msg) => {
+        const updateRead = 'UPDATE matcha.messages SET unread = null WHERE from_user_id = ? AND to_user_id = ?';
+        checkDb.query(updateRead, [msg.msg.fromUser, msg.msg.toUser]).then((result) => {
+        }).catch((err) => {
+            console.log('erreur on update unread message ', err);
+        })
+    });
 
     socket.on('disconnect', () => {
         if (currentUser) {
-            let user = users.find(u => u.id === currentUser.id);
-            console.log('user', user);
+            let user = usersSocket.find(u => u.id === currentUser.id);
             if (user) {
                 user.count--;
                 if (user.count === 0) {
-                    users = users.filter(u => u.id !== currentUser.id);
+                    usersSocket = usersSocket.filter(u => u.id !== currentUser.id);
                     socket.broadcast.emit('users.leave', {user: currentUser});
-                    console.log('user disconnected');
                 }
             }
         }

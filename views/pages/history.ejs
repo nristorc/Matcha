@@ -70,26 +70,6 @@
         </table>
     </div>
 
-    <a class="btn hashtag" style="margin-bottom: 10px;" data-toggle="collapse" href="#dropdownLikeMe"  aria-expanded="false" aria-controls="dropdownLikeMe">Ils vous ont liké <i class="fas fa-arrow-circle-down"></i></a>
-    <div class="collapse" id="dropdownLikeMe">
-        <table class="table" style="text-align: center">
-            <tbody>
-            <%if (theirLikes.length === 0) {%>
-                <td>Aucun utilisateur ne vous a encore liké... Patience !  <i class="far fa-smile-wink"></i></td>
-            <%}%>
-            <%for (var l = 0; l < theirLikes.length; l++) {%>
-            <tr>
-                <td style="vertical-align: middle"><i class="fas fa-thumbs-up"></i></td>
-                <td style="vertical-align: middle"><a href="user/<%=theirLikes[l].user_id%>"><%=theirLikes[l].username%></a> a liké votre profil, Well done !</td>
-                <td style="vertical-align: middle"><img src="<%=theirLikes[l].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
-                <td style="vertical-align: middle">le <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
-                    <%=theirLikes[l].liked_at.toLocaleDateString('fr-FR', options)%></td>
-            </tr>
-            <%}%>
-            </tbody>
-        </table>
-    </div>
-
     <a class="btn hashtag" style="margin-bottom: 10px;" data-toggle="collapse" href="#dropdownLikeThem"  aria-expanded="false" aria-controls="dropdownLikeThem">Vous les avez liké <i class="fas fa-arrow-circle-down"></i></a>
     <div class="collapse" id="dropdownLikeThem">
         <table class="table" style="text-align: center">
@@ -104,6 +84,26 @@
                 <td style="vertical-align: middle"><img src="<%=myLikes[m].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
                 <td style="vertical-align: middle">le <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
                     <%=myLikes[m].liked_at.toLocaleDateString('fr-FR', options)%></td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+    </div>
+
+    <a class="btn hashtag" style="margin-bottom: 10px;" data-toggle="collapse" href="#dropdownLikeMe"  aria-expanded="false" aria-controls="dropdownLikeMe">Ils vous ont liké <i class="fas fa-arrow-circle-down"></i></a>
+    <div class="collapse" id="dropdownLikeMe">
+        <table class="table" style="text-align: center">
+            <tbody>
+            <%if (theirLikes.length === 0) {%>
+                <td>Aucun utilisateur ne vous a encore liké... Patience !  <i class="far fa-smile-wink"></i></td>
+            <%}%>
+            <%for (var l = 0; l < theirLikes.length; l++) {%>
+            <tr>
+                <td style="vertical-align: middle"><i class="fas fa-thumbs-up"></i></td>
+                <td style="vertical-align: middle"><a href="user/<%=theirLikes[l].user_id%>"><%=theirLikes[l].username%></a> a liké votre profil, Well done !</td>
+                <td style="vertical-align: middle"><img src="<%=theirLikes[l].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
+                <td style="vertical-align: middle">le <% const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
+                    <%=theirLikes[l].liked_at.toLocaleDateString('fr-FR', options)%></td>
             </tr>
             <%}%>
             </tbody>

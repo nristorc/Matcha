@@ -12,9 +12,9 @@
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="/profil">Profil <span class="sr-only">(current)</span></a>
                 <a class="nav-item nav-link" href="/search">Recherche</a>
-                <a class="nav-item nav-link" href="/chat">Messagerie</a>
+                <a class="nav-item nav-link" id="headerMsg" href="/chat"></a>
                 <a class="nav-item nav-link" href="/history">Historique</a>
-                <a class="nav-item nav-link" href="#">Notifications <i class="fas fa-bell"></i></a>
+                <a class="nav-item nav-link" id="headerNotif" onclick="readNotif(user.id)" href="/notifications"></a>
                 <a class="nav-item nav-link" href="/logout"><i class="fas fa-power-off"></i></a>
                 <a class="nav-item nav-link" href="#" onclick="openSearch()" id="searchIcon"><i class="fas fa-search"></i></a>
             </div>

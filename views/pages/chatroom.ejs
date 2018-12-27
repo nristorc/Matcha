@@ -21,15 +21,19 @@
                             <div class="chat_ib">
                                 <div id="chatOnline">
                                     <h5><%=myMatches[x].username%>
-                                        <%if (myMatches[x].online === 'N') {%>
+                                        <% if (myMatches[x].online === 'N') {%>
                                             <i style="color: red" class="fas fa-circle fa-xs user<%=myMatches[x].id%>"></i>
                                         <%} else if (myMatches[x].online === 'Y') {%>
                                         <i style="color: green" class="fas fa-circle fa-xs user<%=myMatches[x].id%>"></i>
                                         <%}%>
                                     </h5>
                                 </div>
-                                <p>Test, which is a new approach to have all solutions
-                                    astrology under one roof.</p>
+                                <%if (typeof unread === "object") {%>
+                                    <%for (var y = 0; y < unread.length; y++) {%>
+                                        <%if (unread[y].from_user_id === myMatches[x].id) {%>
+                                            <%if (unread[y].unread !== 0) {%>
+                                            <p id="unreadMsg<%=unread[y].from_user_id%>"><%=unread[y].unread%> message(s) non lu</p>
+                                <%}}}}%>
                             </div>
                         </div>
                     </div>
@@ -66,6 +70,14 @@
     });
 
     function activeChat(tab, userId) {
+
+        var unread = document.getElementById('unreadMsg' + userId);
+        if (unread) {
+            decrementMsg(parseInt(unread.innerText));
+            unread.remove();
+        }
+
+
         $('.type_msg').show();
 
         var inputHidden = document.getElementById('hiddenInput');

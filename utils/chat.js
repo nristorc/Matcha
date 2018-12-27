@@ -51,25 +51,59 @@ router.route('/').get((request, response) => {
         const decoded = jwt.verify(token, 'ratonlaveur', {
             algorithms: ['HS256']
         });
+
         checkDb.getMatches(decoded.id).then((tab) => {
+            console.log('tab', tab);
+            const tableau = Array.from(tab);
             if (tab != "") {
+                console.log('je rentre dans tab');
                 const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
-                const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE ' + sqlCondition + ';';
+
+                const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE (' + sqlCondition + ') AND `id` NOT IN (SELECT reported_id FROM matcha.reports WHERE flag = 2 AND report_id = ?);';
                 let push = [];
-                checkDb.query(sql, tab)
+                tableau.push(decoded.id);
+
+                checkDb.query(sql, tableau)
                     .then((res) => {
+                        console.log('token', token);
                         push = res;
-                        response.render('pages/chatroom', {myMatches: push, token});
+                        var msg = "SELECT count(unread) as unread, from_user_id FROM matcha.messages WHERE (";
+                        for (var i = 0; i < push.length; i++) {
+
+                            if (push.length == 1){
+
+                                msg = msg.concat("from_user_id = " + push[i].id);
+                            } else if (i < push.length - 1){
+
+                                msg = msg.concat("from_user_id = " + push[i].id + " OR ");
+
+                            } else if (i == push.length - 1){
+                                msg = msg.concat("from_user_id = " + push[i].id);
+
+                            }
+                        }
+                        msg = msg.concat(") AND to_user_id = ? GROUP BY from_user_id");
+
+                        checkDb.query(msg, decoded.id).then((count) => {
+                            response.render('pages/chatroom', {myMatches: push, token, unread: count});
+                        }).catch((error)=>{
+                            console.log("Error count notif:", error);
+                            response.render('pages/chatroom', {myMatches: push, token, unread: 0});
+                        })
                     })
                     .catch((err) => {
-                        console.log(`An error occured: ${err}`);
+                        console.log(`An error occured patate: ${err}`);
+                        response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match',token});
                     });
             }
             else {
-                response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match'}, token);
+                console.log('je rentre pas');
+                console.log('token', token);
+                response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
             }
         }).catch((tab) => {
             console.log(`An error occured: ${tab}`);
+            response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
         });
     } catch (e) {
         request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
@@ -86,7 +120,12 @@ router.route('/').get((request, response) => {
             if (request.body.submit === 'getMessages') {
                 console.log(request.body.userId);
                 checkDb.getMessages(decoded.id, request.body.userId, request.body.userId, decoded.id).then((result) => {
-                    response.json(result);
+                    const sqlRead = 'UPDATE matcha.messages SET unread = null WHERE from_user_id = ? AND to_user_id = ?';
+                    checkDb.query(sqlRead, [request.body.userId, decoded.id]).then((res) => {
+                        response.json(result);
+                    }).catch((err) => {
+                        console.log('catch read ', err);
+                    });
                 }).catch((result) => {
                     console.log('result catch', result);
                 })
