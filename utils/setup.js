@@ -44,8 +44,8 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`lastOnline` DATETIME DEFAULT NULL," +
     "`latitude` float DEFAULT '91'," +
     "`longitude` float NOT NULL DEFAULT '181'," +
-    "`city` varchar(255) NOT NULL," +
-    "`changed_loc` enum('N','Y','E') NOT NULL DEFAULT 'E'" +
+    "`city` varchar(255) DEFAULT NULL," +
+    "`changed_loc` enum('N','Y','E') NOT NULL DEFAULT 'E'," +
     "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
     
 const sql_tags = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.tags_table +

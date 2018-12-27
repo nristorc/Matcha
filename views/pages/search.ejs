@@ -115,7 +115,7 @@
 			<% if (users[x]){%>
 				<div class="img-pop">
 					<div class="containerPic">
-						<img src="<%=users[x]['profil']%>" title="<%=users[x]['username']%>" alt="<%=users[x]['username']%>" class="profile-pic search-pic">
+						<a href="/user/<%=users[x]['id']%>"><img src="<%=users[x]['profil']%>" title="<%=users[x]['username']%>" alt="<%=users[x]['username']%>" class="profile-pic search-pic"></a>
 					</div>
 					<% if (users[x]['popularity'] >= 0){
 						if (users[x]['popularity'] < 50){ %>
@@ -136,16 +136,11 @@
 					}
 			
 					%>
-					<i class="fas fa-heart matched" id="matched<%=users[x]['id']%>" title="c'est un match !" style="display:none"></i>
-					<i class="fas fa-thumbs-up liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i>
 				</div>
-
-				<span><i class="far fa-thumbs-up picto" id="oklikeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
-				<span><i class="fas fa-thumbs-up picto" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)">Unlike</i></span>
-
+				
 			<div id="searchOnline">
 				<%if (users[x]['online'] === 'Y') {%>
-				<h5><i style="color: green;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i> <%=users[x]['username']%></h5>
+				<h5><i style="color: green;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i><%=users[x]['username']%></h5>
 				<%} else if (users[x]['online'] === 'N') {%>
 				<h5><i style="color: red;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i> <%=users[x]['username']%></h5>
 				<%}%>
@@ -162,15 +157,21 @@
 						<%=users[x]['orientation']%>
 					<% } %>
 				</h6>
-				<h6>
+				<h6 class="desc-search">
 					<% if (users[x]['description'] == null) { %>
 						Description manquante
 					<%} else { %>
 						<%=users[x]['description']%>
 					<% } %>
 				</h6>
+			<div id=likes>
+				<span><i class="fas fa-heartbeat matched" id="matched<%=users[x]['id']%>" title="c'est un match !" style="display:none"></i></span>
+				<span><i class="far fa-smile-wink liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i></span>
+				<span><i class="far fa-thumbs-up picto" id="oklikeSearch-<%=users[x]['id']%>" style="text-align: center;" onclick="like(this.id)">Like</i></span>
+				<span><i class="fas fa-thumbs-up picto" id="unlikeSearch-<%=users[x]['id']%>" style="text-align: center; display: none;" onclick="unlike(this.id)">Unlike</i></span>	
+			</div>	
 
-<!-- Like and match check -->
+				<!-- Like and match check -->
 
 			<% var a = 0;
 			var like = 0;

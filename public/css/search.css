@@ -142,20 +142,25 @@ a:hover {
 .liked {
     border:none;
     display: flex;
-    position: absolute;
-    /* margin: 215px 0 0 40px; */
+    /* position: absolute; */
+    margin: 4px 4px 4px 0px;
     font-size: 1.5rem;
-    color : rgb(254, 224, 224);
+    color : rgb(255, 0, 100);
 }
 
 .matched {
     border:none;
     display: flex;
-    position: absolute;
-    /* margin: 215px 0 0 40px; */
+    /* position: absolute; */
+    margin: 4px 4px 4px 0px;
     font-size: 1.5rem;
     color : rgb(255, 0, 100);
 }
+
+.picto {
+    margin: 4px 4px 4px 0px;
+}
+
 .search-pic {
     display: flex;
 	position: relative;
@@ -176,6 +181,18 @@ a:hover {
 
 .search-col {
     padding: 30px;
+}
+
+.desc-search {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#likes{
+    display: inline-flex;
 }
 
 .filter-search {

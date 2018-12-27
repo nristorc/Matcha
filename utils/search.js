@@ -199,11 +199,13 @@ router.route('/').get((request, response) => {
         return response.render('index');
     }
 }).post(async(request, response) => {
+    const token = request.cookies.token;
     try {
         const decoded = jwt.verify(token, 'ratonlaveur', {
             algorithms: ['HS256']
         });
         if (request.body.id_liked){
+            console.log("request.body.id_liked", request.body.id_liked);
             var data = request.body.id_liked;
             var likeAction = data.substring(0, 12);
             var userLiked =  data.substring(13, data.length);

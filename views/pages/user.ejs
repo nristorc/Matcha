@@ -83,7 +83,11 @@
         </div>
         <div class="row" id="location">
             <div class="col-sm">
-                À 7km
+                <% if (!user[0]['city']) { %>
+					<p id="localisation">Localisation non renseigné</p>
+				<%} else { %>
+					<p id="localisation">À <%=user[0]['city']%></p>
+				<% } %>
             </div>
         </div>
         <div class="description" id="desc">
@@ -144,7 +148,6 @@
 </div>
 
 <% include ../partial/footer.ejs%>
-
 <script>
 
     function iLike(userId) {

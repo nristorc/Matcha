@@ -155,6 +155,7 @@ p {
     border-radius: 50%;
     margin-right: 20px;
     margin-bottom: 20px;
+    object-fit: cover;
 }
 
 .description{
