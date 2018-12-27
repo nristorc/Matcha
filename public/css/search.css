@@ -142,7 +142,6 @@ a:hover {
 .liked {
     border:none;
     display: flex;
-    /* position: absolute; */
     margin: 4px 4px 4px 0px;
     font-size: 1.5rem;
     color : rgb(255, 0, 100);
@@ -151,7 +150,6 @@ a:hover {
 .matched {
     border:none;
     display: flex;
-    /* position: absolute; */
     margin: 4px 4px 4px 0px;
     font-size: 1.5rem;
     color : rgb(255, 0, 100);
