@@ -140,7 +140,6 @@ class DatabaseRequest {
 
                 this.query(`SELECT count(resetToken) as count FROM matcha.users WHERE resetToken = ?`, [params]).then((result) => {
                     if (result && result[0] && result[0].count === 1) {
-                        // this.query("UPDATE matcha.users SET `resetToken` = null, `reset_at` = null WHERE users.resetToken = ?", [params]);
                         resolve('Reset effectué');
                     } else {
                         reject('Probleme');
@@ -241,11 +240,11 @@ class DatabaseRequest {
                 });
 
                 let mailOptions = {
-                    from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>', // sender address
-                    to: params['email'], // list of receivers
-                    subject: 'Confirm your Registration to Matcha website', // Subject line
+                    from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>',
+                    to: params['email'],
+                    subject: 'Confirmez votre compte sur le site RoooCool',
                     // text: 'Hello world?', // plain text body
-                    html: compiledTemplate.render({username: params['username'], registerToken: registerToken}) // render template
+                    html: compiledTemplate.render({username: params['username'], registerToken: registerToken})
                 };
 
                 transporter.sendMail(mailOptions, (error, info) => {
@@ -1011,7 +1010,11 @@ class DatabaseRequest {
                                 this.getSpecificMatch(user_id, id).then(() => {
                                         this.updateNotifications(user_id, id, 4).then(() => {
                                             this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
-                                                this.updatePop(id, 2);
+                                                this.updatePop(id, 2).then(() => {
+                                                    resolve();
+                                                }).catch((err) => {
+                                                    console.log(err);
+                                                });
                                                 resolve();
                                             }).catch(() => {
                                                 reject();
@@ -1021,7 +1024,11 @@ class DatabaseRequest {
                                         })
                                 }).catch((err) => {
                                     this.query("DELETE FROM matcha.likes WHERE `user_id` = ? AND `user_liked` = ?", [user_id, id]).then(() => {
-                                        this.updatePop(id, 2);
+                                        this.updatePop(id, 2).then(() => {
+                                            resolve();
+                                        }).catch((err) => {
+                                            console.log(err);
+                                        });
                                         resolve();
                                     }).catch(() => {
                                         reject();
@@ -1033,7 +1040,7 @@ class DatabaseRequest {
                         }
                     }
                 }).catch((exist)=> {
-                    console.log('catch existe', exist)
+                    console.log('catch existe', exist);
                     return(false);
                 });
             })
@@ -1140,13 +1147,13 @@ class DatabaseRequest {
 
                 this.query("SELECT `changed_loc` FROM matcha.users WHERE `id` = ?", [user_id]).then((loc) => {
 					if (loc[0].changed_loc == "E"){
-						ipstack(ip,"31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
-							const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `changed_loc` = ? WHERE users.id = ?";
-							this.query(sql, [response.latitude, response.longitude, "E", user_id]).then(() => {
+					    ipstack(ip,"31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
+					        const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `changed_loc` = ? WHERE users.id = ?";
+					        this.query(sql, [response.latitude, response.longitude, "E", user_id]).then(() => {
 								console.log("geoloc forcee reussie");
-								});
-							});
-                        };
+					        });
+					    });
+					}
                 }).catch((err) => {
 					console.log(err);
 				});
@@ -1181,16 +1188,16 @@ class DatabaseRequest {
 
                         if (result[0].id === reportUser) {
                             var mailOptions = {
-                                from: '"Reporting a User" <nina.ristorcelli@gmail.com>', // sender address
-                                to: 'nina.ristorcelli@gmail.com', // list of receivers
-                                subject: 'Un faux compte a été détecté', // Subject line
+                                from: '"Reporting a User" <nina.ristorcelli@gmail.com>',
+                                to: 'nina.ristorcelli@gmail.com',
+                                subject: 'Un faux compte a été détecté',
                                 html: compiledTemplate.render({reportUser: result[0].username, reportedUser: result[1].username, clickLink: result[1].id})
                             };
                         } else if (result[1].id === reportUser) {
                             var mailOptions = {
-                                from: '"Reporting a User" <nina.ristorcelli@gmail.com>', // sender address
-                                to: 'nina.ristorcelli@gmail.com', // list of receivers
-                                subject: 'Un faux compte a été détecté', // Subject line
+                                from: '"Reporting a User" <nina.ristorcelli@gmail.com>',
+                                to: 'nina.ristorcelli@gmail.com',
+                                subject: 'Un faux compte a été détecté',
                                 html: compiledTemplate.render({reportUser: result[1].username, reportedUser: result[0].username, clickLink: result[0].id})
                             };
                         }
@@ -1209,17 +1216,6 @@ class DatabaseRequest {
             return false;
         }
     }
-
-    close() {
-        return new Promise((resolve, reject) => {
-            this.connection.end(err => {
-                if (err)
-                    return reject(err);
-                resolve();
-            });
-        });
-    }
-
 }
 
 module.exports = DatabaseRequest;

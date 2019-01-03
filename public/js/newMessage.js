@@ -43,10 +43,6 @@ let iceToast = {
       document.body.appendChild(dom_style)
   },
   push: function(xx){
-
-    // console.log('push');
-    // console.log('xx', xx);
-    // create the ul box if on the first push
     if (!this.domToastBox) {
       this.initDom()
     }
@@ -80,10 +76,6 @@ let iceToast = {
     ul.appendChild(li)
 
     // remove li in the dom
-
-      // console.log('ul', ul);
-      // console.log('li', li);
-
     this.remove(ul,li,time)
     
   },

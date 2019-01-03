@@ -5,7 +5,7 @@ function like(id){
     document.getElementById(unlike).style.display = "flex";
     var data = {
         id_liked	: id,
-    }
+    };
     $.ajax({
         type        : 'POST',
         url         : '/search',

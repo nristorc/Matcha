@@ -36,7 +36,6 @@ function initAutocomplete() {
                   url : "/profil",
                   data : data,
               });
-            //   autocomplete.value = "";
       });
   }
 
@@ -89,7 +88,7 @@ function deletePic(image) {
         encode		: true
     })
         .done(function (data) {
-            console.log('delete Pic data: ', data);
+            // console.log('delete Pic data: ', data);
             if (data.errors) {
                 if (document.getElementById('messages')) {
                     const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
@@ -271,7 +270,7 @@ $(function () {
                             birthdate.innerHTML = age + ' ans';
 
                             if (document.getElementById('messages')) {
-                                console.log('il y a un message')
+                                // console.log('il y a un message')
                                 const flash = document.getElementsByClassName('alert');
                                 flash[0].className = 'alert alert-dark alert-dismissible';
                                 flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
@@ -302,7 +301,6 @@ $(function () {
                         }
                     }
                 });
-            // stop the form from submitting the normal way and refreshing the page
             event.preventDefault();
         });
 
@@ -327,16 +325,14 @@ $(function () {
 
             // process the form
             $.ajax({
-                type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-                url         : '/profil', // the url where we want to POST
-                data        : formData, // our data object
-                dataType    : 'json', // what type of data do we expect back from the server
+                type        : 'POST',
+                url         : '/profil',
+                data        : formData,
+                dataType    : 'json',
                 encode		: true
             })
-            // using the done promise callback
-                .done(function(data) {
 
-                    //console.log('data: ', data);
+                .done(function(data) {
 
                     // here we will handle errors and validation messages
                     if (data.errors) {
@@ -436,9 +432,7 @@ $(function () {
         $('form[id=uploadPics]').submit(function (event) {
 
             var form = $('#uploadPics').get(0);
-            console.log(form)
             var formData = new FormData(form);
-            console.log(formData)
             $.ajax({
                 type		: 'POST',
                 url		: '/profil',
@@ -496,19 +490,15 @@ $(function () {
             var k = e.which || e.key
             if(/^(9)$/.test(k)) {
                 $(this).value = ""
-                //console.log("Tabulation catch:" + k)
                 e.preventDefault()
             }
             if(/^(188|13)$/.test(k)) {
-                //console.log("Submit form:"+ $(this))
                 validFormTag();
             }
         })
 
         const validFormTag = () => {
-            //console.log($("#addTag")[0].value);
             if ($('.hashtag').length < 6) {
-                //console.log("Submit call")
 
                 var inputTag = $('#addTag')[0]
                 var addedTag = $("#addTag")[0].value;
@@ -557,10 +547,10 @@ $(function () {
                         const flash = document.getElementsByClassName('alert');
                         // console.log('flash', flash);
                         flash[0].className = 'alert alert-warning alert-dismissible';
-                        flash[0].innerHTML = "Mauvais format de tag";
+                        flash[0].innerHTML = "Le format de votre tag est incorrect";
                     } else {
                         $('#container').prepend('<div id="messages"></div>');
-                        $('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag JQUERY</div>')
+                        $('#messages').append('<div class="alert alert-warning alert-dismissible">Le format de votre tag est incorrect</div>')
                     }
                 }
 

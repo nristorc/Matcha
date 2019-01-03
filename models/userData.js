@@ -28,20 +28,13 @@ class User{
         }
     }
 
-    // ageConvert(params) {
-    //          var today = new Date();
-    //             var date = today.getFullYear() - params + "-" + today.getMonth() + "-" + today.getDate();
-    //             return(date);
-    //         }
-	// 	}
 
-// Version Async
     async ageConvert(params) {
         // try {
             return new Promise((resolve, reject) => {
                 var today = new Date(); 
                     var date = today.getFullYear() - params + "-" + today.getMonth() + 1 + "-" + today.getDate();
-                    console.log(`From age conver, date is : ${date}`)
+                    // console.log(`From age conver, date is : ${date}`)
                     resolve(date);
                 });
         // } catch (error){
@@ -49,11 +42,6 @@ class User{
         //     reject(error);
         // }
     }
-
-
-    // getLocation(){
-        // https://www.alsacreations.com/tuto/lire/926-geolocalisation-geolocation-html5.html        
-    // }
 }
 
 module.exports = User;
