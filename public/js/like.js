@@ -1,8 +1,8 @@
 function like(id){
-    event.preventDefault();
     var unlike = id.replace("ok", "un");
     document.getElementById(id).style.display = "none";
     document.getElementById(unlike).style.display = "flex";
+    console.log(id)
     var data = {
         id_liked	: id,
     }
@@ -14,10 +14,12 @@ function like(id){
         encode		: true
     })
     .done(function(data) {
+        console.log(data)
         if (data.getMatches) {
             var id_user = id.substring(13, id.length);
             var match = "matched"+id_user;
             var liked = "liked"+id_user;
+            var pop = "pop"+id_user;
             for (var i = 0; i < data.getMatches.length; i++) {
                 if (data.getMatches[i] == id_user) {
                     document.getElementById(match).style.display = "flex";
@@ -25,15 +27,16 @@ function like(id){
                 }
             }
         }
+        document.getElementById(pop).innerHTML = data.updatePop + "%";
     });
 }
 
 function unlike(id){
-    event.preventDefault();
     var like = id.replace("un", "ok");
     document.getElementById(id).style.display = "none";
     document.getElementById(like).style.display = "flex";
-    var data = {
+    console.log(id)
+        var data = {
         id_liked	: id,
     }
     $.ajax({
@@ -44,10 +47,12 @@ function unlike(id){
         encode		: true
     })
     .done(function(data) {
+        console.log(data)
         if (data.getMatches) {
             var id_user = id.substring(13, id.length);
             var match = "matched"+id_user;
             var liked = "liked"+id_user;
+            var pop = "pop"+id_user;
             for (var i = 0; i < data.getMatches.length; i++) {
                 if (data.getMatches[i] == id_user) {
                     document.getElementById(match).style.display = "none";
@@ -55,5 +60,6 @@ function unlike(id){
                 }
             }
         }
+        document.getElementById(pop).innerHTML = data.updatePop + "%";
     });
 }
