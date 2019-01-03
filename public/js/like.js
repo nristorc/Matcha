@@ -2,7 +2,6 @@ function like(id){
     var unlike = id.replace("ok", "un");
     document.getElementById(id).style.display = "none";
     document.getElementById(unlike).style.display = "flex";
-    console.log(id)
     var data = {
         id_liked	: id,
     };
@@ -14,7 +13,6 @@ function like(id){
         encode		: true
     })
     .done(function(data) {
-        console.log(data)
         if (data.getMatches) {
             var id_user = id.substring(13, id.length);
             var match = "matched"+id_user;
@@ -35,7 +33,6 @@ function unlike(id){
     var like = id.replace("un", "ok");
     document.getElementById(id).style.display = "none";
     document.getElementById(like).style.display = "flex";
-    console.log(id)
         var data = {
         id_liked	: id,
     }
@@ -47,7 +44,6 @@ function unlike(id){
         encode		: true
     })
     .done(function(data) {
-        console.log(data)
         if (data.getMatches) {
             var id_user = id.substring(13, id.length);
             var match = "matched"+id_user;

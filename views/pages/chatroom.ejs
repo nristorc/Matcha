@@ -17,7 +17,7 @@
                     <%for (var x = 0; x < myMatches.length; x++) {%>
                     <div class="chat_list" onclick="activeChat(this, <%=myMatches[x].id%>)">
                         <div class="chat_people">
-                            <div class="chat_img"> <img src="<%=myMatches[x].profil%>" style="border-radius: 50%" alt="profil"> </div>
+                            <div class="chat_img"> <img src="<%=myMatches[x].profil%>" class="chat_img" style="border-radius: 50%; object-fit: cover;" alt="profil"> </div>
                             <div class="chat_ib">
                                 <div id="chatOnline">
                                     <h5><%=myMatches[x].username%>

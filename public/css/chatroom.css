@@ -45,14 +45,25 @@ img{ max-width:100%;}
 .chat_img {
     float: left;
     width: 11%;
+    margin: 1px;
+    height: 50px; 
+    width: 50px;
+    max-height: 50px; 
+    max-width: 50px; 
 }
 .chat_ib {
     float: left;
-    padding: 0 0 0 15px;
+    padding: 0 0 0 10px;
     width: 88%;
 }
 
-.chat_people{ overflow:hidden; clear:both;}
+.chat_people{ 
+    overflow:hidden; 
+    clear:both;
+    display: flex;
+    align-items: center;
+}
+
 .chat_list {
     border-bottom: 1px solid #c4c4c4;
     margin: 0;
@@ -147,4 +158,11 @@ img{ max-width:100%;}
 
 .noMatch p {
     color: #747474;
+}
+
+@media screen and (max-width: 700px)
+{
+    .chat_ib {
+        display: none;
+    }
 }

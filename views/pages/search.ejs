@@ -111,8 +111,8 @@
 		if (i===0 || i===3){ %>
 			<!-- <div class="row"> -->
 		<%}%>
-		<div class="col-sm search-col">
-			<% if (users[x]){%>
+		<% if (users[x]){%>
+			<div class="col-sm search-col">
 				<div class="img-pop">
 					<div class="containerPic">
 						<a href="/user/<%=users[x]['id']%>"><img src="<%=users[x]['profil']%>" title="<%=users[x]['username']%>" alt="<%=users[x]['username']%>" class="profile-pic search-pic"></a>
@@ -137,7 +137,7 @@
 					%>
 				</div>
 				
-				<a href="/user/<%=users[x]['id']%>"><div id="searchOnline">
+				<a class="lien-search" href="/user/<%=users[x]['id']%>"><div id="searchOnline">
 					<%if (users[x]['online'] === 'Y') {%>
 					<h5><i style="color: green;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i><%=users[x]['username']%></h5>
 					<%} else if (users[x]['online'] === 'N') {%>

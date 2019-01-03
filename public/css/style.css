@@ -18,9 +18,9 @@ body {
     background-color: rgb(254, 224, 224);
 }
 
-a, a:hover {
+.lien-search, .lien-search:hover {
     color: black !important;
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 .container {

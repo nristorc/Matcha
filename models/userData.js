@@ -30,17 +30,11 @@ class User{
 
 
     async ageConvert(params) {
-        // try {
-            return new Promise((resolve, reject) => {
-                var today = new Date(); 
-                    var date = today.getFullYear() - params + "-" + today.getMonth() + 1 + "-" + today.getDate();
-                    // console.log(`From age conver, date is : ${date}`)
-                    resolve(date);
-                });
-        // } catch (error){
-        //     console.log(error);
-        //     reject(error);
-        // }
+        return new Promise((resolve, reject) => {
+            var today = new Date(); 
+                var date = today.getFullYear() - params + "-" + today.getMonth() + 1 + "-" + today.getDate();
+                resolve(date);
+        });
     }
 }
 

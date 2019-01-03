@@ -824,7 +824,6 @@ class DatabaseRequest {
             return new Promise((resolve, reject) => {
 
                 const sql = 'SELECT user_id, user_liked FROM matcha.likes WHERE (user_id = ? AND user_liked = ?) OR (user_id = ? AND user_liked = ?)';
-                console.log(sql);
                 this.query(sql, [iLike, userLiked, userLiked, iLike]).then((exist) => {
                     if (exist && exist[0] && exist[1]) {
                         resolve();
