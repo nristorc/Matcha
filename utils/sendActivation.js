@@ -52,7 +52,7 @@ router.post('/', async (request, response) => {
     if (valid && validation.errors !== []) {
         checkingResponse.error = true;
         checkingResponse.type = 'warning';
-        checkingResponse.message = `Mauvais format d'email`;
+        checkingResponse.message = `Mauvais format de l'email`;
         request.flash(checkingResponse.type, checkingResponse.message);
         validation.errors = [];
         response.status(417).redirect('/');

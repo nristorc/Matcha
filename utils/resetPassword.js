@@ -48,11 +48,11 @@ function checkFileType(file, callback) {
 
 router.post('/', async (request, response) => {
     const checkingResponse = {};
-    const valid = await validation.isEmail(request.body.checkEmail, "Wrong Email");
+    const valid = await validation.isEmail(request.body.checkEmail, "Mauvais format de l'email");
     if (valid && validation.errors !== []) {
         checkingResponse.error = true;
         checkingResponse.type = 'warning';
-        checkingResponse.message = `Mauvais format d'email`;
+        checkingResponse.message = `Mauvais format de l'email`;
         request.flash(checkingResponse.type, checkingResponse.message);
         validation.errors = [];
         response.status(417).redirect('/');

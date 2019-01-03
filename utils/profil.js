@@ -54,9 +54,6 @@ const ipstack = require('ipstack')
 router.route('/').get((request, response) => {
     const token = request.cookies.token;
     try {
-
-        console.log('decoded start GET', token);
-
         const decoded = jwt.verify(token, 'ratonlaveur', {
             algorithms: ['HS256']
         });
@@ -138,7 +135,6 @@ router.route('/').get((request, response) => {
         if (request.body.latitude && request.body.longitude && request.body.city){
             const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `city` = ?, `changed_loc` = ? WHERE users.id = ?";
             checkDb.query(sql, [request.body.latitude, request.body.longitude, request.body.city, request.body.change, decoded.id]).then(() => {
-                // console.log("update position reussi")
             }).catch((err) =>{
                 console.log(err);
             });
@@ -156,11 +152,11 @@ router.route('/').get((request, response) => {
                 confirmPassword: request.body.confirmNewPass
             };
 
-            await validation.isName(data.firstname, "Mauvais format de prénom", 30);
-            await validation.isName(data.lastname, "Mauvais format de nom de Famille", 50);
-            await validation.isEmail(data.email, "Mauvais format d'email", 255);
-            await validation.isAlpha(data.username, "Mauvais format d'identifiant", 50);
-            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
+            await validation.isName(data.firstname, "Mauvais format du prénom", 30);
+            await validation.isName(data.lastname, "Mauvais format du nom de Famille", 50);
+            await validation.isEmail(data.email, "Mauvais format de l'email", 255);
+            await validation.isAlpha(data.username, "Mauvais format de l'identifiant", 50);
+            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de la date de naissance");
 
 
             if (data.currentPassword !== '' || data.newPassword !== '' || data.confirmPassword !== '') {
@@ -176,13 +172,13 @@ router.route('/').get((request, response) => {
             if (data.username !== decoded.username) {
                 const resultUsername  = await checkDb.checkUsername(data.username);
                 if (resultUsername[0].count !== 0) {
-                    validation.errors.push({errorMsg:'Identifiant deja pris'});
+                    validation.errors.push({errorMsg:'Identifiant déjà utilisé'});
                 }
             }
             if (data.email !== decoded.email) {
                 const resultEmail = await checkDb.checkEmail(data.email);
                 if (resultEmail[0].count !== 0) {
-                    validation.errors.push({errorMsg:'Email deja pris'});
+                    validation.errors.push({errorMsg:'Email déjà utilisé'});
                 }
             }
 
@@ -203,7 +199,7 @@ router.route('/').get((request, response) => {
                                 expiresIn: 3600000
                             }, (err, token) => {
                                 if (err) {
-                                    console.log('Error occurred while generating token');
+                                    console.log('Une erreur est apparue lors de la création du token');
                                     console.log(err);
                                     return false;
                                 } else {
@@ -240,7 +236,7 @@ router.route('/').get((request, response) => {
                                 expiresIn: 3600000
                             }, (err, token) => {
                                 if (err) {
-                                    console.log('Error occurred while generating token');
+                                    console.log('Une erreur est apparue lors de la création du token');
                                     console.log(err);
                                     return false;
                                 } else {
@@ -275,10 +271,10 @@ router.route('/').get((request, response) => {
                 orientation: request.body.orientation,
                 description: request.body.description,
             };
-            await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format de genre");
-            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
-            await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format d'orientation");
-            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
+            await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format du genre");
+            await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de la date de naissance");
+            await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format de l'orientation");
+            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de la description");
 
             if (validation.errors.length === 0) {
                 const sql = "UPDATE matcha.users SET `birth` = CASE WHEN ? = '' THEN NULL ELSE str_to_date(?, '%d/%m/%Y') END, `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
@@ -304,9 +300,9 @@ router.route('/').get((request, response) => {
                 orientation: request.body.orientation,
                 description: request.body.description,
             };
-            await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format de genre");
-            await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format d'orientation");
-            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de description");
+            await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format du genre");
+            await validation.matchingRegex(data.orientation, /^Hétérosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format de l'orientation");
+            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de la description");
 
             if (validation.errors.length === 0) {
                 const sql = "UPDATE matcha.users SET `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
@@ -357,7 +353,7 @@ router.route('/').get((request, response) => {
                                 checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
                                     fs.unlink(imagePath, (err) => {
                                         if (err) throw err;
-                                        console.log('successfully deleted ' + imagePath);
+                                        // console.log('successfully deleted ' + imagePath);
                                     });
                                     response.json({
                                         image: imagePath,
@@ -376,7 +372,7 @@ router.route('/').get((request, response) => {
                         checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
                             fs.unlink(imagePath, (err) => {
                                 if (err) throw err;
-                                console.log('successfully deleted ' + imagePath);
+                                // console.log('successfully deleted ' + imagePath);
                             });
                             response.json({image: imagePath, message: 'Votre photo a bien été supprimée'});
                         }).catch((deleteRes) => {
@@ -441,7 +437,7 @@ router.route('/').get((request, response) => {
                             response.json({errors: error.message});
                         } else {
                             if (request.file === undefined) {
-                                response.json({errors: 'No file selected !'});
+                                response.json({errors: 'Aucun fichier sélectionné'});
                             }
                             else {
                                 checkDb.insertPhoto(decoded.id, request.file.path).then((result) => {
@@ -452,19 +448,19 @@ router.route('/').get((request, response) => {
                                                     response.json({file: request.file.path, flag: resultFlag.flag});
                                                 }).catch((result) => {
                                                     console.log('result CATCH update: ', result);
-                                                    response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb UPDATE"});
+                                                    response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
                                                 });
                                             } else if (resultFlag && resultFlag.flag === 1) {
                                                 response.json({file: request.file.path, flag: resultFlag.flag});
                                             }
                                         }).catch((result) => {
                                             console.log('result CATCH checkphoto: ', result);
-                                            response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb CHECK"});
+                                            response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
                                         });
                                     }
                                 }).catch((result) => {
                                     console.log('result CATCH insert: ', result);
-                                    response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement // Pb INSERT"});
+                                    response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
                                 });
                             }
                         }

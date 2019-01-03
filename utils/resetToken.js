@@ -63,7 +63,7 @@ router.route('/:resetToken')
             if (result) {
                 resetResponse.error = true;
                 resetResponse.type = 'warning';
-                resetResponse.message = "Token not valid";
+                resetResponse.message = "Token de réinitialisation invalide";
                 request.flash(resetResponse.type, resetResponse.message);
                 response.status(401).redirect('/');
             } else {
