@@ -31,6 +31,7 @@ const history = require('./utils/history');
 const chat = require('./utils/chat');
 const tagSearch = require('./utils/tagSearch');
 const notifications = require('./utils/notifications');
+const sendActivation = require('./utils/sendActivation');
 
 const port =  process.env.PORT || 3000;
 const host = 'localhost';
@@ -86,6 +87,7 @@ app.use('/history', history);
 app.use('/chat', chat);
 app.use('/tagsearch', tagSearch);
 app.use('/notifications', notifications);
+app.use('/sendActivation', sendActivation);
 
 
 /* EJS */

@@ -307,6 +307,50 @@ class DatabaseRequest {
         }
     }
 
+    async newActivationEmail (params) {
+        try {
+            console.log('params: ', params);
+            this.query('SELECT username, registerToken FROM matcha.users WHERE email = ?', [params]).then((result) => {
+                const template = fs.readFileSync('views/pages/registrationEmail.ejs', 'utf-8');
+                const compiledTemplate = hogan.compile(template);
+
+                let transporter = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false, // true for 465, false for other ports
+                    auth: {
+                        user: 'nina.ristorcelli@gmail.com', // generated ethereal user
+                        pass: 'wasfvdajlwqpgjfo'  // generated ethereal password
+                    },
+                    tls:{
+                        rejectUnauthorized:false
+                    }
+                });
+
+                let mailOptions = {
+                    from: '"RoooCool Admin" <nina.ristorcelli@gmail.com>', // sender address
+                    to: params, // list of receivers
+                    subject: 'Confirm your Registration to Matcha website', // Subject line
+                    // text: 'Hello world?', // plain text body
+                    html: compiledTemplate.render({username: result[0].username, registerToken: result[0].registerToken}) // render template
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    console.log('Message sent: %s', info.messageId);
+                });
+                return true;
+            }).catch((err) => {
+                console.log('error on sending activation email again: ', err);
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async resetPassword(params) {
         try {
             bcrypt.hash(params['newPassword'], saltRounds, (err, hash) => {
