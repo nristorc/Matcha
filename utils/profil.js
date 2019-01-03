@@ -54,10 +54,14 @@ const ipstack = require('ipstack')
 router.route('/').get((request, response) => {
     const token = request.cookies.token;
     try {
+
+        console.log('decoded start GET', token);
+
         const decoded = jwt.verify(token, 'ratonlaveur', {
             algorithms: ['HS256']
         });
 
+        // response.cookie('token', 'tototototo');
         // var ip = request.headers['x-forwarded-for'] ||
         // request.connection.remoteAddress ||
         // request.socket.remoteAddress ||
@@ -131,8 +135,6 @@ router.route('/').get((request, response) => {
             algorithms: ['HS256']
         });
 
-        console.log('decoded start', decoded);
-
         if (request.body.latitude && request.body.longitude && request.body.city){
             const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `city` = ?, `changed_loc` = ? WHERE users.id = ?";
             checkDb.query(sql, [request.body.latitude, request.body.longitude, request.body.city, request.body.change, decoded.id]).then(() => {
@@ -188,27 +190,10 @@ router.route('/').get((request, response) => {
                 if (data.newPassword !== '') {
                     checkDb.updateInfoWithPass(data, decoded.id).then(() => {
                         checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [decoded.id]).then((result) => {
-                            response.json({user: result[0]});
-                            decoded.username = data.username;
-                            decoded.email = data.email;
-
-                        }).catch((result) => {
-                            console.log('result CATCH:',result);
-                        });
-                    }).catch((result) => {
-                        console.log('result CATCH:',result);
-                    });
-                } else if (data.newPassword === '') {
-                    checkDb.updateInfoWithoutPass(data, decoded.id).then(() => {
-                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [decoded.id]).then((result) => {
-                            response.json({user: result[0]});
-
-                            // const user = result[0];
-                            // console.log('token', token)
                             const secret = 'ratonlaveur';
                             const jwtId = Math.random().toString(36).substring(7);
                             var payload = {
-                                'id': data.id,
+                                'id': decoded.id,
                                 'username': data.username,
                                 'email': data.email,
                                 jwtId
@@ -223,18 +208,51 @@ router.route('/').get((request, response) => {
                                     return false;
                                 } else {
                                     if (token != false) {
-                                        // console.log('decoded end', decoded);
                                         response.cookie('token', token, {
                                             httpOnly: true,
                                             expiresIn: 9000000
                                         });
                                     }
                                 }
+                                response.json({user: result[0], token: token});
                             });
 
+                        }).catch((result) => {
+                            console.log('result CATCH:',result);
+                        });
+                    }).catch((result) => {
+                        console.log('result CATCH:',result);
+                    });
+                } else if (data.newPassword === '') {
+                    checkDb.updateInfoWithoutPass(data, decoded.id).then(() => {
+                        checkDb.query("SELECT * FROM matcha.users WHERE id = ?", [decoded.id]).then((result) => {
 
-                            decoded.username = data.username;
-                            decoded.email = data.email;
+                            const secret = 'ratonlaveur';
+                            const jwtId = Math.random().toString(36).substring(7);
+                            var payload = {
+                                'id': decoded.id,
+                                'username': data.username,
+                                'email': data.email,
+                                jwtId
+                            };
+
+                            jwt.sign(payload, secret, {
+                                expiresIn: 3600000
+                            }, (err, token) => {
+                                if (err) {
+                                    console.log('Error occurred while generating token');
+                                    console.log(err);
+                                    return false;
+                                } else {
+                                    if (token != false) {
+                                        response.cookie('token', token, {
+                                            httpOnly: true,
+                                            expiresIn: 9000000
+                                        });
+                                    }
+                                }
+                                response.json({user: result[0], token: token});
+                            });
 
                         }).catch((result) => {
                             console.log('result CATCH:',result);
