@@ -258,3 +258,9 @@ button:focus {
 .media {
     margin-top: 5%;
 }
+
+small {
+    font-style: italic;
+    font-size: 70%;
+    color: grey;
+}

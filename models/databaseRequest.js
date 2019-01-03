@@ -370,9 +370,26 @@ class DatabaseRequest {
         return await this.query(sql, [id, path]);
     }
 
-    async insertTag(id, tag) {
-        const sql = "INSERT INTO matcha.tags (user_id, tag) VALUES (?, ?)";
-        return await this.query(sql, [id, tag]);
+    async insertTag(id, tag, size) {
+        try {
+            return new Promise((resolve, reject) => {
+                if (tag.length > size) {
+                    reject('Le tag renseigné est trop long');
+                } else {
+                    const sql = "INSERT INTO matcha.tags (user_id, tag) VALUES (?, ?)";
+                    this.query(sql, [id, tag]).then(() => {
+                        resolve();
+                    }).catch(() => {
+                        reject("Une erreur s'est produite, merci de réessayer ultérieurement");
+                    })
+                }
+            });
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+
+        // return await this.query(sql, [id, tag]);
     }
 
     async deletePhoto(id, path) {

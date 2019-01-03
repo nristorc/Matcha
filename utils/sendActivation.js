@@ -48,7 +48,7 @@ function checkFileType(file, callback) {
 
 router.post('/', async (request, response) => {
     const checkingResponse = {};
-    const valid = await validation.isEmail(request.body.checkEmail, "Wrong Email");
+    const valid = await validation.isEmail(request.body.sendmail, "Wrong Email");
     if (valid && validation.errors !== []) {
         checkingResponse.error = true;
         checkingResponse.type = 'warning';
@@ -57,7 +57,7 @@ router.post('/', async (request, response) => {
         validation.errors = [];
         response.status(417).redirect('/');
     } else {
-        const resultEmail = await checkDb.checkEmail(request.body.checkEmail);
+        const resultEmail = await checkDb.checkEmail(request.body.sendmail);
         if (resultEmail[0].count === 0) {
             checkingResponse.error = true;
             checkingResponse.type = 'warning';
@@ -65,17 +65,16 @@ router.post('/', async (request, response) => {
             request.flash(checkingResponse.type, checkingResponse.message);
             response.status(417).redirect('/');
         } else {
-            checkDb.checkActive(request.body.checkEmail).then(() => {
-                // console.log('actif')
+            checkDb.checkActive(request.body.sendmail).then(() => {
+                // console.log('actif', request.body.sendmail)
                 checkingResponse.error = true;
                 checkingResponse.type = 'warning';
                 checkingResponse.message = "Votre compte a déjà été activé";
                 request.flash(checkingResponse.type, checkingResponse.message);
                 response.status(401).redirect('/');
-                // checkDb.resetToken(request.body.checkEmail);
             }).catch(() => {
-                console.log('inactif');
-                checkDb.newActivationEmail(request.body.checkEmail);
+                // console.log('inactif');
+                checkDb.newActivationEmail(request.body.sendmail);
                 request.flash('dark', "Nous vous avons envoyé un nouvel email d'activation de votre compte");
                 response.status(200).redirect('/');
             });

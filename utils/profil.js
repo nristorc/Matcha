@@ -130,7 +130,6 @@ router.route('/').get((request, response) => {
     const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
     });
-    // console.log("request.body : ", request.body);
     if (request.body.latitude && request.body.longitude && request.body.city){
         const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `city` = ?, `changed_loc` = ? WHERE users.id = ?";
         checkDb.query(sql, [request.body.latitude, request.body.longitude, request.body.city, request.body.change, decoded.id]).then(() => {
@@ -138,7 +137,6 @@ router.route('/').get((request, response) => {
         }).catch((err) =>{
             console.log(err);
         });
-        // console.log("POST", request.body);
     }
 
     if (request.body.submit === 'modifyParams') {
@@ -153,17 +151,17 @@ router.route('/').get((request, response) => {
             confirmPassword: request.body.confirmNewPass
         };
 
-        await validation.isName(data.firstname, "Mauvais format de prénom");
-        await validation.isName(data.lastname, "Mauvais format de nom de Famille");
-        await validation.isEmail(data.email, "Mauvais format d'email");
-        await validation.isAlpha(data.username, "Mauvais format d'identifiant");
+        await validation.isName(data.firstname, "Mauvais format de prénom", 30);
+        await validation.isName(data.lastname, "Mauvais format de nom de Famille", 50);
+        await validation.isEmail(data.email, "Mauvais format d'email", 255);
+        await validation.isAlpha(data.username, "Mauvais format d'identifiant", 50);
         await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de date de naissance");
 
 
         if (data.currentPassword !== '' || data.newPassword !== '' || data.confirmPassword !== '') {
             await checkDb.checkPassword(data, decoded.id).then((result) => {
                 if (result === true) {
-                    validation.isConfirmed(data.newPassword, data.confirmPassword, "Nouveau mot de passe incorrect");
+                    validation.isConfirmed(data.newPassword, data.confirmPassword, "Nouveau mot de passe incorrect", 255);
                 }
             }).catch((result) => {
                 validation.errors.push(result);
@@ -354,10 +352,10 @@ router.route('/').get((request, response) => {
                         if (flag === true) {
                             response.json({errors: "Vous possédez déjà un tag similaire"});
                         } else {
-                            checkDb.insertTag(decoded.id, request.body.tag).then((resTag) => {
+                            checkDb.insertTag(decoded.id, request.body.tag, 255).then(() => {
                                 response.json({message: "Tag added"});
                             }).catch((resTag) => {
-                                response.json({errors: "Une erreur s'est produite: " + resTag});
+                                response.json({errors: resTag});
                             })
                         }
                     }

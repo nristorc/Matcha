@@ -66,12 +66,12 @@ router.post('/', async (request, response)=> {
         request.flash(registrationResponse.type, registrationResponse.message);
         response.status(412).redirect('/');
     } else {
-        await validation.isName(data.firstname, 'Wrong firstname');
-        await validation.isName(data.lastname, 'Wrong lastname');
-        await validation.isAlpha(data.username, 'Wrong username');
-        await validation.isEmail(data.email, "Wrong Email");
-        await validation.isConfirmed(data.password, data.confirmPassword, "Wrong matching password");
-        console.log(validation.errors);
+        await validation.isName(data.firstname, 'Wrong firstname', 30);
+        await validation.isName(data.lastname, 'Wrong lastname', 50);
+        await validation.isAlpha(data.username, 'Wrong username', 50);
+        await validation.isEmail(data.email, "Wrong Email", 255);
+        await validation.isConfirmed(data.password, data.confirmPassword, "Wrong matching password", 255);
+        // console.log(validation.errors);
 
         if (validation.errors.length === 0) {
 
