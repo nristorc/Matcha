@@ -532,10 +532,8 @@ $(function () {
                                 if (document.getElementById('messages')) {
                                     $('#messages').remove();
                                 }
-                                // console.log("Je dois ajouter un tag")
-                                // console.log(addedTag)
                                 if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag +'</a>');
-                                inputTag.value = ""
+                                inputTag.value = "";
                                 inputTag.focus();
                             }
                             if ($(".hashtag").length === 6) {
@@ -545,7 +543,6 @@ $(function () {
                 } else {
                     if (document.getElementById('messages')) {
                         const flash = document.getElementsByClassName('alert');
-                        // console.log('flash', flash);
                         flash[0].className = 'alert alert-warning alert-dismissible';
                         flash[0].innerHTML = "Le format de votre tag est incorrect";
                     } else {

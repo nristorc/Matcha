@@ -48,7 +48,7 @@ function checkFileType(file, callback) {
 
 router.route('/:registerToken').get((request, response) => {
     const loginResponse = {};
-    console.log('params', request.params);
+    // console.log('params', request.params);
     checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
         if (result && result !== undefined) {
 
@@ -57,6 +57,8 @@ router.route('/:registerToken').get((request, response) => {
             const jwtId = Math.random().toString(36).substring(7);
             var payload = {
                 'id': user.id,
+                'username': user.username,
+                'email': user.email,
                 jwtId
             };
             jwt.sign(payload, secret, {

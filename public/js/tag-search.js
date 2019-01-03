@@ -49,15 +49,15 @@ const validFormTag = () => {
 			if (document.getElementById('messages')) {
 				const flash = document.getElementsByClassName('alert');
 				flash[0].className = 'alert alert-warning alert-dismissible';
-				flash[0].innerHTML = "Mauvais format de tag";
+				flash[0].innerHTML = "Le format de votre tag est incorrect";
 			} else {
 				$('#container').prepend('<div id="messages"></div>');
-				$('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag JQUERY</div>')
+				$('#messages').append('<div class="alert alert-warning alert-dismissible">Le format de votre tag est incorrect</div>')
 			}
 		}
 
 	}
-}
+};
 
 
 $(function () {
@@ -70,7 +70,6 @@ $(function () {
             var k = e.which || e.key
             if(/^(9)$/.test(k)) {
                 $(this).value = ""
-                // console.log("Tabulation catch:" + k)
                 e.preventDefault()
             }
 		})
@@ -87,8 +86,8 @@ $(function () {
 					success : function(server_response){
 						var tagDiv = document.getElementById('resultTag')
 						if (tagDiv == null)
-							return
-						tagDiv.innerHTML = ""
+							return;
+						tagDiv.innerHTML = "";
 						$('#resultTag').html(server_response);
 					}
 				});

@@ -51,11 +51,7 @@ function search() {
                     $(document).on('click', 'li', function(){
 
                         var username = $(this).text();
-                        // if (username === 'No data found !') {
-                        //     $('#response').html("");
-                        //     $('ul').remove();
-                        // } else {
-                            console.log('data', data.userdata);
+                            // console.log('data', data.userdata);
                             $('#searchBox').val(username);
 
                             $('#response').html("");
@@ -63,7 +59,7 @@ function search() {
 
                             if ($('#accessProfil').length === 0) {
 
-                                console.log('data', data.userdata);
+                                // console.log('data', data.userdata);
 
 
                                 const button = document.createElement('button');
@@ -73,7 +69,7 @@ function search() {
                                 button.innerHTML = 'Accéder au profil';
 
                                 button.onclick = (elem) => {
-                                    console.log('userdata', data.userdata.length)
+                                    // console.log('userdata', data.userdata.length)
                                     for (var i = 0; i < data.userdata.length; i++) {
                                         if ($('#searchBox').val() === data.userdata[i].username) {
                                             $(location).attr('href', '/user/' + data.userdata[i].id);

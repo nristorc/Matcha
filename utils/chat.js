@@ -97,7 +97,7 @@ router.route('/').get((request, response) => {
                     });
             }
             else {
-                console.log('je rentre pas');
+                // console.log('je rentre pas');
                 console.log('token', token);
                 response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
             }

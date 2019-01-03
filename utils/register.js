@@ -71,7 +71,6 @@ router.post('/', async (request, response)=> {
         await validation.isAlpha(data.username, 'Wrong username', 50);
         await validation.isEmail(data.email, "Wrong Email", 255);
         await validation.isConfirmed(data.password, data.confirmPassword, "Wrong matching password", 255);
-        // console.log(validation.errors);
 
         if (validation.errors.length === 0) {
 
