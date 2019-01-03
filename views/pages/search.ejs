@@ -107,9 +107,9 @@
 <div class="scroll" id="scroll">
 	<% var x = index;
 	var i = 0;
-	while (i < 6){
+	while (i < 12){
 		if (i===0 || i===3){ %>
-			<div class="row">
+			<!-- <div class="row"> -->
 		<%}%>
 		<div class="col-sm search-col">
 			<% if (users[x]){%>
@@ -205,7 +205,7 @@
 		</div>
 		<% i++;
 		if (i===3 || i===6){ %>
-			</div>
+			<!-- </div> -->
 		<% }  
 		x++;
 	}

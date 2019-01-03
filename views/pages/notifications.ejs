@@ -26,15 +26,15 @@
             <tr>
                 <td style="vertical-align: middle"><i class="fas fa-thumbs-up"></i></td>
                 <td style="vertical-align: middle"><a href="user/<%=notif[j].from%>"><%=notif[j].username%></a> vous a liké</td>
-                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
+                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="height: 50px; width: 50px; max-height: 50px; max-width: 50px; border-radius: 50%; object-fit: cover;"></td>
                 <td style="vertical-align: middle">le <%=notif[j].date.toLocaleDateString('fr-FR', options)%></td>
             </tr>
 
             <%}else if (notif[j].flag === 2) {%>
             <tr>
-                <td style="vertical-align: middle"><i class="fas fa-heart"></i></td>
+                <td style="vertical-align: middle"><i class="fas fa-heartbeat"></i></td>
                 <td style="vertical-align: middle">Vous avez matché avec <a href="user/<%=notif[j].from%>"><%=notif[j].username%></a></td>
-                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
+                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="height: 50px; width: 50px; max-height: 50px; max-width: 50px; border-radius: 50%; object-fit: cover;"></td>
                 <td style="vertical-align: middle">le <%=notif[j].date.toLocaleDateString('fr-FR', options)%></td>
             </tr>
 
@@ -42,7 +42,7 @@
             <tr>
                 <td style="vertical-align: middle"><i class="fas fa-thumbs-down"></i></td>
                 <td style="vertical-align: middle"><a href="user/<%=notif[j].from%>"><%=notif[j].username%></a> ne vous like plus</td>
-                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
+                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="height: 50px; width: 50px; max-height: 50px; max-width: 50px; border-radius: 50%; object-fit: cover;"></td>
                 <td style="vertical-align: middle">le <%=notif[j].date.toLocaleDateString('fr-FR', options)%></td>
             </tr>
 
@@ -50,7 +50,7 @@
             <tr>
                 <td style="vertical-align: middle"><i class="fas fa-sad-tear"></i></td>
                 <td style="vertical-align: middle">Vous ne matchez plus avec <a href="user/<%=notif[j].from%>"><%=notif[j].username%></a></td>
-                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
+                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="height: 50px; width: 50px; max-height: 50px; max-width: 50px; border-radius: 50%; object-fit: cover;"></td>
                 <td style="vertical-align: middle">le <%=notif[j].date.toLocaleDateString('fr-FR', options)%></td>
             </tr>
 
@@ -58,7 +58,7 @@
             <tr>
                 <td style="vertical-align: middle"><i class="fas fa-eye"></i></td>
                 <td style="vertical-align: middle"><a href="user/<%=notif[j].from%>"><%=notif[j].username%></a> a visité votre profil</td>
-                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="max-height: 50px; max-width: 50px; border-radius: 50%"></td>
+                <td style="vertical-align: middle"><img src="<%=notif[j].profil%>" style="height: 50px; width: 50px; max-height: 50px; max-width: 50px; border-radius: 50%; object-fit: cover;"></td>
                 <td style="vertical-align: middle">le <%=notif[j].date.toLocaleDateString('fr-FR', options)%></td>
             </tr>
             <%}}}%>

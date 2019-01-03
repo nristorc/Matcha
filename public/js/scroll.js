@@ -1,4 +1,4 @@
-var i=6;
+var i=12;
 var end = 0;
 
 	// Initilaize sliders
@@ -56,7 +56,7 @@ $(function () {
             if ($(document).height() - win.height() == win.scrollTop() && end == 0) {
                 $('#loading').show();
                 requestNextPage();
-                i=i+6;
+                i=i+12;
             }
         });
 

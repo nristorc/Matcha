@@ -240,3 +240,21 @@ button:focus {
 #notFake, #notBlock {
     cursor: pointer;
 }
+
+.profil-gal{
+    max-width: 30%;
+}
+
+#rowPic {
+    background: none;
+    border: none;
+    margin-top: 10%;
+}
+.photos{
+    background: none;
+    border: none;
+}
+
+.media {
+    margin-top: 5%;
+}

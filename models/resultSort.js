@@ -69,8 +69,12 @@ class Sort{
 					ageMin++;
 				}
 				var today = new Date();
-				var dateMin = today.getFullYear() - ageMin + "-" + today.getMonth() + "-" + today.getDate();
-				var dateMax = today.getFullYear() - ageMax + "-" + today.getMonth() + "-" + today.getDate();
+				// console.log("TODAY", today);
+				var dateMin = today.getFullYear() - ageMin + "-" + today.getMonth() + 1 + "-" + today.getDate();
+				var dateMax = today.getFullYear() - ageMax + "-" + today.getMonth() + 1 + "-" + today.getDate();
+				// console.log("today.getMonth()", today.getMonth());
+				// console.log("dateMin", dateMin);
+				// console.log("dateMax", dateMax);
 				var popMin = popFilter.substring(0, popFilter.indexOf(","));
 				var popMax = popFilter.substring(popFilter.indexOf(",")+1);
 				var locMin = locFilter.substring(0, locFilter.indexOf(","));
