@@ -18,6 +18,11 @@ body {
     background-color: rgb(254, 224, 224);
 }
 
+a, a:hover {
+    color: black !important;
+    text-decoration: none;
+}
+
 .container {
     padding-top: 40px;
 }

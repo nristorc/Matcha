@@ -119,32 +119,32 @@
 					</div>
 					<% if (users[x]['popularity'] >= 0){
 						if (users[x]['popularity'] < 50){ %>
-							<button type="button" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
+							<button type="button" id="pop<%=users[x]['id']%>" class="btn btn-primary popularity-search-1"><%=users[x]['popularity']%>%</button>
 						<% } else if (users[x]['popularity'] < 85) { %>
-							<button type="button" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
+							<button type="button" id="pop<%=users[x]['id']%>" class="btn btn-primary popularity-search-2"><%=users[x]['popularity']%>%</button>
 						<% } else { %>
-							<button type="button" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
+							<button type="button" id="pop<%=users[x]['id']%>" class="btn btn-primary popularity-search-3"><%=users[x]['popularity']%>%</button>
 						<%}
 					} else {
 						if (users[x]['popularity'] > -50){ %>
-							<button type="button" class="btn btn-primary popularity-search-4"><%=users[x]['popularity']%>%</button>
+							<button type="button" id="pop<%=users[x]['id']%>" class="btn btn-primary popularity-search-4"><%=users[x]['popularity']%>%</button>
 						<% } else if (users[x]['popularity'] > -85) { %>
-							<button type="button" class="btn btn-primary popularity-search-5"><%=users[x]['popularity']%>%</button>
+							<button type="button" id="pop<%=users[x]['id']%>" class="btn btn-primary popularity-search-5"><%=users[x]['popularity']%>%</button>
 						<% } else { %>
-							<button type="button" class="btn btn-primary popularity-search-6"><%=users[x]['popularity']%>%</button>
+							<button type="button" id="pop<%=users[x]['id']%>" class="btn btn-primary popularity-search-6"><%=users[x]['popularity']%>%</button>
 						<%}
 					}
-			
 					%>
 				</div>
 				
-			<div id="searchOnline">
-				<%if (users[x]['online'] === 'Y') {%>
-				<h5><i style="color: green;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i><%=users[x]['username']%></h5>
-				<%} else if (users[x]['online'] === 'N') {%>
-				<h5><i style="color: red;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i> <%=users[x]['username']%></h5>
-				<%}%>
-			</div>
+				<a href="/user/<%=users[x]['id']%>"><div id="searchOnline">
+					<%if (users[x]['online'] === 'Y') {%>
+					<h5><i style="color: green;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i><%=users[x]['username']%></h5>
+					<%} else if (users[x]['online'] === 'N') {%>
+					<h5><i style="color: red;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i> <%=users[x]['username']%></h5>
+					<%}%>
+				</div>
+
 				<h6>
 					<% if (users[x]['gender'] === null) { %>
 						Genre non renseigne,
@@ -157,13 +157,15 @@
 						<%=users[x]['orientation']%>
 					<% } %>
 				</h6>
+
 				<h6 class="desc-search">
 					<% if (users[x]['description'] == null) { %>
 						Description manquante
 					<%} else { %>
 						<%=users[x]['description']%>
 					<% } %>
-				</h6>
+				</h6></a>
+
 			<div id=likes>
 				<span><i class="fas fa-heartbeat matched" id="matched<%=users[x]['id']%>" title="c'est un match !" style="display:none"></i></span>
 				<span><i class="far fa-smile-wink liked" id="liked<%=users[x]['id']%>" title="Ce membre vous a liké !" style="display:none"></i></span>

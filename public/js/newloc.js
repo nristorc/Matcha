@@ -1,7 +1,3 @@
-function forceGeo() {
-	// console.log("FORCE GEOLOC")
-}
-
 $(function () {
 	$(document).ready(function() {
 		console.log("1ere geoloc");

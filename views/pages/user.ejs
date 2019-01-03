@@ -150,18 +150,18 @@
 <% include ../partial/footer.ejs%>
 <script>
 
-    function iLike(userId) {
+function iLike(userId) {
         const formData = {
             'userId': userId,
             'submit': 'iLiked'
         }
 
         $.ajax({
-            type		: 'POST',
+            type        : 'POST',
             url         : '/user/' + userId,
-            data		: formData,
-            dataType	: 'json',
-            encode		: true
+            data        : formData,
+            dataType    : 'json',
+            encode        : true
         })
             .done(function(data) {
                 // console.log('data like: ', data);
@@ -215,11 +215,11 @@
         }
 
         $.ajax({
-            type		: 'POST',
+            type        : 'POST',
             url         : '/user/' + userId,
-            data		: formData,
-            dataType	: 'json',
-            encode		: true
+            data        : formData,
+            dataType    : 'json',
+            encode        : true
         })
             .done(function(data) {
                 if (data.flag === '1') {

@@ -202,22 +202,31 @@ router.route('/').get((request, response) => {
             algorithms: ['HS256']
         });
         if (request.body.id_liked){
-            console.log("request.body.id_liked", request.body.id_liked);
             var data = request.body.id_liked;
             var likeAction = data.substring(0, 12);
             var userLiked =  data.substring(13, data.length);
             if (likeAction == "oklikeSearch"){
-                checkDb.updateLikes(decoded.id, userLiked, 1).then((update) => {
+                checkDb.updateLikes(decoded.id, parseInt(userLiked), 1).then((newPop) => {
                     checkDb.getMatches(decoded.id).then((myMatches) => {
-                        response.json({getMatches: myMatches});
+                            response.json({
+                                getMatches: myMatches,
+                                updatePop: newPop
+                            });
                     }).catch((myMatches) => {
                         console.log('err occured: ', myMatches);
                     });
+                }).catch((update) => {
+                    console.log('err occured: ', update);
                 });
             } else if (likeAction == "unlikeSearch"){
                 checkDb.getMatches(decoded.id).then((myMatches) => {
-                    checkDb.updateLikes(decoded.id, userLiked, -1).then((update) => {
-                        response.json({getMatches: myMatches});
+                    checkDb.updateLikes(decoded.id, parseInt(userLiked), -1).then((newPop) => {
+							response.json({
+								getMatches: myMatches,
+								updatePop: newPop
+							});
+                    }).catch((update) => {
+                        console.log('err occured: ', update);
                     });
                 }).catch((myMatches) => {
                     console.log('err occured: ', myMatches);
