@@ -25,6 +25,7 @@ body {
 
 .container {
     padding-top: 40px;
+    position: relative;
 }
 
 .navbar-custom {
@@ -33,6 +34,14 @@ body {
 
 .nav {
     display: inline;
+}
+
+.fixed-top {
+    z-index: 10;
+}
+
+header {
+    position: absolute;
 }
 
 .form-signin {
