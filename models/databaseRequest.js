@@ -407,7 +407,6 @@ class DatabaseRequest {
             return new Promise((resolve, reject) => {
                 const sql = "SELECT profil FROM matcha.users WHERE id = ?";
                 this.query(sql, [params]).then((profil) => {
-                    //console.log(profil[0].profil);
                     if (profil && profil[0] && profil[0].profil === 'public/img/avatarDefault.png'){
                         resolve({picture: profil[0].profil, flag: 0});
                     } else if (profil && profil[0] && profil[0].profil !== 'public/img/avatarDefault.png') {
@@ -1061,8 +1060,11 @@ class DatabaseRequest {
                             });
                         } else if (flag == 2) {
                             this.query("INSERT INTO matcha.reports(`report_id`, `reported_id`, `reported_at`, `flag`) VALUES (?, ?, NOW(), ?)", [id, reported, flag]).then(() => {
-                                this.updatePop(id, 3);
-                                resolve();
+                                this.updatePop(reported, 3).then(() => {
+                                    resolve();
+                                }).catch((err) => {
+                                    console.log(err);
+                                });
                             }).catch(() => {
                                 reject();
                             });

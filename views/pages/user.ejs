@@ -164,11 +164,20 @@
             encode		: true
         })
             .done(function(data) {
-                console.log('data like: ', data);
+                // console.log('data like: ', data);
                 if (data.flag === '1') {
                     $('.fa-thumbs-up').attr('class', 'fas fa-thumbs-up');
                     $('.fa-thumbs-up').attr('style', 'color: dodgerblue; font-size: xx-large; margin-left: 10px');
                     $('.fa-thumbs-up').attr('onclick', 'iUnlike(<%=user[0].id%>)');
+
+                    var pop = $('span.badge.badge-light')[0].innerHTML;
+                    if (parseInt(pop) < 50 && parseInt(pop) > -50) {
+                        $('span.badge.badge-light')[0].innerHTML = parseInt(pop) + 10 + '%';
+                    } else if (parseInt(pop) < 80 && parseInt(pop) > -80) {
+                        $('span.badge.badge-light')[0].innerHTML = parseInt(pop) + 5 + '%';
+                    } else if (parseInt(pop) < 99 && parseInt(pop) >= -100) {
+                        $('span.badge.badge-light')[0].innerHTML = parseInt(pop) + 2 + '%';
+                    }
                 }
                 if (data.getMatches) {
                     for (var i = 0; i < data.getMatches.length; i++) {
@@ -217,6 +226,16 @@
                     $('.fa-thumbs-up').attr('class', 'far fa-thumbs-up');
                     $('.fa-thumbs-up').attr('style', 'font-size: xx-large; margin-left: 10px');
                     $('.fa-thumbs-up').attr('onclick', 'iLike(<%=user[0].id%>)');
+
+
+                    var pop = $('span.badge.badge-light')[0].innerHTML;
+                    if (parseInt(pop) < 50 && parseInt(pop) > -50) {
+                        $('span.badge.badge-light')[0].innerHTML = parseInt(pop) - 10 + '%';
+                    } else if (parseInt(pop) < 80 && parseInt(pop) > -80) {
+                        $('span.badge.badge-light')[0].innerHTML = parseInt(pop) - 5 + '%';
+                    } else if (parseInt(pop) <= 100 && parseInt(pop) > -99) {
+                        $('span.badge.badge-light')[0].innerHTML = parseInt(pop) - 2 + '%';
+                    }
 
                     if ($('.fa-heartbeat')) {
                         $('.fa-heartbeat').remove();

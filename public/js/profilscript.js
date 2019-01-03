@@ -46,7 +46,7 @@ function deleteTag(tag) {
     var formData = {
         'tag': delTag,
         'submit': 'deleteTag'
-    }
+    };
 
     $.ajax({
         type		: 'POST',
@@ -79,7 +79,7 @@ function deletePic(image) {
     var formData = {
         'image': srcImg.src,
         'submit': 'deletePic'
-    }
+    };
 
     $.ajax({
         type		: 'POST',
@@ -128,7 +128,7 @@ function changePic(image) {
     var formData = {
         'image': srcImg.src,
         'submit': 'updateProfilPic'
-    }
+    };
 
     $.ajax({
         type		: 'POST',
