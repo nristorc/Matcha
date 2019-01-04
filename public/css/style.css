@@ -270,7 +270,7 @@ small {
     color: grey;
 }
 
-.pageNotfound {
+.pageNotfound, .pageErrors{
     text-align: center;
     margin: 0;
     position: absolute;
@@ -280,6 +280,6 @@ small {
     transform: translate(-50%, -50%);
 }
 
-.pageNotfound img{
+.pageNotfound img, .pageErrors img{
     margin-bottom: 100px;
 }

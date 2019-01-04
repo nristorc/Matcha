@@ -11,7 +11,7 @@ function deleteTag(tag) {
 }
 
 const	validTag = (tag) => {
-	var i = document.getElementById('addTag')
+	var i = document.getElementById('addTag');
 	if (i == null)
 		return
 	i.value = tag
@@ -67,12 +67,12 @@ $(function () {
 		}
 
         $('#addTag').on('keydown', (e) => {
-            var k = e.which || e.key
+            var k = e.which || e.key;
             if(/^(9)$/.test(k)) {
-                $(this).value = ""
+                $(this).value = "";
                 e.preventDefault()
             }
-		})
+		});
 		
 		$('#addTag').keyup(function(){
 			$('ul').remove();
@@ -84,7 +84,7 @@ $(function () {
 					url : "/tagsearch",
 					data : data,
 					success : function(server_response){
-						var tagDiv = document.getElementById('resultTag')
+						var tagDiv = document.getElementById('resultTag');
 						if (tagDiv == null)
 							return;
 						tagDiv.innerHTML = "";

@@ -1,21 +1,30 @@
 function openSearch() {
+    const div = document.createElement('div');
+    div.setAttribute('style', 'display: grid');
     const input = document.createElement('input');
-    $('.navbar-nav').append(input);
     input.setAttribute('type', 'text');
     input.setAttribute('id', 'searchBox');
     input.setAttribute('placeholder', 'Recherche par username');
     input.setAttribute('onfocus', 'search()');
+    div.append(input);
+    $('.navbar-nav').append(div);
     $('#searchIcon').hide();
 }
 
 function search() {
     if ($('#divSearch').length === 0) {
+        if (document.getElementById('errorSearch')) {
+            document.getElementById('errorSearch').remove();
+        }
         const div = document.createElement('div');
         $('.navbar-nav').append(div);
         div.id = 'divSearch';
     }
 
     $(document).on('keyup', function () {
+        if (document.getElementById('errorSearch')) {
+            document.getElementById('errorSearch').remove();
+        }
         $('#accessProfil').remove();
         const query = $('#searchBox').val();
         if (query.length > 1) {
@@ -32,9 +41,18 @@ function search() {
             })
                 .done(function (data) {
 
+                    if (data.error) {
+                        var small = document.createElement('small');
+                        small.innerText = data.error;
+                        small.id = 'errorSearch';
+                        small.setAttribute('style', 'color: red');
+                        document.getElementById('searchBox').insertAdjacentElement('afterend', small);
+                        data.error = null;
+                        // console.log('erreurs', data.error);
+                    }
 
-                    console.log('data', data)
-                    console.log('length', $('#response').length);
+                    // console.log('data', data)
+                    // console.log('length', $('#response').length);
 
                     if (data.res == ''){
                         console.log('pas de match')
