@@ -801,6 +801,24 @@ class DatabaseRequest {
         }
     }
 
+    async igotBlockedBy(reported, report){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.reports WHERE (reported_id = ? AND report_id = ? AND flag = 2)";
+                this.query(sql, [reported, report]).then((reports) => {
+                    if (reports){
+                        resolve(reports);
+                    } else {
+                        reject(reports);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async getMyBlocks(params){
         try {
             return new Promise((resolve, reject) => {

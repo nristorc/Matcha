@@ -217,14 +217,19 @@ router.route('/').get((request, response) => {
                     checkDb.getMatches(decoded.id).then((myMatches) => {
                         checkDb.getUser(decoded.id).then((me) => {
                             checkDb.getMessages(decoded.id, parseInt(userLiked)).then((messages) => {
-                                console.log('hello');
-                                u.forEach(user => {
-                                    io.sockets.connected[user.socket].emit('likeMatch', {users: usersSocket, messages, like: parseInt(userLiked), match: myMatches, me});
-                                });
-                                response.json({
-                                    getMatches: myMatches,
-                                    updatePop: newPop,
-                                    messages
+                                checkDb.igotBlockedBy(decoded.id, parseInt(userLiked)).then((reported) => {
+                                    if (reported.length === 0) {
+                                        u.forEach(user => {
+                                            io.sockets.connected[user.socket].emit('likeMatch', {users: usersSocket, messages, like: parseInt(userLiked), match: myMatches, me});
+                                        });
+                                    }
+                                    response.json({
+                                        getMatches: myMatches,
+                                        updatePop: newPop,
+                                        messages
+                                    });
+                                }).catch((err) => {
+                                    console.log('error while blocking: ', err);
                                 });
                             }).catch((err) => {
                                 console.log('error happened when getting messages: ', err);
@@ -244,14 +249,20 @@ router.route('/').get((request, response) => {
                         checkDb.getLikes(decoded.id).then((liked) => {
                             checkDb.getUser(decoded.id).then((me) => {
                                 checkDb.getMessages(decoded.id, parseInt(userLiked)).then((messages) => {
-                                    u.forEach(user => {
-                                        io.sockets.connected[user.socket].emit('unlikeMatch', {users: usersSocket, messages, unlike: parseInt(userLiked), unmatch: myMatches, me});
-                                    });
-                                    response.json({
-                                        getMatches: myMatches,
-                                        updatePop: newPop,
-                                        theyLikedMe: liked,
-                                        messages
+                                    checkDb.igotBlockedBy(decoded.id, parseInt(userLiked)).then((reported) => {
+                                        if (reported.length === 0) {
+                                            u.forEach(user => {
+                                                io.sockets.connected[user.socket].emit('unlikeMatch', {users: usersSocket, messages, unlike: parseInt(userLiked), unmatch: myMatches, me});
+                                            });
+                                        }
+                                        response.json({
+                                            getMatches: myMatches,
+                                            updatePop: newPop,
+                                            theyLikedMe: liked,
+                                            messages
+                                        });
+                                    }).catch((err) => {
+                                        console.log('error while blocking: ', err);
                                     });
                                 }).catch((err) => {
                                     console.log('error happened when getting messages: ', err);
