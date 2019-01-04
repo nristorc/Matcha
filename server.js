@@ -32,6 +32,8 @@ const chat = require('./utils/chat');
 const tagSearch = require('./utils/tagSearch');
 const notifications = require('./utils/notifications');
 const sendActivation = require('./utils/sendActivation');
+const notFound = require('./utils/notFound');
+const errors = require('./utils/errors');
 
 const port =  process.env.PORT || 3000;
 const host = 'localhost';
@@ -68,7 +70,6 @@ app.use(function (request, response, next) {
     next();
 });
 
-// app.locals.io = io;
 usersSocket = [];
 
 /* ROUTES */
@@ -88,7 +89,17 @@ app.use('/chat', chat);
 app.use('/tagsearch', tagSearch);
 app.use('/notifications', notifications);
 app.use('/sendActivation', sendActivation);
+app.use('/notFound', notFound);
+app.use('/errors', errors);
 
+app.use((req, res, next) => {
+    res.status(404).redirect('/notFound')
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).redirect('/errors')
+});
 
 /* EJS */
 app.set('views', './views');
@@ -96,7 +107,6 @@ app.set('view engine', 'ejs');
 
 /* SOCKETS */
 const jwtSecret = 'ratonlaveur';
-// let usersSocket = [];
 
 io.sockets.on('connection', (socket) => {
     let currentUser = null;
@@ -168,9 +178,6 @@ io.sockets.on('connection', (socket) => {
                             return acc;
                         }, []);
                         socket.emit('blockMessage', {users: usersSocket, msg: "Cet utilisateur vous a bloqué, vous ne pouvez plus lui envoyer de message"});
-                        // u.forEach(user => {
-                        //     io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
-                        // })
 
                 } else {
                     // User unmatched
@@ -199,9 +206,6 @@ io.sockets.on('connection', (socket) => {
                         return acc;
                     }, []);
                         socket.emit('blockMessage', {users: usersSocket, msg: "Vous ne matchez plus avec cet utilisateur, vous ne pouvez plus lui envoyer de message"});
-                        // u.forEach(user => {
-                        //     io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
-                        // });
                     });
 
 

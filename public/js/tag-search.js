@@ -11,7 +11,7 @@ function deleteTag(tag) {
 }
 
 const	validTag = (tag) => {
-	var i = document.getElementById('addTag')
+	var i = document.getElementById('addTag');
 	if (i == null)
 		return
 	i.value = tag
@@ -49,15 +49,15 @@ const validFormTag = () => {
 			if (document.getElementById('messages')) {
 				const flash = document.getElementsByClassName('alert');
 				flash[0].className = 'alert alert-warning alert-dismissible';
-				flash[0].innerHTML = "Mauvais format de tag";
+				flash[0].innerHTML = "Le format de votre tag est incorrect";
 			} else {
 				$('#container').prepend('<div id="messages"></div>');
-				$('#messages').append('<div class="alert alert-warning alert-dismissible">Mauvais format de tag JQUERY</div>')
+				$('#messages').append('<div class="alert alert-warning alert-dismissible">Le format de votre tag est incorrect</div>')
 			}
 		}
 
 	}
-}
+};
 
 
 $(function () {
@@ -67,15 +67,17 @@ $(function () {
 		}
 
         $('#addTag').on('keydown', (e) => {
-            var k = e.which || e.key
+            var k = e.which || e.key;
             if(/^(9)$/.test(k)) {
-                $(this).value = ""
-                // console.log("Tabulation catch:" + k)
+                $(this).value = "";
                 e.preventDefault()
             }
-		})
+		});
 		
 		$('#addTag').keyup(function(){
+            if (document.getElementById('errorSearch')) {
+                document.getElementById('errorSearch').remove();
+            }
 			$('ul').remove();
 			var inputVal = $(this).val();
 			var data = 'tagSearch=' + inputVal;
@@ -85,13 +87,25 @@ $(function () {
 					url : "/tagsearch",
 					data : data,
 					success : function(server_response){
-						var tagDiv = document.getElementById('resultTag')
+
+					    if (server_response.error) {
+                            var small = document.createElement('small');
+                            small.innerText = server_response.error;
+                            small.id = 'errorSearch';
+                            small.setAttribute('style', 'color: red');
+                            console.log('small', document.getElementById('addTag'));
+
+                            document.getElementById('addTag').insertAdjacentElement('afterend', small);
+                            server_response.error = null;
+                        }
+
+						var tagDiv = document.getElementById('resultTag');
 						if (tagDiv == null)
-							return
-						tagDiv.innerHTML = ""
+							return;
+						tagDiv.innerHTML = "";
 						$('#resultTag').html(server_response);
 					}
-				});
+				})
 			}
 		});       
     });

@@ -304,6 +304,31 @@ $(function () {
             event.preventDefault();
         });
 
+
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        function setCookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            var expires = "expires="+ d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
         $('form[id=modifyParams]').submit(function(event) {
 
             $('.form-group').removeClass('has-error'); // remove the error class
@@ -334,6 +359,8 @@ $(function () {
 
                 .done(function(data) {
 
+                    // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5yaXN0b3JzIiwiZW1haWwiOiJuaW5hLnJpc3RvcmNlbGxpQGdtYWlsLmNvbSIsImp3dElkIjoiNnB4ZWoiLCJpYXQiOjE1NDY1Mzg2NDQsImV4cCI6MTU1MDEzODY0NH0.5UETzOr8wG3Islrhv_0xv-4Lr7Wt7gsDqez5WkUxtls
+
                     // here we will handle errors and validation messages
                     if (data.errors) {
                         for (var i = 0; i < data.errors.length; i++) {
@@ -346,6 +373,11 @@ $(function () {
                         }
                     } else {
                         if (data.user) {
+
+                            console.log('data', data);
+                            setCookie('token', data.token, {
+                                expiresIn: 9000000
+                            });
 
                             $('#accountParam').modal('hide');
                             const userDetails = document.getElementById('userDetails');
@@ -532,10 +564,8 @@ $(function () {
                                 if (document.getElementById('messages')) {
                                     $('#messages').remove();
                                 }
-                                // console.log("Je dois ajouter un tag")
-                                // console.log(addedTag)
                                 if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag +'</a>');
-                                inputTag.value = ""
+                                inputTag.value = "";
                                 inputTag.focus();
                             }
                             if ($(".hashtag").length === 6) {
@@ -545,7 +575,6 @@ $(function () {
                 } else {
                     if (document.getElementById('messages')) {
                         const flash = document.getElementsByClassName('alert');
-                        // console.log('flash', flash);
                         flash[0].className = 'alert alert-warning alert-dismissible';
                         flash[0].innerHTML = "Le format de votre tag est incorrect";
                     } else {

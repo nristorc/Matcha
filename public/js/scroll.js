@@ -77,8 +77,6 @@ $(function () {
         $('#inputFilter').click((event) => {
             if (1){
                 $(location).attr("href", "/search?filter=" + "age" + valSlideAge + "pop" + valSlidePop + "loc" + valSlideLoc + "tag" + tags);
-                // console.log($('#searchTag').val());
-                // console.log("salut la compagnie");
             } else {
                 $(location).attr("href", "/search?filter=" + "age" + valSlideAge + "pop" + valSlidePop + "loc" + valSlideLoc);
             }

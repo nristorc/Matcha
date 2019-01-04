@@ -206,17 +206,42 @@ router.route('/').get((request, response) => {
         const decoded = jwt.verify(token, 'ratonlaveur', {
             algorithms: ['HS256']
         });
+
         if (request.body.id_liked){
             var data = request.body.id_liked;
             var likeAction = data.substring(0, 12);
             var userLiked =  data.substring(13, data.length);
+            var u = usersSocket.reduce((acc, elem) => {
+                if (elem.id == parseInt(userLiked)) {
+                    acc.push(elem);
+                }
+                return acc;
+            }, []);
             if (likeAction == "oklikeSearch"){
                 checkDb.updateLikes(decoded.id, parseInt(userLiked), 1).then((newPop) => {
                     checkDb.getMatches(decoded.id).then((myMatches) => {
-                            response.json({
-                                getMatches: myMatches,
-                                updatePop: newPop
+                        checkDb.getUser(decoded.id).then((me) => {
+                            checkDb.getMessages(decoded.id, parseInt(userLiked)).then((messages) => {
+                                checkDb.igotBlockedBy(decoded.id, parseInt(userLiked)).then((reported) => {
+                                    if (reported.length === 0) {
+                                        u.forEach(user => {
+                                            io.sockets.connected[user.socket].emit('likeMatch', {users: usersSocket, messages, like: parseInt(userLiked), match: myMatches, me});
+                                        });
+                                    }
+                                    response.json({
+                                        getMatches: myMatches,
+                                        updatePop: newPop,
+                                        messages
+                                    });
+                                }).catch((err) => {
+                                    console.log('error while blocking: ', err);
+                                });
+                            }).catch((err) => {
+                                console.log('error happened when getting messages: ', err);
                             });
+                        }).catch((err) => {
+                            console.log('get my info error: ', err);
+                        });
                     }).catch((myMatches) => {
                         console.log('err occured: ', myMatches);
                     });
@@ -226,10 +251,33 @@ router.route('/').get((request, response) => {
             } else if (likeAction == "unlikeSearch"){
                 checkDb.getMatches(decoded.id).then((myMatches) => {
                     checkDb.updateLikes(decoded.id, parseInt(userLiked), -1).then((newPop) => {
-							response.json({
-								getMatches: myMatches,
-								updatePop: newPop
-							});
+                        checkDb.getLikes(decoded.id).then((liked) => {
+                            checkDb.getUser(decoded.id).then((me) => {
+                                checkDb.getMessages(decoded.id, parseInt(userLiked)).then((messages) => {
+                                    checkDb.igotBlockedBy(decoded.id, parseInt(userLiked)).then((reported) => {
+                                        if (reported.length === 0) {
+                                            u.forEach(user => {
+                                                io.sockets.connected[user.socket].emit('unlikeMatch', {users: usersSocket, messages, unlike: parseInt(userLiked), unmatch: myMatches, me});
+                                            });
+                                        }
+                                        response.json({
+                                            getMatches: myMatches,
+                                            updatePop: newPop,
+                                            theyLikedMe: liked,
+                                            messages
+                                        });
+                                    }).catch((err) => {
+                                        console.log('error while blocking: ', err);
+                                    });
+                                }).catch((err) => {
+                                    console.log('error happened when getting messages: ', err);
+                                });
+                            }).catch((err) => {
+                                console.log('get my info error: ', err);
+                            });
+                        }).catch((liked) => {
+                            console.log('get my likes error: ', liked);
+                        });
                     }).catch((update) => {
                         console.log('err occured: ', update);
                     });

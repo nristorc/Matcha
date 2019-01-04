@@ -53,19 +53,23 @@ router.post('/', async (request, response) => {
         });
 
         const query = request.body.tagSearch;
-        checkDb.query("SELECT `tag` FROM matcha.tags WHERE `tag` LIKE '%" + query + "%' GROUP BY `tag`").then((result) => {
-            if (result) {
-                var res = [];
-                for (var i = 0; i < result.length; i++) {
-                    res.push('<li class="searchLi" onclick="validTag(\''+result[i].tag+'\')">' + result[i].tag + '</li>');
-                }
-                console.log("---1---");
-                response.json(res);
-            }
-        }).catch((result) => {
-            console.log('result catch: ', result);
-        });
 
+        if (!request.body.tagSearch.match(/^[a-z0-9A-Z_]+$/)) {
+            response.json({error: 'Format incorrect'});
+        } else {
+            checkDb.query("SELECT `tag` FROM matcha.tags WHERE `tag` LIKE '%" + query + "%' GROUP BY `tag`").then((result) => {
+                if (result) {
+                    var res = [];
+                    for (var i = 0; i < result.length; i++) {
+                        res.push('<li class="searchLi" onclick="validTag(\''+result[i].tag+'\')">' + result[i].tag + '</li>');
+                    }
+                    console.log("---1---");
+                    response.json(res);
+                }
+            }).catch((result) => {
+                console.log('result catch: ', result);
+            });
+        }
     } catch (e) {
         request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
         return response.render('index');

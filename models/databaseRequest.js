@@ -308,7 +308,7 @@ class DatabaseRequest {
 
     async newActivationEmail (params) {
         try {
-            console.log('params: ', params);
+            // console.log('params: ', params);
             this.query('SELECT username, registerToken FROM matcha.users WHERE email = ?', [params]).then((result) => {
                 const template = fs.readFileSync('views/pages/registrationEmail.ejs', 'utf-8');
                 const compiledTemplate = hogan.compile(template);
@@ -801,6 +801,24 @@ class DatabaseRequest {
         }
     }
 
+    async igotBlockedBy(reported, report){
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT * FROM matcha.reports WHERE (reported_id = ? AND report_id = ? AND flag = 2)";
+                this.query(sql, [reported, report]).then((reports) => {
+                    if (reports){
+                        resolve(reports);
+                    } else {
+                        reject(reports);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async getMyBlocks(params){
         try {
             return new Promise((resolve, reject) => {
@@ -1147,7 +1165,7 @@ class DatabaseRequest {
 					    ipstack(ip,"31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
 					        const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `changed_loc` = ? WHERE users.id = ?";
 					        this.query(sql, [response.latitude, response.longitude, "E", user_id]).then(() => {
-								console.log("geoloc forcee reussie");
+								// console.log("geoloc forcee reussie");
 					        });
 					    });
 					}

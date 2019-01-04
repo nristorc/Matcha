@@ -1,6 +1,5 @@
 const express	= require('express');
 const router 	= express.Router();
-
 const databaseRequest = require("../models/databaseRequest");
 const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
@@ -79,67 +78,79 @@ router.route('/:id').get(async (request, response) => {
                                                     checkDb.getLikes(decoded.id).then((liked) => {
                                                         checkDb.getMatches(decoded.id).then((matches) => {
                                                             checkDb.getMyReports(decoded.id).then((reports) => {
-                                                                if (photos == '') {
-                                                                    if (matches == ''){
-                                                                        u.forEach(user => {
-                                                                            io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
-                                                                        });
-                                                                        response.render('pages/user', {
-                                                                            user: result,
-                                                                            userage: age,
-                                                                            usertags: tags,
-                                                                            userphotos: photos,
-                                                                            likes: null,
-                                                                            matches: null,
-                                                                            reports: reports,
-                                                                            token
-                                                                        });
+                                                                checkDb.igotBlockedBy(decoded.id, request.params.id).then((reported) => {
+                                                                    if (photos == '') {
+                                                                        if (matches == ''){
+                                                                            if (reported.length === 0) {
+                                                                                u.forEach(user => {
+                                                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                                });
+                                                                            }
+                                                                            response.render('pages/user', {
+                                                                                user: result,
+                                                                                userage: age,
+                                                                                usertags: tags,
+                                                                                userphotos: photos,
+                                                                                likes: null,
+                                                                                matches: null,
+                                                                                reports: reports,
+                                                                                token
+                                                                            });
+                                                                        } else {
+                                                                            if (reported.length === 0) {
+                                                                                u.forEach(user => {
+                                                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                                });
+                                                                            }
+                                                                            response.render('pages/user', {
+                                                                                user: result,
+                                                                                userage: age,
+                                                                                usertags: tags,
+                                                                                userphotos: photos,
+                                                                                likes: null,
+                                                                                matches: matches,
+                                                                                reports: reports,
+                                                                                token
+                                                                            });
+                                                                        }
                                                                     } else {
-                                                                        u.forEach(user => {
-                                                                            io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
-                                                                        });
-                                                                        response.render('pages/user', {
-                                                                            user: result,
-                                                                            userage: age,
-                                                                            usertags: tags,
-                                                                            userphotos: photos,
-                                                                            likes: null,
-                                                                            matches: matches,
-                                                                            reports: reports,
-                                                                            token
-                                                                        });
+                                                                        if (matches == ''){
+                                                                            if (reported.length === 0) {
+                                                                                u.forEach(user => {
+                                                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                                });
+                                                                            }
+                                                                            response.render('pages/user', {
+                                                                                user: result,
+                                                                                userage: age,
+                                                                                usertags: tags,
+                                                                                userphotos: photos,
+                                                                                likes: liked,
+                                                                                matches: null,
+                                                                                reports: reports,
+                                                                                token
+                                                                            });
+                                                                        } else {
+                                                                            if (reported.length === 0) {
+                                                                                u.forEach(user => {
+                                                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                                });
+                                                                            }
+                                                                            response.render('pages/user', {
+                                                                                user: result,
+                                                                                userage: age,
+                                                                                usertags: tags,
+                                                                                userphotos: photos,
+                                                                                likes: liked,
+                                                                                matches: matches,
+                                                                                reports: reports,
+                                                                                token
+                                                                            });
+                                                                        }
                                                                     }
-                                                                } else {
-                                                                    if (matches == ''){
-                                                                        u.forEach(user => {
-                                                                            io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
-                                                                        });
-                                                                        response.render('pages/user', {
-                                                                            user: result,
-                                                                            userage: age,
-                                                                            usertags: tags,
-                                                                            userphotos: photos,
-                                                                            likes: liked,
-                                                                            matches: null,
-                                                                            reports: reports,
-                                                                            token
-                                                                        });
-                                                                    } else {
-                                                                        u.forEach(user => {
-                                                                            io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
-                                                                        });
-                                                                        response.render('pages/user', {
-                                                                            user: result,
-                                                                            userage: age,
-                                                                            usertags: tags,
-                                                                            userphotos: photos,
-                                                                            likes: liked,
-                                                                            matches: matches,
-                                                                            reports: reports,
-                                                                            token
-                                                                        });
-                                                                    }
-                                                                }
+                                                                }).catch((reported) => {
+                                                                    console.log('reports catch', reported)
+                                                                });
                                                             }).catch((reports) => {
                                                                 console.log('reports catch', reports)
                                                             });
@@ -150,41 +161,65 @@ router.route('/:id').get(async (request, response) => {
                                                         console.log('likes list CATCH', liked);
                                                     });
                                                 }).catch((age) => {
-                                                    u.forEach(user => {
-                                                        io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                    checkDb.igotBlockedBy(decoded.id, request.params.id).then((reported) => {
+                                                        if (reported.length === 0) {
+                                                            u.forEach(user => {
+                                                                io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                            });
+                                                        }
+                                                        console.log('age CATCH: ', age);
+                                                        response.render('pages/user', {
+                                                            user: result,
+                                                            usertags: tags,
+                                                            userage: null,
+                                                            userphotos: photos,
+                                                            token
+                                                        });
+                                                    }).catch((reported) => {
+                                                        console.log('reports catch', reported)
                                                     });
-                                                    console.log('age CATCH: ', age);
+                                                });
+                                            }).catch((photos) => {
+                                                checkDb.igotBlockedBy(decoded.id, request.params.id).then((reported) => {
+                                                    if (reported.length === 0) {
+                                                        u.forEach(user => {
+                                                            io.sockets.connected[user.socket].emit('visit', {
+                                                                users: usersSocket,
+                                                                notif: result
+                                                            });
+                                                        });
+                                                    }
                                                     response.render('pages/user', {
                                                         user: result,
                                                         usertags: tags,
                                                         userage: null,
-                                                        userphotos: photos,
+                                                        userphotos: null,
+                                                        likes: null,
                                                         token
                                                     });
+                                                }).catch((reported) => {
+                                                    console.log('reports catch', reported)
                                                 });
-                                            }).catch((photos) => {
-                                                u.forEach(user => {
-                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
-                                                });
+                                            });
+                                        }).catch((tags) => {
+                                            checkDb.igotBlockedBy(decoded.id, request.params.id).then((reported) => {
+                                                if (reported.length === 0) {
+                                                    u.forEach(user => {
+                                                        io.sockets.connected[user.socket].emit('visit', {
+                                                            users: usersSocket,
+                                                            notif: result
+                                                        });
+                                                    });
+                                                }
                                                 response.render('pages/user', {
                                                     user: result,
                                                     usertags: tags,
                                                     userage: null,
-                                                    userphotos: null,
-                                                    likes: null,
+                                                    userphotos: photos,
                                                     token
                                                 });
-                                            });
-                                        }).catch((tags) => {
-                                            u.forEach(user => {
-                                                io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
-                                            });
-                                            response.render('pages/user', {
-                                                user: result,
-                                                usertags: tags,
-                                                userage: null,
-                                                userphotos: photos,
-                                                token
+                                            }).catch((reported) => {
+                                                console.log('reports catch', reported)
                                             });
                                         });
                                     }
@@ -212,7 +247,6 @@ router.route('/:id').get(async (request, response) => {
 
 
     }).post(async (request, response) => {
-        console.log(request.body);
         const token = request.cookies.token;
         try {
         const decoded = jwt.verify(token, 'ratonlaveur', {
@@ -230,10 +264,16 @@ router.route('/:id').get(async (request, response) => {
                 checkDb.getMatches(decoded.id).then((myMatches) => {
                     checkDb.getUser(decoded.id).then((me) => {
                         checkDb.getMessages(decoded.id, request.body.userId).then((messages) => {
-                            u.forEach(user => {
-                                io.sockets.connected[user.socket].emit('likeMatch', {users: usersSocket, messages, like: request.body.userId, match: myMatches, me});
+                            checkDb.igotBlockedBy(decoded.id, request.body.userId).then((reported) => {
+                                if (reported.length === 0) {
+                                    u.forEach(user => {
+                                        io.sockets.connected[user.socket].emit('likeMatch', {users: usersSocket, messages, like: request.body.userId, match: myMatches, me});
+                                    });
+                                }
+                                response.json({flag: '1', getMatches: myMatches, messages});
+                            }).catch((err) => {
+                               console.log('error while blocking: ', err);
                             });
-                            response.json({flag: '1', getMatches: myMatches, messages});
                         }).catch((err) => {
                             console.log('error happened when getting messages: ', err);
                         });
@@ -252,23 +292,31 @@ router.route('/:id').get(async (request, response) => {
                     checkDb.getLikes(decoded.id).then((liked) => {
                         checkDb.getUser(decoded.id).then((me) => {
                             checkDb.getMessages(decoded.id, request.body.userId).then((messages) => {
-                                u.forEach(user => {
-                                    io.sockets.connected[user.socket].emit('unlikeMatch', {users: usersSocket, messages, unlike: request.body.userId, unmatch: myMatches, me});
+                                checkDb.igotBlockedBy(decoded.id, request.body.userId).then((reported) => {
+                                    if (reported.length === 0) {
+                                        u.forEach(user => {
+                                            io.sockets.connected[user.socket].emit('unlikeMatch', {users: usersSocket, messages, unlike: request.body.userId, unmatch: myMatches, me});
+                                        });
+                                    }
+                                    response.json({flag: '1', theyLikedMe: liked, messages});
+                                }).catch((err) => {
+                                    console.log('error while blocking: ', err);
                                 });
-                                response.json({flag: '1', theyLikedMe: liked, messages});
                             }).catch((err) => {
                                 console.log('error happened when getting messages: ', err);
                             });
                         }).catch((err) => {
                             console.log('get my info error: ', err);
                         });
+                    }).catch((liked) => {
+                        console.log('get my likes error: ', liked);
                     });
                 }).catch(() => {
                     response.json({flag: '0'});
                 })
             }).catch((err) => {
                 console.log('an error occured unlike and match: ', err);
-            })
+            });
         } else if (request.body.submit === 'iReport') {
             checkDb.updateReports(decoded.id, parseInt(request.body.userId), 1).then(() => {
                 checkDb.emailReport(decoded.id, request.body.userId).then(() => {
@@ -280,10 +328,25 @@ router.route('/:id').get(async (request, response) => {
                 console.log('an error occured: ', result);
             });
         } else if (request.body.submit === 'iBlock') {
-            checkDb.updateReports(decoded.id, parseInt(request.body.userId), 2).then(() => {
-                response.json({flag: 'blocked'});
-            }).catch((result) => {
-                console.log('an error occured: ', result);
+            checkDb.getMatches(decoded.id).then((myMatches) => {
+                checkDb.updateReports(decoded.id, parseInt(request.body.userId), 2).then(() => {
+                    checkDb.getUser(decoded.id).then((me) => {
+                        checkDb.getMessages(decoded.id, parseInt(request.body.userId)).then((messages) => {
+                            u.forEach(user => {
+                                io.sockets.connected[user.socket].emit('blocked', {users: usersSocket, messages, blocked: parseInt(request.body.userId), me, myMatches});
+                            });
+                            response.json({flag: 'blocked', messages});
+                        }).catch((err) => {
+                            console.log('error happened when getting messages: ', err);
+                        });
+                    }).catch((err) => {
+                        console.log('get my info error: ', err);
+                    });
+                }).catch((result) => {
+                    console.log('an error occured: ', result);
+                });
+            }).catch((err) => {
+                console.log('an error occured unlike and match: ', err);
             });
         } else if (request.body.submit === 'iUnblock') {
             checkDb.deleteReports(decoded.id, parseInt(request.body.userId)).then(() => {

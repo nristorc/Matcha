@@ -48,7 +48,7 @@ function checkFileType(file, callback) {
 
 router.route('/:registerToken').get((request, response) => {
     const loginResponse = {};
-    console.log('params', request.params);
+    // console.log('params', request.params);
     checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
         if (result && result !== undefined) {
 
@@ -57,13 +57,15 @@ router.route('/:registerToken').get((request, response) => {
             const jwtId = Math.random().toString(36).substring(7);
             var payload = {
                 'id': user.id,
+                'username': user.username,
+                'email': user.email,
                 jwtId
             };
             jwt.sign(payload, secret, {
                 expiresIn: 9000000
             }, (err, token) => {
                 if (err) {
-                    console.log('Error occurred while generating token');
+                    console.log("Une erreur s'est produite lors de la création du token");
                     console.log(err);
                     return false;
                 } else {
@@ -82,7 +84,7 @@ router.route('/:registerToken').get((request, response) => {
                            console.log('an error occured, please try again later', err);
                         });
                     } else {
-                        response.send("Could not create token");
+                        response.send("Aucun token n'a pu être créé");
                         response.end();
                     }
                 }
@@ -92,7 +94,7 @@ router.route('/:registerToken').get((request, response) => {
         console.log("Catch: ", result);
         loginResponse.error = true;
         loginResponse.type = 'warning';
-        loginResponse.message = `Token not valid`;
+        loginResponse.message = `Token d'activation du compte invalide`;
         request.flash(loginResponse.type, loginResponse.message);
         response.status(401).redirect('/');
     });

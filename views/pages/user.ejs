@@ -309,6 +309,7 @@ function iLike(userId) {
             encode		: true
         })
             .done(function(data) {
+
                 if (data && data.flag === 'blocked') {
                     $('#notBlock').remove();
                     const block = document.createElement('p');
@@ -328,6 +329,18 @@ function iLike(userId) {
                         $('span.badge.badge-light')[0].innerHTML = parseInt(pop) - 15 + '%';
                     } else if (parseInt(pop) <= -85) {
                         $('span.badge.badge-light')[0].innerHTML = -100 + '%';
+                    }
+
+                    if (data.messages.length !== 0) {
+                        var unread = 0;
+                        for (var k = 0; k < data.messages.length; k++) {
+                            if (data.messages[k].from_user_id === userId) {
+                                if (data.messages[k].unread === 1) {
+                                    unread++;
+                                }
+                            }
+                        }
+                        decrementMsg(unread);
                     }
                 }
             });

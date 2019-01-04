@@ -45,34 +45,8 @@ function checkFileType(file, callback) {
     }
 }
 
-router.post('/', async (request, response) => {
-
-    const token = request.cookies.token;
-    try {
-        const decoded = jwt.verify(token, 'ratonlaveur', {
-        algorithms: ['HS256']
-    });
-
-        const query = request.body.q;
-        if (!request.body.q.match(/^[a-z0-9A-Z_]+$/)) {
-            response.json({error: 'Format incorrect'});
-        } else {
-            checkDb.query("SELECT id, username FROM matcha.users WHERE `username` LIKE '%" + query + "%'").then((result) => {
-                if (result) {
-                    var res = [];
-                    for (var i = 0; i < result.length; i++) {
-                        res.push('<li class="searchLi">' + result[i].username + '</li>');
-                    }
-                    response.json({res: res, userdata: result});
-                }
-            }).catch((result) => {
-                console.log('result catch: ', result);
-            });
-        }
-    } catch (e) {
-        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
-        return response.render('index');
-    }
+router.route('/').get((request, response) => {
+    response.render('pages/notFound');
 });
 
 module.exports = router;

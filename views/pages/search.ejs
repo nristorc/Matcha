@@ -142,7 +142,9 @@
 									<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#<%=tags[k]%></a>
 								<% }
 							}%>
-							<input type="text" placeholder="Ajouter un Tag" id="addTag">
+							<div style="display: grid">
+                                <input type="text" placeholder="Ajouter un Tag" id="addTag">
+                            </div>
 							<input id="previousTag" type="hidden" value ="<%=tags%>">
 						</div>
 						<div class="resultTag" id="resultTag"></div>

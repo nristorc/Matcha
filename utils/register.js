@@ -61,17 +61,16 @@ router.post('/', async (request, response)=> {
         data.email === '' || data.username === '' ||
         data.password === '' || data.confirmPassword === '') {
         registrationResponse.error = true;
-        registrationResponse.message = `One of the fields is empty -- ALL MANDATORY`;
+        registrationResponse.message = `Tous les champs doivent être remplis`;
         registrationResponse.type = 'warning';
         request.flash(registrationResponse.type, registrationResponse.message);
         response.status(412).redirect('/');
     } else {
-        await validation.isName(data.firstname, 'Wrong firstname', 30);
-        await validation.isName(data.lastname, 'Wrong lastname', 50);
-        await validation.isAlpha(data.username, 'Wrong username', 50);
-        await validation.isEmail(data.email, "Wrong Email", 255);
-        await validation.isConfirmed(data.password, data.confirmPassword, "Wrong matching password", 255);
-        // console.log(validation.errors);
+        await validation.isName(data.firstname, 'Mauvais format du prénom', 30);
+        await validation.isName(data.lastname, 'Mauvais format du nom de famille', 50);
+        await validation.isAlpha(data.username, "Mauvais format de l'identifiant", 50);
+        await validation.isEmail(data.email, "Mauvais format de l'email", 255);
+        await validation.isConfirmed(data.password, data.confirmPassword, "Mauvais format du mot de passe", 255);
 
         if (validation.errors.length === 0) {
 
@@ -80,19 +79,19 @@ router.post('/', async (request, response)=> {
 
             if (resultUsername[0].count !== 0 && resultEmail[0].count !== 0) {
                 registrationResponse.error = true;
-                registrationResponse.message = `This username and email are already taken.`;
+                registrationResponse.message = `Cet identifiant et cet email sont déjà utilisés`;
                 registrationResponse.type = 'warning';
                 request.flash(registrationResponse.type, registrationResponse.message);
                 response.status(401).redirect('/');
             } else if (resultUsername[0].count !== 0 && resultEmail[0].count === 0) {
                 registrationResponse.error = true;
-                registrationResponse.message = `This username is already taken.`;
+                registrationResponse.message = `Cet identifiant est déjà utilisé`;
                 registrationResponse.type = 'warning';
                 request.flash(registrationResponse.type, registrationResponse.message);
                 response.status(401).redirect('/');
             } else if (resultUsername[0].count === 0 && resultEmail[0].count !== 0) {
                 registrationResponse.error = true;
-                registrationResponse.message = `This email is already taken.`;
+                registrationResponse.message = `Cet email est déjà utilisé`;
                 registrationResponse.type = 'warning';
                 request.flash(registrationResponse.type, registrationResponse.message);
                 response.status(401).redirect('/');
@@ -102,14 +101,14 @@ router.post('/', async (request, response)=> {
                 if (result === false) {
                     registrationResponse.type = 'warning';
                     registrationResponse.error = true;
-                    registrationResponse.message = `User registration unsuccessful,try after some time.`;
+                    registrationResponse.message = `Un problème est survenu, merci de recommencer ultérieurement`;
                     request.flash(registrationResponse.type, registrationResponse.message);
                     response.status(417).redirect('/');
                 } else {
                     registrationResponse.error = false;
                     registrationResponse.userId = result.insertId;
                     registrationResponse.type = 'dark';
-                    registrationResponse.message = `User registration successful. An email to confirm your registration has been sent to your mailbox`;
+                    registrationResponse.message = `Votre inscription a bien eéteé prise en compte. Merci d'activer votre compte via le lien envoyé par email`;
                     request.flash(registrationResponse.type, registrationResponse.message);
                     response.status(200).redirect('/');
                 }
@@ -117,7 +116,7 @@ router.post('/', async (request, response)=> {
         } else {
             registrationResponse.type = 'warning';
             registrationResponse.error = true;
-            registrationResponse.message = `Error fields format... Check which is wrong please`;
+            registrationResponse.message = `Un ou plusieurs champs renseignés ont des erreurs dans leur format`;
             request.flash(registrationResponse.type, registrationResponse.message);
             response.status(417).redirect('/');
             validation.errors = [];
