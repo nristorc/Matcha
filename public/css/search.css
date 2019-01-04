@@ -20,12 +20,22 @@ a:hover {
 .search-nav {
 	background:rgb(254, 224, 224);
 	top : 75px;
-	box-shadow: 0px 3px 4px rgba(37, 37, 37, 0.2);
+    border-bottom: 1px;
+    border-bottom-style: dotted;
+    border-bottom-color: rgba(37, 37, 37, 0.2);
     justify-content: center;
     flex-direction: column;
     position: relative;
     z-index: 1;
+    width: 40%;
+    margin: auto;
 }
+
+@media screen and (max-width: 640px) {
+    .search-nav{
+        width: 100%;
+    }
+  }
 
 .scroll {
     margin-top: 100px;
