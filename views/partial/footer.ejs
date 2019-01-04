@@ -512,6 +512,26 @@
         }
     });
 
+    socket.on('blocked', (info) => {
+        console.log('i blocked', info);
+
+
+        // for (var m = 0; m < info.blocked.length; m++) {
+
+
+            if (info.messages.length !== 0) {
+                var unread = 0;
+                for (var k = 0; k < info.messages.length; k++) {
+                    if (info.messages[k].from_user_id === info.me[0].id) {
+                        if (info.messages[k].unread === 1) {
+                            unread++;
+                        }
+                    }
+                }
+                decrementMsg(unread);
+            }
+    });
+
     socket.on('unlikeMatch', (info) => {
         incrementNotif();
         unlikeNotif(info.me[0].username, info.me[0].id);

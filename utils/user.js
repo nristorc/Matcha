@@ -316,7 +316,7 @@ router.route('/:id').get(async (request, response) => {
                 })
             }).catch((err) => {
                 console.log('an error occured unlike and match: ', err);
-            })
+            });
         } else if (request.body.submit === 'iReport') {
             checkDb.updateReports(decoded.id, parseInt(request.body.userId), 1).then(() => {
                 checkDb.emailReport(decoded.id, request.body.userId).then(() => {
@@ -328,10 +328,25 @@ router.route('/:id').get(async (request, response) => {
                 console.log('an error occured: ', result);
             });
         } else if (request.body.submit === 'iBlock') {
-            checkDb.updateReports(decoded.id, parseInt(request.body.userId), 2).then(() => {
-                response.json({flag: 'blocked'});
-            }).catch((result) => {
-                console.log('an error occured: ', result);
+            checkDb.getMatches(decoded.id).then((myMatches) => {
+                checkDb.updateReports(decoded.id, parseInt(request.body.userId), 2).then(() => {
+                    checkDb.getUser(decoded.id).then((me) => {
+                        checkDb.getMessages(decoded.id, parseInt(request.body.userId)).then((messages) => {
+                            u.forEach(user => {
+                                io.sockets.connected[user.socket].emit('blocked', {users: usersSocket, messages, blocked: parseInt(request.body.userId), me, myMatches});
+                            });
+                            response.json({flag: 'blocked', messages});
+                        }).catch((err) => {
+                            console.log('error happened when getting messages: ', err);
+                        });
+                    }).catch((err) => {
+                        console.log('get my info error: ', err);
+                    });
+                }).catch((result) => {
+                    console.log('an error occured: ', result);
+                });
+            }).catch((err) => {
+                console.log('an error occured unlike and match: ', err);
             });
         } else if (request.body.submit === 'iUnblock') {
             checkDb.deleteReports(decoded.id, parseInt(request.body.userId)).then(() => {
