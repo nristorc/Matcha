@@ -1,6 +1,5 @@
 const express	= require('express');
 const router 	= express.Router();
-
 const databaseRequest = require("../models/databaseRequest");
 const checkDb = new databaseRequest();
 const registerValidation = require('../models/registerValidation');
@@ -212,7 +211,6 @@ router.route('/:id').get(async (request, response) => {
 
 
     }).post(async (request, response) => {
-        console.log(request.body);
         const token = request.cookies.token;
         try {
         const decoded = jwt.verify(token, 'ratonlaveur', {
@@ -262,6 +260,8 @@ router.route('/:id').get(async (request, response) => {
                         }).catch((err) => {
                             console.log('get my info error: ', err);
                         });
+                    }).catch((liked) => {
+                        console.log('get my likes error: ', liked);
                     });
                 }).catch(() => {
                     response.json({flag: '0'});

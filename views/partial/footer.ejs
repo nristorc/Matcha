@@ -423,7 +423,6 @@
     });
 
     socket.on('visit', (visits) => {
-        console.log(visits)
         incrementNotif();
         visitNotif();
     });
@@ -438,6 +437,10 @@
                 if ($('.fa-thumbs-up')) {
                     $('.fa-thumbs-up').append('<span><i class="far fa-smile-wink" style="color: rgb(255, 0, 100); font-size: xx-large; margin-left: 10px"></i></span>');
                 }
+            }
+        } else if (document.getElementById('pop' + info.me[0].id)) {
+            if ($('.fa-thumbs-up #oklikeSearch-'+info.me[0].id)) {
+                $('#liked'+info.me[0].id).show();
             }
         }
 
@@ -499,6 +502,11 @@
                         }
                         $('#likeAndMatch').append('<span><i class="fas fa-heartbeat" style="color: red; font-size: xx-large; margin-left: 10px"></i></span>');
                     }
+                } else if (document.getElementById('pop' + info.me[0].id)) {
+                    if ($('#liked'+info.me[0].id)) {
+                        $('#liked'+info.me[0].id).remove();
+                    }
+                    $('#matched'+info.me[0].id).show();
                 }
             }
         }
@@ -513,6 +521,10 @@
                 if ($('.fa-smile-wink')) {
                     $('.fa-smile-wink').remove();
                 }
+            }
+        } else if (document.getElementById('pop' + info.me[0].id)) {
+            if ($('.fa-thumbs-up #oklikeSearch-'+info.me[0].id)) {
+                $('#liked'+info.me[0].id).hide();
             }
         }
 
@@ -562,6 +574,11 @@
                             $('.fa-heartbeat').remove();
                         }
                     }
+                } else if (document.getElementById('pop' + info.me[0].id)) {
+                    if ($('#liked'+info.me[0].id)) {
+                        $('#liked'+info.me[0].id).remove();
+                    }
+                    $('#matched'+info.me[0].id).hide();
                 }
             }
         }
