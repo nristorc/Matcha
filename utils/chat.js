@@ -53,55 +53,62 @@ router.route('/').get((request, response) => {
         });
 
         checkDb.getMatches(decoded.id).then((tab) => {
-            console.log('tab', tab);
+            // console.log('tab', tab);
             const tableau = Array.from(tab);
             if (tab != "") {
-                console.log('je rentre dans tab');
+                // console.log('je rentre dans tab');
                 const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
 
                 const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE (' + sqlCondition + ') AND `id` NOT IN (SELECT reported_id FROM matcha.reports WHERE flag = 2 AND report_id = ?);';
-                // console.log('sql', s)
                 let push = [];
                 tableau.push(decoded.id);
 
                 checkDb.query(sql, tableau)
                     .then((res) => {
-                        console.log('token', token);
+                        // console.log('token', token);
                         push = res;
+
+                        // Check user blocked
+
                         var msg = "SELECT count(unread) as unread, from_user_id FROM matcha.messages WHERE (";
-                        for (var i = 0; i < push.length; i++) {
+                        if (push.length > 0) {
+                            for (var i = 0; i < push.length; i++) {
 
-                            if (push.length == 1){
+                                if (push.length == 1){
 
-                                msg = msg.concat("from_user_id = " + push[i].id);
-                            } else if (i < push.length - 1){
+                                    msg = msg.concat("from_user_id = " + push[i].id);
+                                } else if (i < push.length - 1){
 
-                                msg = msg.concat("from_user_id = " + push[i].id + " OR ");
+                                    msg = msg.concat("from_user_id = " + push[i].id + " OR ");
 
-                            } else if (i == push.length - 1){
-                                msg = msg.concat("from_user_id = " + push[i].id);
+                                } else if (i == push.length - 1){
+                                    msg = msg.concat("from_user_id = " + push[i].id);
 
+                                }
                             }
-                        }
-                        msg = msg.concat(") AND to_user_id = ? GROUP BY from_user_id");
+                            msg = msg.concat(") AND to_user_id = ? GROUP BY from_user_id");
 
-                        checkDb.query(msg, decoded.id).then((count) => {
-                            response.render('pages/chatroom', {myMatches: push, token, unread: count});
-                        }).catch((error)=>{
-                            console.log("Error count notif:", error);
-                            response.render('pages/chatroom', {myMatches: push, token, unread: 0});
-                        })
+                            checkDb.query(msg, decoded.id).then((count) => {
+                                response.render('pages/chatroom', {myMatches: push, token, unread: count});
+                            }).catch((error)=>{
+                                console.log("Error count notif:", error);
+                                response.render('pages/chatroom', {myMatches: push, token, unread: 0});
+                            })
+                        } else {
+                            console.log('plus de match');
+                            response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match',token});
+                        }
                     })
                     .catch((err) => {
                         console.log(`An error occured patate: ${err}`);
                         response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match',token});
                     });
             }
-            else {
-                // console.log('je rentre pas');
-                console.log('token', token);
-                response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
-            }
+            // else {
+            //     // console.log('je rentre pas');
+            //     console.log('token', token);
+            //     response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
+            // }
         }).catch((tab) => {
             console.log(`An error occured: ${tab}`);
             response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
