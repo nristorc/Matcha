@@ -24,6 +24,8 @@
     }
     var user = decodeToken(token);
 
+    // console.log('user', user);
+
     function readNotif(user) {
         const formData = {
             'userId': user,
@@ -44,48 +46,48 @@
         iceToast.setPosition('top-right');
         iceToast.setColor('pink','#05728f');
         iceToast.push({
-            words: 'Vous avez reçu un nouveau message',
+            words: ' Vous avez reçu un nouveau message',
             bgcolor: 'pink',
             time: 5000
         });
     }
-    const likeNotif = (username) => {
+    const likeNotif = (username, id) => {
         iceToast.setPosition('top-right');
         iceToast.setColor('blue','#05728f');
         iceToast.push({
-            words: 'Un utilisateur vient de vous liker !',
+            words: '<a href="/user/' + id + '" style="color: white !important;">' + username + ' vient de vous liker</a>',
             bgcolor: 'blue',
             time: 5000
         });
     }
-    const matchNotif = (username) => {
+    const matchNotif = (username, id) => {
         iceToast.setPosition('top-right');
         iceToast.setColor('blue','#05728f');
         iceToast.push({
-            words: 'Vous avez un nouveau match !',
+            words: '<a href="/user/' + id + '" style="color: white !important;">Vous avez un nouveau match avec ' + username +' !</a>',
             bgcolor: 'blue',
             time: 5000
         });
     }
-    const unlikeNotif = (username) => {
+    const unlikeNotif = (username, id) => {
         iceToast.setPosition('top-right');
         iceToast.setColor('blue','#05728f');
         iceToast.push({
-            words: 'Un utilisateur ne vous like plus...',
+            words: '<a href="/user/' + id + '" style="color: white !important;">' + username + ' ne vous like plus...</a>',
             bgcolor: 'blue',
             time: 5000
         });
     }
-    const unmatchNotif = (username) => {
+    const unmatchNotif = (username, id) => {
         iceToast.setPosition('top-right');
         iceToast.setColor('blue','#05728f');
         iceToast.push({
-            words: 'Vous venez de perdre un match...',
+            words: '<a href="/user/' + id + '" style="color: white !important;">Vous venez de perdre votre match avec ' + username +' !</a>',
             bgcolor: 'blue',
             time: 5000
         });
     }
-    const visitNotif = (username) => {
+    const visitNotif = () => {
         iceToast.setPosition('top-right');
         iceToast.setColor('blue','#05728f');
         iceToast.push({
@@ -423,13 +425,14 @@
     });
 
     socket.on('visit', (visits) => {
+        console.log(visits)
         incrementNotif();
-        visitNotif(visits.notif[0].username);
+        visitNotif();
     });
 
     socket.on('likeMatch', (info) => {
         incrementNotif();
-        likeNotif();
+        likeNotif(info.me[0].username, info.me[0].id);
 
         if (document.getElementById('checkOnline')) {
             const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
@@ -455,7 +458,7 @@
         for (var n = 0; n < info.match.length; n++) {
             if (parseInt(info.like) === info.match[n]) {
                 incrementNotif();
-                matchNotif();
+                matchNotif(info.me[0].username, info.me[0].id);
                 incrementMsgMatch(unread);
                 if (msgForm) {
                     const noMatch = document.querySelector('.noMatch');
@@ -505,7 +508,7 @@
 
     socket.on('unlikeMatch', (info) => {
         incrementNotif();
-        unlikeNotif();
+        unlikeNotif(info.me[0].username, info.me[0].id);
         if (document.getElementById('checkOnline')) {
             const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
             if (document.getElementById('userDetails').innerText === getDetails){
@@ -518,7 +521,7 @@
         for (var m = 0; m < info.unmatch.length; m++) {
             if (parseInt(info.unlike) === info.unmatch[m]) {
                 incrementNotif();
-                unmatchNotif();
+                unmatchNotif(info.me[0].username, info.me[0].id);
 
                 if (info.messages.length !== 0) {
                     var unread = 0;

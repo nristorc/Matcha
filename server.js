@@ -32,6 +32,7 @@ const chat = require('./utils/chat');
 const tagSearch = require('./utils/tagSearch');
 const notifications = require('./utils/notifications');
 const sendActivation = require('./utils/sendActivation');
+const notFound = require('./utils/notFound');
 
 const port =  process.env.PORT || 3000;
 const host = 'localhost';
@@ -87,7 +88,11 @@ app.use('/chat', chat);
 app.use('/tagsearch', tagSearch);
 app.use('/notifications', notifications);
 app.use('/sendActivation', sendActivation);
+app.use('/notFound', notFound);
 
+app.use((req, res, next) => {
+    res.status(404).redirect('notFound')
+});
 
 /* EJS */
 app.set('views', './views');
