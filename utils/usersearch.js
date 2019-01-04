@@ -69,8 +69,6 @@ router.post('/', async (request, response) => {
                 console.log('result catch: ', result);
             });
         }
-
-        // }
     } catch (e) {
         request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
         return response.render('index');

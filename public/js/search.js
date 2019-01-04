@@ -48,11 +48,7 @@ function search() {
                         small.setAttribute('style', 'color: red');
                         document.getElementById('searchBox').insertAdjacentElement('afterend', small);
                         data.error = null;
-                        // console.log('erreurs', data.error);
                     }
-
-                    // console.log('data', data)
-                    // console.log('length', $('#response').length);
 
                     if (data.res == ''){
                         console.log('pas de match')
@@ -69,17 +65,12 @@ function search() {
                     $(document).on('click', 'li', function(){
 
                         var username = $(this).text();
-                            // console.log('data', data.userdata);
                             $('#searchBox').val(username);
 
                             $('#response').html("");
                             $('ul').remove();
 
                             if ($('#accessProfil').length === 0) {
-
-                                // console.log('data', data.userdata);
-
-
                                 const button = document.createElement('button');
                                 $('#divSearch').append(button);
                                 button.setAttribute('id', 'accessProfil');
@@ -87,7 +78,6 @@ function search() {
                                 button.innerHTML = 'Accéder au profil';
 
                                 button.onclick = (elem) => {
-                                    // console.log('userdata', data.userdata.length)
                                     for (var i = 0; i < data.userdata.length; i++) {
                                         if ($('#searchBox').val() === data.userdata[i].username) {
                                             $(location).attr('href', '/user/' + data.userdata[i].id);
@@ -95,7 +85,6 @@ function search() {
                                     }
                                 }
                             }
-                        // }
                     });
 
                 });

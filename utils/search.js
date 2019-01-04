@@ -76,7 +76,7 @@ router.route('/').get((request, response) => {
                         }
                     }
                 }
-                console.log("tagFilter : ", tagFilter);
+                // console.log("tagFilter : ", tagFilter);
             }
         }
 

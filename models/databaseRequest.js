@@ -308,7 +308,7 @@ class DatabaseRequest {
 
     async newActivationEmail (params) {
         try {
-            console.log('params: ', params);
+            // console.log('params: ', params);
             this.query('SELECT username, registerToken FROM matcha.users WHERE email = ?', [params]).then((result) => {
                 const template = fs.readFileSync('views/pages/registrationEmail.ejs', 'utf-8');
                 const compiledTemplate = hogan.compile(template);
@@ -630,7 +630,7 @@ class DatabaseRequest {
 			}
             sql = sql.concat(" `score` DESC");
             
-			console.log("SQL = ", sql);
+			// console.log("SQL = ", sql);
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);
@@ -824,7 +824,7 @@ class DatabaseRequest {
             return new Promise((resolve, reject) => {
 
                 const sql = 'SELECT user_id, user_liked FROM matcha.likes WHERE (user_id = ? AND user_liked = ?) OR (user_id = ? AND user_liked = ?)';
-                console.log(sql);
+                // console.log(sql);
                 this.query(sql, [iLike, userLiked, userLiked, iLike]).then((exist) => {
                     if (exist && exist[0] && exist[1]) {
                         resolve();
@@ -1148,7 +1148,7 @@ class DatabaseRequest {
 					    ipstack(ip,"31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {
 					        const sql = "UPDATE matcha.users SET `latitude` = ?, `longitude` = ?, `changed_loc` = ? WHERE users.id = ?";
 					        this.query(sql, [response.latitude, response.longitude, "E", user_id]).then(() => {
-								console.log("geoloc forcee reussie");
+								// console.log("geoloc forcee reussie");
 					        });
 					    });
 					}

@@ -75,6 +75,9 @@ $(function () {
 		});
 		
 		$('#addTag').keyup(function(){
+            if (document.getElementById('errorSearch')) {
+                document.getElementById('errorSearch').remove();
+            }
 			$('ul').remove();
 			var inputVal = $(this).val();
 			var data = 'tagSearch=' + inputVal;
@@ -84,13 +87,25 @@ $(function () {
 					url : "/tagsearch",
 					data : data,
 					success : function(server_response){
+
+					    if (server_response.error) {
+                            var small = document.createElement('small');
+                            small.innerText = server_response.error;
+                            small.id = 'errorSearch';
+                            small.setAttribute('style', 'color: red');
+                            console.log('small', document.getElementById('addTag'));
+
+                            document.getElementById('addTag').insertAdjacentElement('afterend', small);
+                            server_response.error = null;
+                        }
+
 						var tagDiv = document.getElementById('resultTag');
 						if (tagDiv == null)
 							return;
 						tagDiv.innerHTML = "";
 						$('#resultTag').html(server_response);
 					}
-				});
+				})
 			}
 		});       
     });
