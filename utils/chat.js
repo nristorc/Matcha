@@ -60,6 +60,7 @@ router.route('/').get((request, response) => {
                 const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
 
                 const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE (' + sqlCondition + ') AND `id` NOT IN (SELECT reported_id FROM matcha.reports WHERE flag = 2 AND report_id = ?);';
+                // console.log('sql', s)
                 let push = [];
                 tableau.push(decoded.id);
 

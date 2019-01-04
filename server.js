@@ -133,7 +133,8 @@ io.sockets.on('connection', (socket) => {
                         const tableau = Array.from(tab);
                         if (tab != "") {
                             const sqlCondition = tab.map(el => 'from_user_id = ?').join(' OR ');
-                            const sql = 'SELECT count(unread) as allUnread FROM matcha.messages WHERE (' + sqlCondition + ') AND to_user_id = ?;';
+                            const sql = 'SELECT count(unread) as allUnread, `from_user_id` FROM matcha.messages WHERE (' + sqlCondition + ') AND to_user_id = ? AND `from_user_id` NOT IN (SELECT reported_id FROM reports WHERE flag = 2 AND report_id = ?); ';
+                            tableau.push(decoded.id);
                             tableau.push(decoded.id);
                             checkDb.query(sql, tableau).then((result) => {
                                 if (result1) {

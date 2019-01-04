@@ -375,6 +375,29 @@ function iLike(userId) {
                         $('span.badge.badge-light')[0].innerHTML = 100 + '%';
                     }
                 }
+
+                if (data.getMatches) {
+                    for (var i = 0; i < data.getMatches.length; i++) {
+                        if (data.getMatches[i] === userId) {
+                            if (data.messages) {
+                                if (data.messages.length !== 0) {
+                                    var unread = 0;
+                                    for (var k = 0; k < data.messages.length; k++) {
+                                        if (data.messages[k].from_user_id === userId) {
+                                            if (data.messages[k].unread === 1) {
+                                                unread++;
+                                            }
+                                        }
+                                    }
+                                    if (unread !== 0) {
+                                        incrementMsgMatch(unread);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
             });
     }
 
