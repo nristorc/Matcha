@@ -51,22 +51,27 @@ router.route('/').get((request, response) => {
         const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
         });
-
+        // if (request.query.filter == undefined){
+            // console.log(request.query.filter);
+            // mettre la page d'erreur
+            // response.render('notFound');
+            // response.render('index');
+        // }
         if (request.query.filter != undefined) {
             var filter = request.query.filter;
             var ageFilter = filter.substring(3, filter.indexOf("pop"));
             var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
             var locFilter = filter.substring(filter.indexOf("loc") + 3, filter.indexOf("tag"));
             var tagFilter = filter.substring(filter.indexOf("tag") + 3);
-            var ageMin = ageFilter.substring(0, ageFilter.indexOf(","));
-            var ageMax = ageFilter.substring(ageFilter.indexOf(",") + 1);
+            var ageMin = parseInt(ageFilter.substring(0, ageFilter.indexOf(",")));
+            var ageMax = parseInt(ageFilter.substring(ageFilter.indexOf(",") + 1));
             if (ageMin == ageMax) {
                 ageMin++;
             }
-            var popMin = popFilter.substring(0, popFilter.indexOf(","));
-            var popMax = popFilter.substring(popFilter.indexOf(",") + 1);
-            var locMin = locFilter.substring(0, locFilter.indexOf(","));
-            var locMax = locFilter.substring(locFilter.indexOf(",") + 1);
+            var popMin = parseInt(popFilter.substring(0, popFilter.indexOf(",")));
+            var popMax = parseInt(popFilter.substring(popFilter.indexOf(",") + 1));
+            var locMin = parseInt(locFilter.substring(0, locFilter.indexOf(",")));
+            var locMax = parseInt(locFilter.substring(locFilter.indexOf(",") + 1));
             if (tagFilter != "") {
                 tagFilter = tagFilter.split(',');
                 for (var a = 0; a < tagFilter.length; a++) {
@@ -76,10 +81,8 @@ router.route('/').get((request, response) => {
                         }
                     }
                 }
-                console.log("tagFilter : ", tagFilter);
             }
         }
-
         checkDb.profilCompleted(decoded.id).then((result) => {
             checkDb.getPosition(decoded.id).then((user_position) => {
                 resSort.searchParamsCheck(request.query.filter, request.query.sort, user_position).then((searchPref) => {
@@ -177,7 +180,9 @@ router.route('/').get((request, response) => {
                         return response.render('index');
                     });
                 }).catch((searchPref) => {
-                    console.log('catch', searchPref);
+                    // mettre la page d'erreur
+                    console.log('les filtres ne sont pas conformes', searchPref);
+                    // response.render('notFound');
                     response.render('index');
                 });
             }).catch((user_position) => {

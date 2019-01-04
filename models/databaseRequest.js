@@ -630,7 +630,7 @@ class DatabaseRequest {
 			}
             sql = sql.concat(" `score` DESC");
             
-			console.log("SQL = ", sql);
+			// console.log("SQL = ", sql);
                 this.query(sql).then((users) => {
                     if (users){
                         resolve(users);

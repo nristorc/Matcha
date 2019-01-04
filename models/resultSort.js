@@ -3,39 +3,8 @@ class Sort{
         this.errors = []
     }
 
-    // async getSort(params){
-    //     return new Promise((resolve, reject) => {
-    //         if (params == "popAsc"){
-    //             params = " ORDER by `popularity` ASC";
-    //      } else if (params == "popDesc"){
-    //             params = " ORDER by `popularity` DESC";
-    //         } else if (params == "ageAsc"){
-    //             params = " ORDER by `birth` ASC";
-    //         } else if (params == "ageDesc"){
-    //             params = " ORDER by `birth` DESC";
-    //         } else if (params == "loc"){
-    //             params = " ORDER by `birth` DESC";
-    //         }
-    //         resolve(params)
-    //     });
-    // }
-
-    // async getTag(tags){
-    //     return new Promise((resolve, reject) => {
-	// 		var tags = tags.split('-');
-	// 		var req = " INNER JOIN matcha.tags ON (`users`.`id` = `tags`.`user_id`";
-	// 		for (var i=0; i < tags.length; i++){
-	// 			req = req.concat(" AND `tags`.`tag` = " + tags[i]);
-	// 		}
-	// 		req = req.concat(")");
-    //         resolve({req, tags})
-    //     });
-	// }
-
     async searchParamsCheck(filter, sort, user_position){
         return new Promise((resolve, reject) => {
-			// console.log("user_position.latitude", user_position[0].latitude);
-			// console.log("user_position.longitude", user_position[0].longitude);
 			var reqSort;
 			var reqFilter;
 			var reqTag;
@@ -59,26 +28,77 @@ class Sort{
 				reqSort = "";
 			}
 			if (filter != undefined){
+				if (filter.indexOf("pop") == -1 || filter.indexOf("loc") == -1 || filter.indexOf("tag") == -1)  {
+					reject();
+				}
 				var ageFilter = filter.substring(3, filter.indexOf("pop"));
 				var popFilter = filter.substring(filter.indexOf("pop") + 3, filter.indexOf("loc"));
 				var locFilter = filter.substring(filter.indexOf("loc") + 3, filter.indexOf("tag"));
 				var tagFilter = filter.substring(filter.indexOf("tag") + 3);
-				var ageMin = ageFilter.substring(0, ageFilter.indexOf(","));
-				var ageMax = ageFilter.substring(ageFilter.indexOf(",")+1);
+				var ageMin = parseInt(ageFilter.substring(0, ageFilter.indexOf(",")));
+				var ageMax = parseInt(ageFilter.substring(ageFilter.indexOf(",")+1));
+				var tmp;
 				if (ageMin == ageMax){
 					ageMin++;
 				}
+				if (ageMin > ageMax){
+					tmp = ageMin; 
+					ageMin = ageMax;
+					ageMax = tmp;
+				}
 				var today = new Date();
-				// console.log("TODAY", today);
 				var dateMin = today.getFullYear() - ageMin + "-" + today.getMonth() + 1 + "-" + today.getDate();
 				var dateMax = today.getFullYear() - ageMax + "-" + today.getMonth() + 1 + "-" + today.getDate();
-				// console.log("today.getMonth()", today.getMonth());
-				// console.log("dateMin", dateMin);
-				// console.log("dateMax", dateMax);
-				var popMin = popFilter.substring(0, popFilter.indexOf(","));
-				var popMax = popFilter.substring(popFilter.indexOf(",")+1);
-				var locMin = locFilter.substring(0, locFilter.indexOf(","));
-				var locMax = locFilter.substring(locFilter.indexOf(",")+1);
+				var popMin = parseInt(popFilter.substring(0, popFilter.indexOf(",")));
+				var popMax = parseInt(popFilter.substring(popFilter.indexOf(",")+1));
+				var locMin = parseInt(locFilter.substring(0, locFilter.indexOf(",")));
+				var locMax = parseInt(locFilter.substring(locFilter.indexOf(",")+1));
+				if (popMin > popMax){
+					tmp = popMin; 
+					popMin = popMax;
+					popMax = tmp;
+				}
+				if (locMin > locMax){
+					tmp = locMin; 
+					locMin = locMax;
+					locMax = tmp;
+				}
+				if (ageMin < 18) {
+					ageMin = 18;
+				}
+				if (ageMax < 18){
+					ageMax = 18;
+				}
+				if (ageMin > 99) {
+					ageMin = 99;
+				}
+				if (ageMax > 99){
+					ageMax = 99;
+				}
+				if (popMin < -100) {
+					popMin = -100;
+				}
+				if (popMax < -100){
+					popMax = -100;
+				}
+				if (popMin > 100) {
+					popMin = 100;
+				}
+				if (popMax > 100){
+					popMax = 100;
+				}
+				if (locMin < 0) {
+					locMin = 0;
+				}
+				if (locMax < 0){
+					locMax = 0;
+				}
+				if (locMin > 100) {
+					locMin = 100;
+				}
+				if (locMax > 100){
+					locMax = 100;
+				}
 				if (locMax == 100){
 					reqFilter = " AND `birth` BETWEEN \"" + dateMax + "\" AND \"" + dateMin + 
 					"\" AND `popularity` BETWEEN " + popMin + " AND " + popMax +

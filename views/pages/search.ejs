@@ -27,6 +27,58 @@
 		
 		<!-- Filters -->
 		<% 
+		var tmp;
+		if (ageMin > ageMax){
+			tmp = ageMin; 
+			ageMin = ageMax;
+			ageMax = tmp;
+		}
+		if (popMin > popMax){
+			tmp = popMin; 
+			popMin = popMax;
+			popMax = tmp;
+		}
+		if (locMin > locMax){
+			tmp = locMin; 
+			locMin = locMax;
+			locMax = tmp;
+		}
+		if (ageMin < 18) {
+			ageMin = 18;
+		}
+		if (ageMax < 18){
+			ageMax = 18;
+		}
+		if (ageMin > 99) {
+			ageMin = 99;
+		}
+		if (ageMax > 99){
+			ageMax = 99;
+		}
+		if (popMin < -100) {
+			popMin = -100;
+		}
+		if (popMax < -100){
+			popMax = -100;
+		}
+		if (popMin > 100) {
+			popMin = 100;
+		}
+		if (popMax > 100){
+			popMax = 100;
+		}
+		if (locMin < 0) {
+			locMin = 0;
+		}
+		if (locMax < 0){
+			locMax = 0;
+		}
+		if (locMin > 100) {
+			locMin = 100;
+		}
+		if (locMax > 100){
+			locMax = 100;
+		}
 		if (!ageMin){
 			ageMin = 18;
 		}
