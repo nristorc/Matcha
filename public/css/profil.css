@@ -1,0 +1,30 @@
+@media screen and (max-width: 900px)
+{
+    .media {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .media-body {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+    }
+
+    .hashtag {
+        flex-direction: row;
+    }
+    
+    #tags {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .button-profil {
+        margin: 3px;
+    }
+
+    #issues {
+        position: relative;
+    }
+}

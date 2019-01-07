@@ -282,7 +282,7 @@ small {
 .pageNotfound, .pageErrors{
     text-align: center;
     margin: 0;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
@@ -291,4 +291,9 @@ small {
 
 .pageNotfound img, .pageErrors img{
     margin-bottom: 100px;
+}
+
+.drop-search {
+    justify-content: center;
+    flex-wrap: wrap;
 }

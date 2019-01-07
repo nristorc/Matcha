@@ -134,16 +134,20 @@
 					</div>
 
 				<!-- Tags module -->
-				<div class="d-flex bd-highlight">
+				<div class="d-flex bd-highlight drop-search">
 						<div id="tags">
 
 							<% if (tags != null){
+								var tag = 0;
 								for (var k=0; k< tags.length; k++) {%>
 									<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#<%=tags[k]%></a>
-								<% }
+								<% tag++;
+								}
 							}%>
-							<div style="display: grid">
-                                <input type="text" placeholder="Ajouter un Tag" id="addTag">
+							<div>
+							<% if (tag < 5 || tags == null){%>
+								<input type="text" placeholder="Ajouter un Tag" id="addTag">
+							<% }%>
                             </div>
 							<input id="previousTag" type="hidden" value ="<%=tags%>">
 						</div>

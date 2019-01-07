@@ -59,14 +59,14 @@
 <div class="media">
     <img src="<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
     <div class="media-body">
-		<button type="button" class="btn btn-primary popularity">
+		<button type="button" class="btn btn-primary popularity button-profil">
 			Popularité <span class="badge badge-light"><%=user[0]['popularity']%>%</span>
 		</button>
         <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#accountParam">
+        <button type="button" class="btn btn-primary button-profil" data-toggle="modal" data-target="#accountParam">
             Vos Paramètres  <span><i class="fas fa-toolbox"></i></span>
         </button>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editProfil">
+        <button type="button" class="btn btn-primary button-profil" data-toggle="modal" data-target="#editProfil">
             Votre Profil  <span><i class="fas fa-user-edit"></i></span>
         </button>
 		<h2 class="mt-0" id="userDetails"><%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>

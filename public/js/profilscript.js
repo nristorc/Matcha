@@ -487,7 +487,7 @@ $(function () {
                         if (data.file) {
                             if (($('.img-thumbnail.carroussel').length) < 5) {
                                 if (data.flag === 0) {
-                                    $('#rowPic').prepend('<div class="col-sm">' +
+                                    $('#rowPic').prepend('<div class="col-sm profil-gal">' +
                                         '<button type="button" class="photos" style="background: none; border: none;"onclick="changePic(this)">' +
                                         '<img src="' + data.file + '" class="img-thumbnail carroussel" style="border: solid rgb(255, 0, 100) thick" alt="...">' +
                                         '</button>' +
@@ -499,7 +499,7 @@ $(function () {
                                     avatar.src = data.file;
                                     avatar.style = 'border-radius: 50%';
                                 } else {
-                                    $('#rowPic').prepend('<div class="col-sm">' +
+                                    $('#rowPic').prepend('<div class="col-sm profil-gal">' +
                                         '<button type="button" class="photos" style="background: none; border: none;" onclick="changePic(this)">' +
                                         '<img src="' + data.file + '" class="img-thumbnail carroussel" alt="...">' +
                                         '</button>' +
