@@ -167,6 +167,18 @@
         userOffline = document.querySelector('.lastConnected');
     }
     if (checkOnline){
+
+        // socket.on('online', (users) => {
+        //     // console.log('userOnline', users);
+        //     for (var e = 0; e < users.users.length; e++) {
+        //         if (users[0].userOnline === users[0].users[e].id) {
+        //             console.log('userOnline')
+        //         } else {
+        //             console.log('noUser')
+        //         }
+        //     }
+        // });
+
         socket.on('users.new', ({user}) => {
             onlineUserPage(user);
         });
@@ -239,6 +251,7 @@
         }
     }
     if (searchOnline) {
+
         socket.on('users.new', ({user}) => {
             onlineSearchPage(user);
         });

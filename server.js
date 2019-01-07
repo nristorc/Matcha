@@ -122,11 +122,13 @@ io.sockets.on('connection', (socket) => {
             };
             let user = usersSocket.find(u => u.id === currentUser.id);
             if (user) {
+                console.log('un onglet deja ouvert');
                 user.count++;
             } else {
+                console.log("pas d'onglet encore ouvert");
                 currentUser.socket = socket.id;
                 usersSocket.push(currentUser);
-
+            }
                 const getUnreadNotifications = 'SELECT count(unread) as allUnread FROM matcha.notifications WHERE `to` = ?';
                 checkDb.query(getUnreadNotifications, [decoded.id]).then((result1) => {
                     checkDb.getMatches(decoded.id).then((tab) => {
@@ -163,7 +165,7 @@ io.sockets.on('connection', (socket) => {
                 }).catch((err) => {
                     console.log('get notifications error: ', err);
                 });
-            }
+
         } catch (e) {
             throw e.message;
         }
@@ -238,8 +240,11 @@ io.sockets.on('connection', (socket) => {
             if (user) {
                 user.count--;
                 if (user.count === 0) {
+                    // Deconnexion utilisateur
+
                     usersSocket = usersSocket.filter(u => u.id !== currentUser.id);
                     socket.broadcast.emit('users.leave', {user: currentUser});
+
                 }
             }
         }

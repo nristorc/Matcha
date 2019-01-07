@@ -86,6 +86,7 @@ router.route('/:id').get(async (request, response) => {
                                                                                     io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
                                                                                 });
                                                                             }
+                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
                                                                             response.render('pages/user', {
                                                                                 user: result,
                                                                                 userage: age,
@@ -102,6 +103,7 @@ router.route('/:id').get(async (request, response) => {
                                                                                     io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
                                                                                 });
                                                                             }
+                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
                                                                             response.render('pages/user', {
                                                                                 user: result,
                                                                                 userage: age,
@@ -120,6 +122,7 @@ router.route('/:id').get(async (request, response) => {
                                                                                     io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
                                                                                 });
                                                                             }
+                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
                                                                             response.render('pages/user', {
                                                                                 user: result,
                                                                                 userage: age,
@@ -136,6 +139,7 @@ router.route('/:id').get(async (request, response) => {
                                                                                     io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
                                                                                 });
                                                                             }
+                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
                                                                             response.render('pages/user', {
                                                                                 user: result,
                                                                                 userage: age,
