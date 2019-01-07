@@ -76,7 +76,6 @@
                 for (var e = 0; e < users.users.length; e++) {
                     if (parseInt(users.userOnline) === users.users[e].id) {
                         console.log('connecte')
-                        // var chatOnline = document.querySelector('#chatOnline');
                         if (users.users && document.querySelector('#chatOnline .user' + users.users[e].id)) {
                             if (document.querySelector('#chatOnline .user' + users.users[e].id)) {
                                 document.querySelector('#chatOnline .user' + users.users[e].id).setAttribute('style', 'color: green;');

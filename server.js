@@ -257,7 +257,7 @@ io.sockets.on('connection', (socket) => {
                 user.count--;
                 if (user.count === 0) {
                     // Deconnexion utilisateur
-
+                    checkDb.updateOnlineStatus(currentUser.id, 'logout');
                     usersSocket = usersSocket.filter(u => u.id !== currentUser.id);
                     socket.broadcast.emit('users.leave', {user: currentUser});
 
