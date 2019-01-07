@@ -532,7 +532,7 @@ $(function () {
         const validFormTag = () => {
             if ($('.hashtag').length < 6) {
 
-                var inputTag = $('#addTag')[0]
+                var inputTag = $('#addTag')[0];
                 var addedTag = $("#addTag")[0].value;
                 var match = new RegExp('^[a-zA-Z]+$');
 
@@ -564,7 +564,7 @@ $(function () {
                                 if (document.getElementById('messages')) {
                                     $('#messages').remove();
                                 }
-                                if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag +'</a>');
+                                if(addedTag) $('#addTag').before('<a class="btn btn-primary hashtag" href="#" role="button" onclick="deleteTag(this)">#'+ addedTag.toLowerCase() +'</a>');
                                 inputTag.value = "";
                                 inputTag.focus();
                             }

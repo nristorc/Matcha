@@ -375,7 +375,7 @@ class DatabaseRequest {
                 if (tag.length > size) {
                     reject('Le tag renseigné est trop long');
                 } else {
-                    const sql = "INSERT INTO matcha.tags (user_id, tag) VALUES (?, ?)";
+                    const sql = "INSERT INTO matcha.tags (user_id, tag) VALUES (?, lower(?))";
                     this.query(sql, [id, tag]).then(() => {
                         resolve();
                     }).catch(() => {
@@ -406,9 +406,9 @@ class DatabaseRequest {
             return new Promise((resolve, reject) => {
                 const sql = "SELECT profil FROM matcha.users WHERE id = ?";
                 this.query(sql, [params]).then((profil) => {
-                    if (profil && profil[0] && profil[0].profil === 'public/img/avatarDefault.png'){
+                    if (profil && profil[0] && profil[0].profil === '/public/img/avatarDefault.png'){
                         resolve({picture: profil[0].profil, flag: 0});
-                    } else if (profil && profil[0] && profil[0].profil !== 'public/img/avatarDefault.png') {
+                    } else if (profil && profil[0] && profil[0].profil !== '/public/img/avatarDefault.png') {
                         resolve({picture: profil[0].profil, flag: 1});
                     } else {
                         reject({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
@@ -464,13 +464,13 @@ class DatabaseRequest {
     //     SELECT `users`.* 
     //     FROM matcha.users 
     //     WHERE registerToken = 'NULL' 
-    //     AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) 
+    //     AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Heterosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel"))
     //     AND `users`.`id` !=1 AND `users`.`id` !=3 AND `users`.`id` !=2
         
     //     UNION ALL 
         
     //     SELECT `users`.* 
-    //     FROM `matcha`.`users` INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` WHERE (`tags`.`tag` = "cacahouete") AND registerToken = 'NULL' AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Hétérosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel")) 
+    //     FROM `matcha`.`users` INNER JOIN matcha.tags ON `users`.`id` = `tags`.`user_id` WHERE (`tags`.`tag` = "cacahouete") AND registerToken = 'NULL' AND (((`gender` = "Femme" OR `gender` = "Femme-Transgenre") AND `orientation` != "Heterosexuel") OR ((`gender` = "Homme" OR `gender` = "Homme-Transgenre") AND `orientation` != "Homosexuel"))
     //     AND `users`.`id` !=1 
         
     // ) AS `tmp` 
@@ -650,7 +650,7 @@ class DatabaseRequest {
             return new Promise((resolve, reject) => {
                 const sql = "SELECT orientation, gender FROM matcha.users WHERE `users`.`id` = ?";
                 this.query(sql, params).then((pref) => {
-                    if (pref[0]['orientation'] == "Hétérosexuel"){
+                    if (pref[0]['orientation'] == "Heterosexuel"){
 						if (pref[0]['gender'] == "Femme"){
 							// console.log("----- 1 -----");
 							resolve("AND `gender` = \"Homme\" AND `orientation` != \"Homosexuel\" AND `users`.`id` !="+params);
@@ -670,10 +670,10 @@ class DatabaseRequest {
 					} else if (pref[0]['orientation'] == "Homosexuel"){
 						if (pref[0]['gender'] == "Femme"){
 							// console.log("----- 6 -----");
-							resolve("AND `gender` = \"Femme\" AND `orientation` != \"Hétérosexuel\" AND `users`.`id` !="+params);
+							resolve("AND `gender` = \"Femme\" AND `orientation` != \"Heterosexuel\" AND `users`.`id` !="+params);
 						} else if (pref[0]['gender'] == "Homme") {
 							// console.log("----- 7 -----");
-							resolve("AND `gender` = \"Homme\" AND `orientation` != \"Hétérosexuel\" AND `users`.`id` !="+params);
+							resolve("AND `gender` = \"Homme\" AND `orientation` != \"Heterosexuel\" AND `users`.`id` !="+params);
 						} else if (pref[0]['gender'] == "Femme-Transgenre") {
 							// console.log("----- 8 -----");
 							resolve("AND `gender` = \"Femme\" AND `orientation` = \"Pansexuel\" AND `users`.`id` !="+params);
@@ -687,10 +687,10 @@ class DatabaseRequest {
 					} else if (pref[0]['orientation'] == "Bisexuel"){
 						if (pref[0]['gender'] == "Femme"){
 							// console.log("----- 11 -----");
-							resolve("AND ((`gender` = \"Femme\" AND `orientation` != \"Hétérosexuel\") OR (`gender` = \"Homme\" AND `orientation` != \"Homosexuel\")) AND `users`.`id` !="+params);
+							resolve("AND ((`gender` = \"Femme\" AND `orientation` != \"Heterosexuel\") OR (`gender` = \"Homme\" AND `orientation` != \"Homosexuel\")) AND `users`.`id` !="+params);
 						} else if (pref[0]['gender'] == "Homme") {
 							// console.log("----- 12 -----");
-							resolve("AND ((`gender` = \"Homme\" AND `orientation` != \"Hétérosexuel\") OR (`gender` = \"Femme\" AND `orientation` != \"Homosexuel\")) AND `users`.`id` !="+params);						
+							resolve("AND ((`gender` = \"Homme\" AND `orientation` != \"Heterosexuel\") OR (`gender` = \"Femme\" AND `orientation` != \"Homosexuel\")) AND `users`.`id` !="+params);
 						} else if (pref[0]['gender'] == "Femme-Transgenre") {
 							// console.log("----- 13 -----");
 							resolve("AND (`gender` = \"Femme\" OR `gender` = \"Homme\") AND `orientation` = \"Pansexuel\" AND `users`.`id` !="+params);
@@ -704,10 +704,10 @@ class DatabaseRequest {
 					} else if (pref[0]['orientation'] == "Pansexuel") {
 						if (pref[0]['gender'] == "Femme"){
 							// console.log("----- 16 -----");
-							resolve("AND (((`gender` = \"Femme\" OR `gender` = \"Femme\-Transgenre\") AND `orientation` != \"Hétérosexuel\") OR ((`gender` = \"Homme\" OR `gender` = \"Homme\-Transgenre\") AND `orientation` != \"Homosexuel\")) AND `users`.`id` !="+params);
+							resolve("AND (((`gender` = \"Femme\" OR `gender` = \"Femme\-Transgenre\") AND `orientation` != \"Heterosexuel\") OR ((`gender` = \"Homme\" OR `gender` = \"Homme\-Transgenre\") AND `orientation` != \"Homosexuel\")) AND `users`.`id` !="+params);
 						} else if (pref[0]['gender'] == "Homme") {
 							// console.log("----- 17 -----");
-							resolve("AND (((`gender` = \"Femme\" OR `gender` = \"Femme\-Transgenre\") AND `orientation` != \"Homosexuel\") OR ((`gender` = \"Homme\" OR `gender` = \"Homme\-Transgenre\") AND `orientation` != \"Hétérosexuel\")) AND `users`.`id` !="+params);
+							resolve("AND (((`gender` = \"Femme\" OR `gender` = \"Femme\-Transgenre\") AND `orientation` != \"Homosexuel\") OR ((`gender` = \"Homme\" OR `gender` = \"Homme\-Transgenre\") AND `orientation` != \"Heterosexuel\")) AND `users`.`id` !="+params);
 						} else if (pref[0]['gender'] == "Femme-Transgenre") {
 							// console.log("----- 18 -----");
 							resolve("AND `orientation` = \"Pansexuel\" AND `users`.`id` !="+params);

@@ -39,7 +39,7 @@ const sql_user = 'CREATE TABLE IF NOT EXISTS ' + configDatabase.user_table +
     "`orientation` VARCHAR (20) DEFAULT 'Bisexuel'," +
     "`description` LONGTEXT DEFAULT NULL," +
     "`popularity` INT(11) DEFAULT 0," +
-    "`profil` VARCHAR(255) DEFAULT 'public/img/avatarDefault.png'," +
+    "`profil` VARCHAR(255) DEFAULT '/public/img/avatarDefault.png'," +
     "`online` enum('N','Y') DEFAULT 'N'," +
     "`lastOnline` DATETIME DEFAULT NULL," +
     "`latitude` float DEFAULT '91'," +
