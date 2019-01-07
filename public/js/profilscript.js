@@ -19,7 +19,7 @@ function initAutocomplete() {
                   document.getElementById("localisation").innerHTML = "À " + autocomplete.getPlace().vicinity;
               }
               var latitude = place.geometry.location.lat();
-              var longitude = place.geometry.location.lng(); 
+              var longitude = place.geometry.location.lng();
               var data = {
                   'latitude': latitude,
                   'longitude': longitude,
@@ -56,7 +56,6 @@ function deleteTag(tag) {
         encode		: true
     })
         .done(function (data) {
-            console.log('delete Pic data: ', data);
             if (data.errors) {
                 if (document.getElementById('messages')) {
                     const flash = document.getElementsByClassName('alert');
@@ -89,23 +88,26 @@ function deletePic(image) {
         encode		: true
     })
         .done(function (data) {
-            // console.log('delete Pic data: ', data);
             if (data.errors) {
                 if (document.getElementById('messages')) {
-                    const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
-                    flash[0].innerHTML = data.errors;
+                    const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                    if (flash.length > 0) {
+                        flash[0].innerHTML = data.errors;
+                    }
                 } else {
                     $('#container').prepend('<div id="messages"></div>');
-                    $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                    $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.errors}</div>`)
                 }
             }
             else if (data.message && data.image) {
                 if (document.getElementById('messages')) {
-                    const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
-                    flash[0].innerHTML = data.message;
+                    const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                    if (flash.length > 0) {
+                        flash[0].innerHTML = data.message;
+                    }
                 } else {
                     $('#container').prepend('<div id="messages"></div>');
-                    $('#messages').append('<div class="alert alert-dark alert-dismissible">' + data.message + '</div>')
+                    $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.message}</div>`)
                 }
                 if (data.image && data.flag === 'profil') {
                     const avatar = document.getElementById('avatarPic');
@@ -140,19 +142,23 @@ function changePic(image) {
         .done(function (data) {
             if (data.errors) {
                 if (document.getElementById('messages')) {
-                    const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
-                    flash[0].innerHTML = data.errors;
+                    const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                    if (flash.length > 0) {
+                        flash[0].innerHTML = data.errors;
+                    }
                 } else {
                     $('#container').prepend('<div id="messages"></div>');
-                    $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                    $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.errors}</div>`)
                 }
             } else if (data.message) {
                 if (document.getElementById('messages')) {
-                    const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
-                    flash[0].innerHTML = data.message;
+                    const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                    if (flash.length > 0) {
+                        flash[0].innerHTML = data.message;
+                    }
                 } else {
                     $('#container').prepend('<div id="messages"></div>');
-                    $('#messages').append('<div class="alert alert-dark alert-dismissible">' + data.message + '</div>')
+                    $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.message}</div>`)
                 }
                 if (data.image) {
                     const avatar = document.getElementById('avatarPic');
@@ -239,8 +245,6 @@ $(function () {
             })
             // using the done promise callback
                 .done(function(data) {
-
-                    //console.log(data)
                     // here we will handle errors and validation messages
                     if (data.errors) {
                         for (var i = 0; i < data.errors.length; i++) {
@@ -271,12 +275,10 @@ $(function () {
                             birthdate.innerHTML = age + ' ans';
 
                             if (document.getElementById('messages')) {
-                                // console.log('il y a un message')
                                 const flash = document.getElementsByClassName('alert');
                                 flash[0].className = 'alert alert-dark alert-dismissible';
                                 flash[0].innerHTML = 'Votre profil RoooCool a été créé avec succès';
                             } else {
-                                console.log('pas de message');
                                 $('#container').prepend('<div id="messages"></div>');
                                 $('#messages').append('<div class="alert alert-dark alert-dismissible">Votre profil RoooCool a été créé avec succès</div>')
                             }
@@ -294,10 +296,8 @@ $(function () {
 
                             //Update dans profil de Orientation + Genre
                             document.getElementById('editOrientation').value = data.user.orientation;
-                            console.log(document.getElementById('editOrientation').value);
 
                             document.getElementById('editGender').value = data.user.gender;
-                            console.log(document.getElementById('editOrientation').value);
 
                         }
                     }
@@ -360,8 +360,6 @@ $(function () {
 
                 .done(function(data) {
 
-                    // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5yaXN0b3JzIiwiZW1haWwiOiJuaW5hLnJpc3RvcmNlbGxpQGdtYWlsLmNvbSIsImp3dElkIjoiNnB4ZWoiLCJpYXQiOjE1NDY1Mzg2NDQsImV4cCI6MTU1MDEzODY0NH0.5UETzOr8wG3Islrhv_0xv-4Lr7Wt7gsDqez5WkUxtls
-
                     // here we will handle errors and validation messages
                     if (data.errors) {
                         for (var i = 0; i < data.errors.length; i++) {
@@ -375,7 +373,6 @@ $(function () {
                     } else {
                         if (data.user) {
 
-                            console.log('data', data);
                             setCookie('token', data.token, {
                                 expiresIn: 9000000
                             });
@@ -478,11 +475,13 @@ $(function () {
                 .done(function (data) {
                     if (data.errors) {
                         if (document.getElementById('messages')) {
-                            const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
-                            flash[0].innerHTML = data.errors;
+                            const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                            if (flash.length > 0) {
+                                flash[0].innerHTML = data.errors;
+                            }
                         } else {
                             $('#container').prepend('<div id="messages"></div>');
-                            $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                            $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.errors}</div>`)
                         }
                     } else {
                         if (data.file) {
@@ -554,7 +553,6 @@ $(function () {
                             if (data.errors) {
                                 if (document.getElementById('messages')) {
                                     const flash = document.getElementsByClassName('alert');
-                                    // console.log('flash', flash);
                                     flash[0].className = 'alert alert-warning alert-dismissible';
                                     flash[0].innerHTML = data.errors;
                                 } else {

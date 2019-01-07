@@ -89,7 +89,6 @@ function displayLocation(latitude,longitude){
         function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
 								if (results[0]) {
-									console.log(results[0]);
 									// choose from console whatever you need.
 									var city = results[0].address_components[3].short_name;
 									x.innerHTML = "À " + city;

@@ -79,43 +79,7 @@ router.route('/:id').get(async (request, response) => {
                                                         checkDb.getMatches(decoded.id).then((matches) => {
                                                             checkDb.getMyReports(decoded.id).then((reports) => {
                                                                 checkDb.igotBlockedBy(decoded.id, request.params.id).then((reported) => {
-                                                                    if (photos == '') {
-                                                                        if (matches == ''){
-                                                                            if (reported.length === 0) {
-                                                                                u.forEach(user => {
-                                                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
-                                                                                });
-                                                                            }
-                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
-                                                                            response.render('pages/user', {
-                                                                                user: result,
-                                                                                userage: age,
-                                                                                usertags: tags,
-                                                                                userphotos: photos,
-                                                                                likes: null,
-                                                                                matches: null,
-                                                                                reports: reports,
-                                                                                token
-                                                                            });
-                                                                        } else {
-                                                                            if (reported.length === 0) {
-                                                                                u.forEach(user => {
-                                                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
-                                                                                });
-                                                                            }
-                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
-                                                                            response.render('pages/user', {
-                                                                                user: result,
-                                                                                userage: age,
-                                                                                usertags: tags,
-                                                                                userphotos: photos,
-                                                                                likes: null,
-                                                                                matches: matches,
-                                                                                reports: reports,
-                                                                                token
-                                                                            });
-                                                                        }
-                                                                    } else {
+                                                                    checkDb.getUserPic(request.params.id).then((userPic) => {
                                                                         if (matches == ''){
                                                                             if (reported.length === 0) {
                                                                                 u.forEach(user => {
@@ -149,12 +113,44 @@ router.route('/:id').get(async (request, response) => {
                                                                                 reports: reports,
                                                                                 token
                                                                             });
-                                                                            setTimeout(() => {
-
-                                                                                // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
-                                                                            }, 1000)
                                                                         }
-                                                                    }
+                                                                    }).catch((userPic) => {
+                                                                        if (matches == ''){
+                                                                            if (reported.length === 0) {
+                                                                                u.forEach(user => {
+                                                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                                });
+                                                                            }
+                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
+                                                                            response.render('pages/user', {
+                                                                                user: result,
+                                                                                userage: age,
+                                                                                usertags: tags,
+                                                                                userphotos: photos,
+                                                                                likes: null,
+                                                                                matches: null,
+                                                                                reports: reports,
+                                                                                token
+                                                                            });
+                                                                        } else {
+                                                                            if (reported.length === 0) {
+                                                                                u.forEach(user => {
+                                                                                    io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
+                                                                                });
+                                                                            }
+                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
+                                                                            response.render('pages/user', {
+                                                                                user: result,
+                                                                                userage: age,
+                                                                                usertags: tags,
+                                                                                userphotos: photos,
+                                                                                likes: null,
+                                                                                matches: matches,
+                                                                                reports: reports,
+                                                                                token
+                                                                            });
+                                                                        }
+                                                                    });
                                                                 }).catch((reported) => {
                                                                     console.log('reports catch', reported)
                                                                 });
