@@ -393,7 +393,7 @@ router.route('/').get((request, response) => {
                         } else {
                             var flag = false;
                             for (var i = 0; i < result.length; i++) {
-                                if (result[i].tag === request.body.tag) {
+                                if (result[i].tag === request.body.tag.toLowerCase()) {
                                     flag = true;
                                 }
                             }

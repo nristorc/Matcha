@@ -375,7 +375,7 @@ class DatabaseRequest {
                 if (tag.length > size) {
                     reject('Le tag renseigné est trop long');
                 } else {
-                    const sql = "INSERT INTO matcha.tags (user_id, tag) VALUES (?, ?)";
+                    const sql = "INSERT INTO matcha.tags (user_id, tag) VALUES (?, lower(?))";
                     this.query(sql, [id, tag]).then(() => {
                         resolve();
                     }).catch(() => {
