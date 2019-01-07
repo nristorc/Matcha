@@ -225,14 +225,14 @@
     }
 
     const onlineSearchPage = (user) => {
-        if (user) {
+        if (user && document.querySelector('#searchOnline .user' + user.id)) {
             if (document.querySelector('#searchOnline .user' + user.id).style.color === 'red') {
                 document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: green;');
             }
         }
     }
     const offlineSearchPage = (user) => {
-        if (user) {
+        if (user && document.querySelector('#searchOnline .user' + user.id)) {
             if (document.querySelector('#searchOnline .user' + user.id).style.color === 'green') {
                 document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: red;');
             }
