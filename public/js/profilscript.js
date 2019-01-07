@@ -91,20 +91,26 @@ function deletePic(image) {
             // console.log('delete Pic data: ', data);
             if (data.errors) {
                 if (document.getElementById('messages')) {
-                    const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
-                    flash[0].innerHTML = data.errors;
+                    const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                    if (flash.length > 0) {
+                        flash[0].innerHTML = data.errors;
+                    }
+                    // flash[0].innerHTML = data.errors;
                 } else {
                     $('#container').prepend('<div id="messages"></div>');
-                    $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                    $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.errors}</div>`)
                 }
             }
             else if (data.message && data.image) {
                 if (document.getElementById('messages')) {
-                    const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
-                    flash[0].innerHTML = data.message;
+                    const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                    if (flash.length > 0) {
+                        flash[0].innerHTML = data.message;
+                    }
+                    // flash[0].innerHTML = data.message;
                 } else {
                     $('#container').prepend('<div id="messages"></div>');
-                    $('#messages').append('<div class="alert alert-dark alert-dismissible">' + data.message + '</div>')
+                    $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.message}</div>`)
                 }
                 if (data.image && data.flag === 'profil') {
                     const avatar = document.getElementById('avatarPic');
@@ -139,19 +145,26 @@ function changePic(image) {
         .done(function (data) {
             if (data.errors) {
                 if (document.getElementById('messages')) {
-                    const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
-                    flash[0].innerHTML = data.errors;
+                    const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                    if (flash.length > 0) {
+                        flash[0].innerHTML = data.errors;
+                    }
+                    // flash[0].innerHTML = data.errors;
                 } else {
                     $('#container').prepend('<div id="messages"></div>');
-                    $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                    $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.errors}</div>`)
                 }
             } else if (data.message) {
+                console.log('message', data);
                 if (document.getElementById('messages')) {
-                    const flash = document.getElementsByClassName('alert alert-dark alert-dismissible');
-                    flash[0].innerHTML = data.message;
+                    const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                    if (flash.length > 0) {
+                        flash[0].innerHTML = data.message;
+                    }
+                    // flash[0].innerHTML = data.message;
                 } else {
                     $('#container').prepend('<div id="messages"></div>');
-                    $('#messages').append('<div class="alert alert-dark alert-dismissible">' + data.message + '</div>')
+                    $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.message}</div>`)
                 }
                 if (data.image) {
                     const avatar = document.getElementById('avatarPic');
@@ -477,11 +490,14 @@ $(function () {
                 .done(function (data) {
                     if (data.errors) {
                         if (document.getElementById('messages')) {
-                            const flash = document.getElementsByClassName('alert alert-warning alert-dismissible');
-                            flash[0].innerHTML = data.errors;
+                            const flash = document.getElementsByClassName(`alert alert-${data.type} alert-dismissible`);
+                            // console.log(flash);
+                            if (flash.length > 0) {
+                                flash[0].innerHTML = data.errors;
+                            }
                         } else {
                             $('#container').prepend('<div id="messages"></div>');
-                            $('#messages').append('<div class="alert alert-warning alert-dismissible">' + data.errors + '</div>')
+                            $('#messages').append(`<div class="alert alert-${data.type} alert-dismissible">${data.errors}</div>`)
                         }
                     } else {
                         if (data.file) {

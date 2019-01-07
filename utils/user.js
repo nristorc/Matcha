@@ -113,10 +113,6 @@ router.route('/:id').get(async (request, response) => {
                                                                                 reports: reports,
                                                                                 token
                                                                             });
-                                                                            setTimeout(() => {
-
-                                                                                // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
-                                                                            }, 1000)
                                                                         }
                                                                     }).catch((userPic) => {
                                                                         if (matches == ''){

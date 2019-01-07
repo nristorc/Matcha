@@ -329,19 +329,19 @@ router.route('/').get((request, response) => {
                 console.log('pic', result.picture);
                 if (result && result.picture) {
                     if (result.picture === imagePath) {
-                        response.json({message: 'Cette photo est déja votre photo de profil'});
+                        response.json({message: 'Cette photo est déja votre photo de profil', type: 'warning'});
                     } else {
                         checkDb.updateProfilPic(imagePath, decoded.id).then((result) => {
                             if (result) {
-                                response.json({image: imagePath, message: 'Votre photo de profil a bien été mise à jour'});
+                                response.json({image: imagePath, message: 'Votre photo de profil a bien été mise à jour', type: 'dark'});
                             }
                         }).catch((result) => {
-                            response.json({errors: "Une erreur s'est produite: " + result});
+                            response.json({errors: "Une erreur s'est produite: " + result, type: 'warning'});
                         });
                     }
                 }
             }).catch((result) => {
-                response.json({errors: "Une erreur s'est produite: " + result});
+                response.json({errors: "Une erreur s'est produite: " + result, type: 'warning'});
             });
 
         } else if (request.body.submit === 'deletePic') {
@@ -360,14 +360,15 @@ router.route('/').get((request, response) => {
                                     response.json({
                                         image: imagePath,
                                         message: 'Votre photo a bien été supprimée',
-                                        flag: 'profil'
+                                        flag: 'profil',
+                                        type: 'dark'
                                     });
                                 }).catch((deleteRes) => {
-                                    response.json({errors: "Une erreur s'est produite: " + deleteRes});
+                                    response.json({errors: "Une erreur s'est produite: " + deleteRes, type: 'warning'});
                                 });
                             }
                         }).catch((result) => {
-                            response.json({errors: "Une erreur s'est produite: " + result});
+                            response.json({errors: "Une erreur s'est produite: " + result, type: 'warning'});
                         });
 
                     } else {
@@ -376,14 +377,14 @@ router.route('/').get((request, response) => {
                                 if (err) throw err;
                                 // console.log('successfully deleted ' + imagePath);
                             });
-                            response.json({image: imagePath, message: 'Votre photo a bien été supprimée'});
+                            response.json({image: imagePath, message: 'Votre photo a bien été supprimée', type: 'dark'});
                         }).catch((deleteRes) => {
-                            response.json({errors: "Une erreur s'est produite: " + deleteRes});
+                            response.json({errors: "Une erreur s'est produite: " + deleteRes, type: 'warning'});
                         });
                     }
                 }
             }).catch((result) => {
-                response.json({errors: "Une erreur s'est produite: " + result});
+                response.json({errors: "Une erreur s'est produite: " + result, type: 'warning'});
             });
 
         } else if (request.body.submit === 'addTag') {
@@ -432,14 +433,14 @@ router.route('/').get((request, response) => {
                     i++;
                 }
                 if (i >= 5) {
-                    response.json({errors: 'Nombre maximum de photos uploadées atteint'});
+                    response.json({errors: 'Nombre maximum de photos uploadées atteint', type: 'warning'});
                 } else {
                     upload(request, response, (error) => {
                         if (error) {
-                            response.json({errors: error.message});
+                            response.json({errors: error.message, type: 'warning'});
                         } else {
                             if (request.file === undefined) {
-                                response.json({errors: 'Aucun fichier sélectionné'});
+                                response.json({errors: 'Aucun fichier sélectionné', type: 'warning'});
                             }
                             else {
                                 checkDb.insertPhoto(decoded.id, '/'+request.file.path).then((result) => {
@@ -447,17 +448,17 @@ router.route('/').get((request, response) => {
                                         checkDb.checkProfilPic(decoded.id).then((resultFlag) => {
                                             if (resultFlag && resultFlag.flag === 0) {
                                                 checkDb.updateProfilPic('/'+request.file.path, decoded.id).then((result) => {
-                                                    response.json({file: '/'+request.file.path, flag: resultFlag.flag});
+                                                    response.json({file: '/'+request.file.path, flag: resultFlag.flag, type: 'dark'});
                                                 }).catch((result) => {
                                                     console.log('result CATCH update: ', result);
-                                                    response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
+                                                    response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement", type: 'warning'});
                                                 });
                                             } else if (resultFlag && resultFlag.flag === 1) {
-                                                response.json({file: '/'+request.file.path, flag: resultFlag.flag});
+                                                response.json({file: '/'+request.file.path, flag: resultFlag.flag, type: 'dark'});
                                             }
                                         }).catch((result) => {
                                             console.log('result CATCH checkphoto: ', result);
-                                            response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
+                                            response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement", type: 'warning'});
                                         });
                                     }
                                 }).catch((result) => {
