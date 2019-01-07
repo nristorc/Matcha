@@ -7,8 +7,6 @@
 <!-- Check userOnline -->
 
 
-
-
     <h3 class="text-center">Messagerie Privée <i class="fas fa-comments"></i></h3>
     <div class="messaging">
         <div class="inbox_msg">
@@ -28,11 +26,7 @@
                             <div class="chat_ib">
                                 <div id="chatOnline">
                                     <h5><%=myMatches[x].username%>
-                                        <% if (myMatches[x].online === 'N') {%>
-                                            <i style="color: red" class="fas fa-circle fa-xs user<%=myMatches[x].id%>"></i>
-                                        <%} else if (myMatches[x].online === 'Y') {%>
-                                        <i style="color: green" class="fas fa-circle fa-xs user<%=myMatches[x].id%>"></i>
-                                        <%}%>
+                                            <i class="fas fa-circle fa-xs user<%=myMatches[x].id%>"></i>
                                     </h5>
                                 </div>
                                 <%if (typeof unread === "object") {%>
@@ -73,6 +67,35 @@
     $(function () {
         $(document).ready(function () {
             $('.type_msg').hide();
+            <%if (typeof myMatches === "object" && myMatches.length > 0) {%>
+            <%for (var t = 0; t < myMatches.length; t++) {%>
+                socket.emit('okreadyChat', <%=myMatches[t].id%>);
+
+            socket.on('onlineChat', (users) => {
+
+                for (var e = 0; e < users.users.length; e++) {
+                    if (parseInt(users.userOnline) === users.users[e].id) {
+                        console.log('connecte')
+                        // var chatOnline = document.querySelector('#chatOnline');
+                        if (users.users && document.querySelector('#chatOnline .user' + users.users[e].id)) {
+                            if (document.querySelector('#chatOnline .user' + users.users[e].id)) {
+                                document.querySelector('#chatOnline .user' + users.users[e].id).setAttribute('style', 'color: green;');
+                                return;
+                            }
+                        }
+                    }
+                }
+                console.log('non connecte')
+                if (users.users && document.querySelector('#chatOnline .user' + parseInt(users.userOnline))) {
+                    if (document.querySelector('#chatOnline .user' + parseInt(users.userOnline))) {
+                        document.querySelector('#chatOnline .user' + parseInt(users.userOnline)).setAttribute('style', 'color: red;');
+                    }
+                }
+
+            })
+
+            <%}}%>
+
         });
     });
 

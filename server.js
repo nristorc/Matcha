@@ -234,6 +234,22 @@ io.sockets.on('connection', (socket) => {
         })
     });
 
+    socket.on('okreadyUser', (userId) => {
+        socket.emit('onlineUser', {userOnline: userId, users: usersSocket});
+    });
+
+    socket.on('okreadyChat', (userId) => {
+        socket.emit('onlineChat', {userOnline: userId, users: usersSocket});
+    });
+
+    socket.on('okreadyHisto', (userId) => {
+        socket.emit('onlineHisto', {userOnline: userId, users: usersSocket});
+    });
+
+    socket.on('okreadySearch', (userId) => {
+        socket.emit('onlineSearch', {userOnline: userId, users: usersSocket});
+    });
+
     socket.on('disconnect', () => {
         if (currentUser) {
             let user = usersSocket.find(u => u.id === currentUser.id);

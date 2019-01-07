@@ -122,7 +122,6 @@ router.route('/:id').get(async (request, response) => {
                                                                                     io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
                                                                                 });
                                                                             }
-                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
                                                                             response.render('pages/user', {
                                                                                 user: result,
                                                                                 userage: age,
@@ -134,12 +133,12 @@ router.route('/:id').get(async (request, response) => {
                                                                                 token
                                                                             });
                                                                         } else {
+                                                                            // console.log("TEST")
                                                                             if (reported.length === 0) {
                                                                                 u.forEach(user => {
                                                                                     io.sockets.connected[user.socket].emit('visit', {users: usersSocket, notif: result});
                                                                                 });
                                                                             }
-                                                                            // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
                                                                             response.render('pages/user', {
                                                                                 user: result,
                                                                                 userage: age,
@@ -150,6 +149,10 @@ router.route('/:id').get(async (request, response) => {
                                                                                 reports: reports,
                                                                                 token
                                                                             });
+                                                                            setTimeout(() => {
+
+                                                                                // io.sockets.emit('online', {userOnline: request.params.id, users: usersSocket});
+                                                                            }, 1000)
                                                                         }
                                                                     }
                                                                 }).catch((reported) => {
@@ -251,6 +254,9 @@ router.route('/:id').get(async (request, response) => {
 
 
     }).post(async (request, response) => {
+
+        console.log('je rentre dans POST')
+
         const token = request.cookies.token;
         try {
         const decoded = jwt.verify(token, 'ratonlaveur', {

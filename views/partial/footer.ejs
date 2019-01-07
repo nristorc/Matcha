@@ -131,16 +131,20 @@
 
 
     /* ONLINE USER */
-    var checkOnline = document.querySelector('#checkOnline');
+
     var chatOnline = document.querySelector('#chatOnline');
     var histoOnline = document.querySelector('.histoOnline');
     var searchOnline = document.querySelector('#searchOnline');
-
-    var userDetails = document.querySelector('#userDetails');
     var userOnline = document.querySelector('#userDetails .fa-circle');
     var userOffline = document.querySelector('.lastConnected');
+    var checkOnline = document.querySelector('#checkOnline');
+    var userDetails = document.querySelector('#userDetails');
+
 
     const onlineUserPage = (user) => {
+        userOnline = document.querySelector('#userDetails .fa-circle');
+        userOffline = document.querySelector('.lastConnected');
+        checkOnline = document.querySelector('#checkOnline');
          if (userOffline) {
              userOffline.remove();
          }
@@ -154,6 +158,9 @@
         userOnline = document.querySelector('#userDetails .fa-circle');
     }
     const offlineUserPage = (user) => {
+        userOnline = document.querySelector('#userDetails .fa-circle');
+        userOffline = document.querySelector('.lastConnected');
+        checkOnline = document.querySelector('#checkOnline');
         if (userOnline) {
             userOnline.remove();
         }
@@ -166,29 +173,23 @@
         userOnline = document.querySelector('#userDetails .fa-circle');
         userOffline = document.querySelector('.lastConnected');
     }
-    if (checkOnline){
 
-        // socket.on('online', (users) => {
-        //     // console.log('userOnline', users);
-        //     for (var e = 0; e < users.users.length; e++) {
-        //         if (users[0].userOnline === users[0].users[e].id) {
-        //             console.log('userOnline')
-        //         } else {
-        //             console.log('noUser')
-        //         }
-        //     }
-        // });
 
-        socket.on('users.new', ({user}) => {
-            onlineUserPage(user);
-        });
+        if (checkOnline) {
 
-        socket.on('users.leave', ({user}) => {
-            offlineUserPage(user);
-        })
-    }
+            socket.on('users.new', ({user}) => {
+                onlineUserPage(user);
+            });
+
+            socket.on('users.leave', ({user}) => {
+                offlineUserPage(user);
+            })
+        }
+
+
 
     const onlineChatPage = (user) => {
+        chatOnline = document.querySelector('#chatOnline');
         if (user && document.querySelector('#chatOnline .user' + user.id)) {
             if (document.querySelector('#chatOnline .user' + user.id).style.color === 'red') {
                 document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: green;');
@@ -196,6 +197,7 @@
         }
     }
     const offlineChatPage = (user) => {
+        chatOnline = document.querySelector('#chatOnline');
         if (user && document.querySelector('#chatOnline .user' + user.id)) {
             if (document.querySelector('#chatOnline .user' + user.id).style.color === 'green') {
                 document.querySelector('#chatOnline .user' + user.id).setAttribute('style', 'color: red;');
@@ -213,6 +215,7 @@
     }
 
     const onlineHistoPage = (user) => {
+        histoOnline = document.querySelector('.histoOnline');
         if (user && document.querySelector('.histoOnline .user' + user.id)) {
             if (document.querySelector('.histoOnline .user' + user.id).style.color === 'red') {
                 document.querySelector('.histoOnline .user' + user.id).setAttribute('style', 'color: green;');
@@ -220,6 +223,7 @@
         }
     }
     const offlineHistoPage = (user) => {
+        histoOnline = document.querySelector('.histoOnline');
         if (user && document.querySelector('.histoOnline .user' + user.id)) {
             if (document.querySelector('.histoOnline .user' + user.id).style.color === 'green') {
                 document.querySelector('.histoOnline .user' + user.id).setAttribute('style', 'color: red;');
@@ -237,6 +241,7 @@
     }
 
     const onlineSearchPage = (user) => {
+        searchOnline = document.querySelector('#searchOnline');
         if (user && document.querySelector('#searchOnline .user' + user.id)) {
             if (document.querySelector('#searchOnline .user' + user.id).style.color === 'red') {
                 document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: green;');
@@ -244,6 +249,7 @@
         }
     }
     const offlineSearchPage = (user) => {
+        searchOnline = document.querySelector('#searchOnline');
         if (user && document.querySelector('#searchOnline .user' + user.id)) {
             if (document.querySelector('#searchOnline .user' + user.id).style.color === 'green') {
                 document.querySelector('#searchOnline .user' + user.id).setAttribute('style', 'color: red;');
