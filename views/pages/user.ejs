@@ -48,13 +48,7 @@
         </div>
 
         <div id="checkOnline">
-            <%if (user[0].online === 'Y') {%>
-            <h2 style="margin:0" class="mt-0" id="userDetails"><i style="color: green;" class="fas fa-circle fa-xs"></i> <%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>
-            <%} else if (user[0].online === 'N') {%>
             <h2 style="margin:0" class="mt-0" id="userDetails"><%=user[0]['username']%> (<%=user[0]['firstname']%> <%=user[0]['lastname']%>)</h2>
-            <p class="lastConnected" style="margin-bottom: 10px; padding: 0; font-size: 12px;">dernière connexion le : <% const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }; %>
-                <%=user[0].lastOnline.toLocaleDateString('fr-FR', options)%></p>
-            <%}%>
         </div>
 
 
@@ -117,6 +111,7 @@
     <% }} %>
 
 </div>
+</div>
 <div id="issues">
 
     <%if (reports !== null) {%>
@@ -145,10 +140,35 @@
         <%}}%>
 
 
-</div>
 
 <% include ../partial/footer.ejs%>
 <script>
+
+
+    $('document').ready((e) => {
+        socket.emit('okreadyUser', <%=user[0]['id']%>);
+
+        socket.on('onlineUser', (users) => {
+            for (var e = 0; e < users.users.length; e++) {
+                if (parseInt(users.userOnline) === users.users[e].id) {
+                    console.log('userOnline');
+
+                    const i = document.createElement('i');
+                    i.setAttribute('class', 'fas fa-circle fa-xs');
+                    i.setAttribute('style', 'color: green;');
+                    userDetails.prepend(i);
+                    return;
+                }
+            }
+            const p = document.createElement('p');
+            p.setAttribute('class', 'lastConnected');
+            p.setAttribute('style', 'margin-bottom: 10px; padding: 0; font-size: 12px;');
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+            p.innerText = 'dernière connexion le : ' + new Date().toLocaleDateString('fr-FR', options);
+            checkOnline.appendChild(p);
+        });
+    })
+
 
 function iLike(userId) {
         const formData = {
