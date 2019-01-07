@@ -18,13 +18,8 @@ function initAutocomplete() {
               } else if (autocomplete.getPlace().vicinity && document.getElementById('localisation')) {
                   document.getElementById("localisation").innerHTML = "À " + autocomplete.getPlace().vicinity;
               }
-            //   console.log("place", place.address_components);
-            //   console.log("LONG place", place.address_components[0].long_name);
               var latitude = place.geometry.location.lat();
               var longitude = place.geometry.location.lng(); 
-            //   console.log("latitude", latitude);
-            //   console.log("longitude", longitude);
-            //   console.log("autocomplete.getPlace()", autocomplete.getPlace().vicinity);
               var data = {
                   'latitude': latitude,
                   'longitude': longitude,
@@ -35,6 +30,12 @@ function initAutocomplete() {
                   type : "POST",
                   url : "/profil",
                   data : data,
+              })
+              .done(function() {
+                document.getElementById('autocomplete').blur();    
+                setTimeout(function(){
+                    document.getElementById('autocomplete').value = '';
+                },10); 
               });
       });
   }

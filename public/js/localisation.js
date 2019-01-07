@@ -66,7 +66,6 @@ function showError2(error){
 	switch(error.code){
 			case error.PERMISSION_DENIED:
 				x.innerHTML="Localisation non renseignée";
-				forceGeo();
 			break;
 			case error.POSITION_UNAVAILABLE:
 					x.innerHTML="Location information is unavailable."
