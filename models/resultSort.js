@@ -28,7 +28,7 @@ class Sort{
 				reqSort = "";
 			}
 			if (filter != undefined){
-				if (filter.indexOf("pop") == -1 || filter.indexOf("loc") == -1 || filter.indexOf("tag") == -1)  {
+				if (filter.indexOf("age") == -1  || filter.indexOf("pop") == -1 || filter.indexOf("loc") == -1 || filter.indexOf("tag") == -1)  {
 					reject();
 				}
 				var ageFilter = filter.substring(3, filter.indexOf("pop"));

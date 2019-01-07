@@ -180,10 +180,8 @@ router.route('/').get((request, response) => {
                         return response.render('index');
                     });
                 }).catch((searchPref) => {
-                    // mettre la page d'erreur
                     console.log('les filtres ne sont pas conformes', searchPref);
-                    // response.render('notFound');
-                    response.render('index');
+                    response.redirect('/notFound');
                 });
             }).catch((user_position) => {
                 console.log('catch', user_position);
