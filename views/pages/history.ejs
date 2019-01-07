@@ -12,11 +12,7 @@
         <tr>
             <td style="vertical-align: middle"><i class="fas fa-heartbeat"></i></td>
 
-            <%if (myMatches[k].online === 'N') {%>
-            <td class="histoOnline" style="vertical-align: middle"><i style="color: red" class="fas fa-circle fa-xs user<%=myMatches[k].id%>"></i> Vous avez matché avec <a href="user/<%=myMatches[k].id%>"><%=myMatches[k].username%></a></td>
-            <%} else if (myMatches[k].online === 'Y') {%>
-            <td class="histoOnline" style="vertical-align: middle"><i style="color: green" class="fas fa-circle fa-xs user<%=myMatches[k].id%>"></i> Vous avez matché avec <a href="user/<%=myMatches[k].id%>"><%=myMatches[k].username%></a></td>
-            <%}%>
+            <td class="histoOnline" style="vertical-align: middle"><i class="fas fa-circle fa-xs user<%=myMatches[k].id%>"></i> Vous avez matché avec <a href="user/<%=myMatches[k].id%>"><%=myMatches[k].username%></a></td>
             <td style="vertical-align: middle"><img src="<%=myMatches[k].profil%>" style="height: 50px; width: 50px; max-height: 50px; max-width: 50px; border-radius: 50%; object-fit: cover;"></td>
         </tr>
         <%}} else {%>
@@ -113,3 +109,33 @@
 </div>
 
 <%- include('../partial/footer')%>
+
+<script>
+    $(function () {
+        $(document).ready(function () {
+            <%if (typeof myMatches === "object" && myMatches.length > 0) {%>
+            <%for (var t = 0; t < myMatches.length; t++) {%>
+            socket.emit('okreadyHisto', <%=myMatches[t].id%>);
+            socket.on('onlineHisto', (users) => {
+                for (var e = 0; e < users.users.length; e++) {
+                    if (parseInt(users.userOnline) === users.users[e].id) {
+                        if (users.users && document.querySelector('.histoOnline .user' + users.users[e].id)) {
+                            if (document.querySelector('.histoOnline .user' + users.users[e].id)) {
+                                document.querySelector('.histoOnline .user' + users.users[e].id).setAttribute('style', 'color: green;');
+                                return;
+                            }
+                        }
+                    }
+                }
+                if (users.users && document.querySelector('.histoOnline .user' + parseInt(users.userOnline))) {
+                    if (document.querySelector('.histoOnline .user' + parseInt(users.userOnline))) {
+                        document.querySelector('.histoOnline .user' + parseInt(users.userOnline)).setAttribute('style', 'color: red;');
+                    }
+                }
+            })
+
+            <%}}%>
+        });
+    });
+
+</script>

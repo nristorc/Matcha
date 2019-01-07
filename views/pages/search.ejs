@@ -192,11 +192,7 @@
 				</div>
 				
 				<a class="lien-search" href="/user/<%=users[x]['id']%>"><div id="searchOnline">
-					<%if (users[x]['online'] === 'Y') {%>
-					<h5><i style="color: green;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i><%=users[x]['username']%></h5>
-					<%} else if (users[x]['online'] === 'N') {%>
-					<h5><i style="color: red;" class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i> <%=users[x]['username']%></h5>
-					<%}%>
+					<h5><i class="fas fa-circle fa-xs user<%=users[x]['id']%>"></i><%=users[x]['username']%></h5>
 				</div>
 
 				<h6>
@@ -281,9 +277,35 @@
 <script src="./public/js/scroll.js"></script>
 <script src="./public/js/like.js"></script>
 <script src="./public/js/tag-search.js"></script>
-
-
+    <% include ../partial/footer.ejs%>
 <% } %>
 
+<script>
 
-<% include ../partial/footer.ejs%>
+    $(function () {
+        $(document).ready(function () {
+			<%for (var t = 0; t < users.length; t++) {%>
+            socket.emit('okreadySearch', <%=users[t]['id']%>);
+            <%}%>
+            socket.on('onlineSearch', (users) => {
+                for (var e = 0; e < users.users.length; e++) {
+                    if (parseInt(users.userOnline) === users.users[e].id) {
+                        if (users.users && document.querySelector('#searchOnline .user' + users.users[e].id)) {
+                            if (document.querySelector('#searchOnline .user' + users.users[e].id)) {
+                                document.querySelector('#searchOnline .user' + users.users[e].id).setAttribute('style', 'color: green;');
+                                return;
+                            }
+                        }
+                    }
+                }
+                if (users.users && document.querySelector('#searchOnline .user' + parseInt(users.userOnline))) {
+                    if (document.querySelector('#searchOnline .user' + parseInt(users.userOnline))) {
+                        document.querySelector('#searchOnline .user' + parseInt(users.userOnline)).setAttribute('style', 'color: red;');
+                    }
+                }
+
+            })
+
+        });
+    });
+</script>
