@@ -406,9 +406,9 @@ class DatabaseRequest {
             return new Promise((resolve, reject) => {
                 const sql = "SELECT profil FROM matcha.users WHERE id = ?";
                 this.query(sql, [params]).then((profil) => {
-                    if (profil && profil[0] && profil[0].profil === 'public/img/avatarDefault.png'){
+                    if (profil && profil[0] && profil[0].profil === '/public/img/avatarDefault.png'){
                         resolve({picture: profil[0].profil, flag: 0});
-                    } else if (profil && profil[0] && profil[0].profil !== 'public/img/avatarDefault.png') {
+                    } else if (profil && profil[0] && profil[0].profil !== '/public/img/avatarDefault.png') {
                         resolve({picture: profil[0].profil, flag: 1});
                     } else {
                         reject({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});

@@ -324,7 +324,9 @@ router.route('/').get((request, response) => {
         } else if (request.body.submit === 'updateProfilPic') {
 
             checkDb.checkProfilPic(decoded.id).then((result) => {
-                const imagePath = request.body.image.substring(22);
+                const imagePath = '/'+request.body.image.substring(22);
+                console.log('imagepath', imagePath);
+                console.log('pic', result.picture);
                 if (result && result.picture) {
                     if (result.picture === imagePath) {
                         response.json({message: 'Cette photo est déja votre photo de profil'});
@@ -345,13 +347,13 @@ router.route('/').get((request, response) => {
         } else if (request.body.submit === 'deletePic') {
 
             checkDb.checkProfilPic(decoded.id).then((result) => {
-                const imagePath = request.body.image.substring(22);
+                const imagePath = '/'+request.body.image.substring(22);
                 if (result && result.picture) {
                     if (result.picture === imagePath) {
-                        checkDb.updateProfilPic('public/img/avatarDefault.png', decoded.id).then((result) => {
+                        checkDb.updateProfilPic('/public/img/avatarDefault.png', decoded.id).then((result) => {
                             if (result) {
                                 checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
-                                    fs.unlink(imagePath, (err) => {
+                                    fs.unlink(request.body.image.substring(22), (err) => {
                                         if (err) throw err;
                                         // console.log('successfully deleted ' + imagePath);
                                     });
@@ -370,7 +372,7 @@ router.route('/').get((request, response) => {
 
                     } else {
                         checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
-                            fs.unlink(imagePath, (err) => {
+                            fs.unlink(request.body.image.substring(22), (err) => {
                                 if (err) throw err;
                                 // console.log('successfully deleted ' + imagePath);
                             });
@@ -440,18 +442,18 @@ router.route('/').get((request, response) => {
                                 response.json({errors: 'Aucun fichier sélectionné'});
                             }
                             else {
-                                checkDb.insertPhoto(decoded.id, request.file.path).then((result) => {
+                                checkDb.insertPhoto(decoded.id, '/'+request.file.path).then((result) => {
                                     if (result) {
                                         checkDb.checkProfilPic(decoded.id).then((resultFlag) => {
                                             if (resultFlag && resultFlag.flag === 0) {
-                                                checkDb.updateProfilPic(request.file.path, decoded.id).then((result) => {
-                                                    response.json({file: request.file.path, flag: resultFlag.flag});
+                                                checkDb.updateProfilPic('/'+request.file.path, decoded.id).then((result) => {
+                                                    response.json({file: '/'+request.file.path, flag: resultFlag.flag});
                                                 }).catch((result) => {
                                                     console.log('result CATCH update: ', result);
                                                     response.json({errors: "Une erreur s'est produite, merci de réitérer votre demande ultérieurement"});
                                                 });
                                             } else if (resultFlag && resultFlag.flag === 1) {
-                                                response.json({file: request.file.path, flag: resultFlag.flag});
+                                                response.json({file: '/'+request.file.path, flag: resultFlag.flag});
                                             }
                                         }).catch((result) => {
                                             console.log('result CATCH checkphoto: ', result);

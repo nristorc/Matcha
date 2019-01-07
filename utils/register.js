@@ -108,7 +108,7 @@ router.post('/', async (request, response)=> {
                     registrationResponse.error = false;
                     registrationResponse.userId = result.insertId;
                     registrationResponse.type = 'dark';
-                    registrationResponse.message = `Votre inscription a bien eéteé prise en compte. Merci d'activer votre compte via le lien envoyé par email`;
+                    registrationResponse.message = `Votre inscription a bien été prise en compte. Merci d'activer votre compte via le lien envoyé par email`;
                     request.flash(registrationResponse.type, registrationResponse.message);
                     response.status(200).redirect('/');
                 }

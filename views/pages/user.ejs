@@ -4,7 +4,7 @@
 <%- messages('partial/message', locals) %>
 
 <div class="media">
-    <img src="/<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
+    <img src="<%=user[0]['profil']%>" alt="profilPic" class="float-left profile-pic" height="220px" width="220px" id="avatarPic">
     <div class="media-body">
         <div style="display: flex" id="likeAndMatch">
             <button type="button" class="btn btn-primary popularity">
@@ -106,7 +106,7 @@
     <% if (userphotos !== []) {
     for (var j = 0; j < userphotos.length; j++) { %>
     <div class="col-sm profil-gal">
-        <img src="/<%=userphotos[j]['photo']%>" class="img-thumbnail carroussel" alt="...">
+        <img src="<%=userphotos[j]['photo']%>" class="img-thumbnail carroussel" alt="...">
     </div>
     <% }} %>
 
