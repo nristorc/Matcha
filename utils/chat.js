@@ -52,8 +52,10 @@ router.route('/').get((request, response) => {
             algorithms: ['HS256']
         });
 
+        console.log('je rentre sur la page match')
         checkDb.getMatches(decoded.id).then((tab) => {
-            // console.log('tab', tab);
+            console.log('je rentre dans le THEN')
+            console.log('tab', tab);
             const tableau = Array.from(tab);
             if (tab != "") {
                 // console.log('je rentre dans tab');
@@ -104,11 +106,11 @@ router.route('/').get((request, response) => {
                         response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match',token});
                     });
             }
-            // else {
-            //     // console.log('je rentre pas');
-            //     console.log('token', token);
-            //     response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
-            // }
+            else {
+                // console.log('je rentre pas');
+                console.log('token', token);
+                response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
+            }
         }).catch((tab) => {
             console.log(`An error occured: ${tab}`);
             response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
