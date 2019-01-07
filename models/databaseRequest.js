@@ -765,6 +765,25 @@ class DatabaseRequest {
         }
     }
 
+    async getUserPic(params) {
+        try {
+            return new Promise((resolve, reject) => {
+                const sql = "SELECT `profil` FROM matcha.users WHERE id = ?";
+                this.query(sql, params).then((photos) => {
+                    console.log('photos', photos);
+                    if (photos.length > 0 && photos[0].profil !== '/public/img/avatarDefault.png'){
+                        resolve(photos);
+                    } else {
+                        reject(photos);
+                    }
+                });
+            });
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     async getLikes(params){
         try {
             return new Promise((resolve, reject) => {
