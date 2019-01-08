@@ -451,11 +451,16 @@
         likeNotif(info.me[0].username, info.me[0].id);
 
         if (document.getElementById('checkOnline')) {
-            const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+            const getDetails = info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+            console.log('details', getDetails)
+            console.log(document.getElementById('userDetails').innerText)
             if (document.getElementById('userDetails').innerText === getDetails){
+                console.log('toto like');
                 if ($('.fa-thumbs-up')) {
                     $('.fa-thumbs-up').append('<span><i class="far fa-smile-wink" style="color: rgb(255, 0, 100); font-size: xx-large; margin-left: 10px"></i></span>');
                 }
+            } else {
+                console.log('different')
             }
         } else if (document.getElementById('pop' + info.me[0].id)) {
             if ($('.fa-thumbs-up #oklikeSearch-'+info.me[0].id)) {
@@ -514,7 +519,7 @@
                         }
                     }
                 } else if (document.getElementById('checkOnline')) {
-                    const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+                    const getDetails = info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
                     if (document.getElementById('userDetails').innerText === getDetails){
                         if ($('.fa-smile-wink')) {
                             $('.fa-smile-wink').remove();
@@ -535,7 +540,8 @@
         incrementNotif();
         unlikeNotif(info.me[0].username, info.me[0].id);
         if (document.getElementById('checkOnline')) {
-            const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+            console.log('toto unlike');
+            const getDetails = info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
             if (document.getElementById('userDetails').innerText === getDetails){
                 if ($('.fa-smile-wink')) {
                     $('.fa-smile-wink').remove();
@@ -587,7 +593,7 @@
                         return;
                     }
                 } else if (document.getElementById('checkOnline')) {
-                    const getDetails = ' ' + info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
+                    const getDetails = info.me[0].username + ' (' + info.me[0].firstname + ' ' + info.me[0].lastname + ')';
                     if (document.getElementById('userDetails').innerText === getDetails){
                         if ($('.fa-heartbeat')) {
                             $('.fa-heartbeat').remove();
