@@ -51,12 +51,6 @@ router.route('/').get((request, response) => {
         const decoded = jwt.verify(token, 'ratonlaveur', {
         algorithms: ['HS256']
         });
-        // if (request.query.filter == undefined){
-            // console.log(request.query.filter);
-            // mettre la page d'erreur
-            // response.render('notFound');
-            // response.render('index');
-        // }
         if (request.query.filter != undefined) {
             var filter = request.query.filter;
             var ageFilter = filter.substring(3, filter.indexOf("pop"));
@@ -104,7 +98,6 @@ router.route('/').get((request, response) => {
                                                 locMax: locMax,
                                                 sort: request.query.sort,
                                                 tags : tagFilter,
-                                                reports: reports,
                                                 token
                                             });
                                         }).catch((likes) => {
@@ -120,7 +113,6 @@ router.route('/').get((request, response) => {
                                                 locMax: locMax,
                                                 sort: request.query.sort,
                                                 tags : tagFilter,
-                                                reports: reports,
                                                 token
                                             });
                                         });
@@ -139,7 +131,6 @@ router.route('/').get((request, response) => {
                                                     locMax: locMax,
                                                     sort: request.query.sort,
                                                     tags : tagFilter,
-                                                    reports: reports,
                                                     token
                                                 });
                                             }).catch((likes) => {
@@ -155,7 +146,6 @@ router.route('/').get((request, response) => {
                                                     locMax: locMax,
                                                     sort: request.query.sort,
                                                     tags : tagFilter,
-                                                    reports: reports,
                                                     token
                                                 });
                                             });

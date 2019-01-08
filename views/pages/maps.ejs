@@ -1,0 +1,66 @@
+<%- include('../partial/head')%>
+<%- include('../partial/header')%>
+
+<div id="map"></div>
+
+<% include ../partial/footer.ejs%>
+<script>
+	function createMarker(pos, infowindow, map) {
+			var marker = new google.maps.Marker({       
+					position: pos, 
+					map: map,
+					title: "user",
+			}); 
+			google.maps.event.addListener(marker, 'click', function() {
+				if(!marker.open){
+					infowindow.open(map,marker);
+					marker.open = true;
+        } else{
+					infowindow.close();
+					marker.open = false;
+        }
+				google.maps.event.addListener(map, 'click', function() {
+						infowindow.close();
+						marker.open = false;
+				});
+			}); 
+			return marker;  
+	}
+
+	function initMap() {
+		var myLatLng = {lat: <%=position[0]['latitude']%>, lng: <%=position[0]['longitude']%>};
+		var map = new google.maps.Map(document.getElementById('map'), {
+		center: myLatLng,
+		zoom: 12
+		});
+
+		var infowindow;
+		var latLng;
+		var infoUser;
+
+		<%for (var t = 0; t < users.length; t++) {%>
+		latLng = {lat: <%=users[t]['latitude']%>, lng: <%=users[t]['longitude']%>};
+		infoUser = '<div id="content">'+
+      '<div id="siteNotice">'+
+			'</div>'+
+			'<img src="<%=users[t]['profil']%>" style="height: 50px; width: 50px; max-height: 50px; max-width: 50px; border-radius: 50%; object-fit: cover;">' +
+      '<a href="/user/<%=users[t]['id']%>"><h1 id="firstHeading" class="firstHeading">'+ "<%=users[t]['username']%>" + '</h1></a>'+
+      '<div id="bodyContent">'+
+			'<p><%=users[t]['gender']%>, <%=users[t]['orientation']%></p> ' +
+			'<p>Popularité : <%=users[t]['popularity']%>%</p> ' +
+				'<p><a href="/user/<%=users[t]['id']%>">'+
+      'Voir le profil</a></p> '+
+      '</div>'+
+      '</div>';
+
+		infowindow = new google.maps.InfoWindow({
+				content: infoUser
+				});
+
+		createMarker(latLng, infowindow, map);
+    	<%}%>
+	}
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeGqsazfzYjC4__DuVZ-pB6Hik52ciaNI&callback=initMap"
+async defer></script>
