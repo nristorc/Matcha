@@ -124,12 +124,10 @@ io.sockets.on('connection', (socket) => {
             };
             let user = usersSocket.find(u => u.id === currentUser.id);
             if (user) {
-                // currentUser.socket = socket.id;
-                // usersSocket.push(currentUser);
                 user.count++;
             } else {
                 currentUser.socket = socket.id;
-                usersSocket.push(currentUser);
+                usersSocket.push(currentUser)
             }
                 const getUnreadNotifications = 'SELECT count(unread) as allUnread FROM matcha.notifications WHERE `to` = ?';
                 checkDb.query(getUnreadNotifications, [decoded.id]).then((result1) => {
@@ -206,8 +204,6 @@ io.sockets.on('connection', (socket) => {
                                 }, []);
                                 socket.emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
                                 u.forEach(user => {
-                                    console.log('user', user);
-                                    console.log('connected', user.socket);
                                     io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
                                 })
                             }

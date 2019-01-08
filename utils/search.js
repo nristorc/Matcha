@@ -150,6 +150,7 @@ router.route('/').get((request, response) => {
                                                 });
                                             });
                                         } else {
+                                            response.json({})
                                             response.end();
                                         }
                                     }

@@ -60,11 +60,10 @@ router.route('/').get((request, response) => {
 
         publicIp.v4().then(ip => {
             checkDb.forceGeo(ip, decoded.id).then((geoloc) => {
-                console.log(geoloc);
+                // console.log(geoloc);
             }).catch((err) => {
                 console.log(err);
             });
-
         });
 
         checkDb.getUser(decoded.id).then((user) => {
