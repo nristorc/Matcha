@@ -84,8 +84,7 @@ router.post('/', async (request, response)=> {
                     expiresIn: 3600000
                 }, (err, token) => {
                     if (err) {
-                        console.log('Error occurred while generating token');
-                        console.log(err);
+                        console.log('Error occurred while generating token', err);
                         return false;
                     } else {
                         if (token != false) {

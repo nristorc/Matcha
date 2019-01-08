@@ -114,9 +114,6 @@ router.post('/', async (request, response)=> {
                 }
             }
         } else {
-
-            console.log(validation.errors);
-
             registrationResponse.type = 'warning';
             registrationResponse.error = true;
             var errors = [];

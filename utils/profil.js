@@ -339,7 +339,6 @@ router.route('/').get((request, response) => {
             checkDb.getPhotos(decoded.id).then((result2) => {
                 if (result2 && result2 != '') {
                     const imagePath = '/'+request.body.image.substring(22);
-                    // console.log('imagePath', imagePath);
                     for (var i = 0; i < result2.length; i++) {
                         if (result2[i].photo === imagePath) {
                             checkDb.checkProfilPic(decoded.id).then((result) => {
@@ -384,8 +383,6 @@ router.route('/').get((request, response) => {
                             });
                         }
                     }
-                    // console.log('toto');
-                    // response.json({errors: "Aucune image correspondant à votre demande ne peut être supprimée", type: 'warning'});
                 }
             }).catch((err) => {
                 console.log('catch', err)
@@ -422,7 +419,6 @@ router.route('/').get((request, response) => {
         } else if(request.body.submit === 'deleteTag') {
             if (request.body.tag) {
                 checkDb.deleteTag(decoded.id, request.body.tag).then((resTag) => {
-                    console.log('then', resTag);
                     response.json({message: "Tag deleted"});
                 }).catch((resTag) => {
                     console.log('catch', resTag);

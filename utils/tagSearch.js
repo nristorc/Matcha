@@ -63,7 +63,6 @@ router.post('/', async (request, response) => {
                     for (var i = 0; i < result.length; i++) {
                         res.push('<li class="searchLi" onclick="validTag(\''+result[i].tag+'\')">' + result[i].tag + '</li>');
                     }
-                    console.log("---1---");
                     response.json(res);
                 }
             }).catch((result) => {

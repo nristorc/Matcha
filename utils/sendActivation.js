@@ -66,14 +66,12 @@ router.post('/', async (request, response) => {
             response.status(417).redirect('/');
         } else {
             checkDb.checkActive(request.body.sendmail).then(() => {
-                // console.log('actif', request.body.sendmail)
                 checkingResponse.error = true;
                 checkingResponse.type = 'warning';
                 checkingResponse.message = "Votre compte a déjà été activé";
                 request.flash(checkingResponse.type, checkingResponse.message);
                 response.status(401).redirect('/');
             }).catch(() => {
-                // console.log('inactif');
                 checkDb.newActivationEmail(request.body.sendmail);
                 request.flash('dark', "Nous vous avons envoyé un nouvel email d'activation de votre compte");
                 response.status(200).redirect('/');

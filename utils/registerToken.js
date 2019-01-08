@@ -48,7 +48,6 @@ function checkFileType(file, callback) {
 
 router.route('/:registerToken').get((request, response) => {
     const loginResponse = {};
-    // console.log('params', request.params);
     checkDb.checkRegisterToken(request.params.registerToken).then((result) => {
         if (result && result !== undefined) {
 
@@ -65,8 +64,7 @@ router.route('/:registerToken').get((request, response) => {
                 expiresIn: 9000000
             }, (err, token) => {
                 if (err) {
-                    console.log("Une erreur s'est produite lors de la création du token");
-                    console.log(err);
+                    console.log("Une erreur s'est produite lors de la création du token", err);
                     return false;
                 } else {
                     if (token != false) {

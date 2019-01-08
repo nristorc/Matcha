@@ -151,7 +151,6 @@
         socket.on('onlineUser', (users) => {
             for (var e = 0; e < users.users.length; e++) {
                 if (parseInt(users.userOnline) === users.users[e].id) {
-                    console.log('userOnline');
 
                     const i = document.createElement('i');
                     i.setAttribute('class', 'fas fa-circle fa-xs');

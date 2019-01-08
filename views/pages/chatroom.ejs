@@ -1,12 +1,6 @@
 <%- include('../partial/head')%>
 <%- include('../partial/header')%>
 
-
-
-
-<!-- Check userOnline -->
-
-
     <h3 class="text-center">Messagerie Privée <i class="fas fa-comments"></i></h3>
     <div class="messaging">
         <div class="inbox_msg">
@@ -75,7 +69,6 @@
 
                 for (var e = 0; e < users.users.length; e++) {
                     if (parseInt(users.userOnline) === users.users[e].id) {
-                        console.log('connecte')
                         if (users.users && document.querySelector('#chatOnline .user' + users.users[e].id)) {
                             if (document.querySelector('#chatOnline .user' + users.users[e].id)) {
                                 document.querySelector('#chatOnline .user' + users.users[e].id).setAttribute('style', 'color: green;');
@@ -84,7 +77,6 @@
                         }
                     }
                 }
-                console.log('non connecte')
                 if (users.users && document.querySelector('#chatOnline .user' + parseInt(users.userOnline))) {
                     if (document.querySelector('#chatOnline .user' + parseInt(users.userOnline))) {
                         document.querySelector('#chatOnline .user' + parseInt(users.userOnline)).setAttribute('style', 'color: red;');

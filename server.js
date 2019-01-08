@@ -122,10 +122,8 @@ io.sockets.on('connection', (socket) => {
             };
             let user = usersSocket.find(u => u.id === currentUser.id);
             if (user) {
-                console.log('un onglet deja ouvert');
                 user.count++;
             } else {
-                console.log("pas d'onglet encore ouvert");
                 currentUser.socket = socket.id;
                 usersSocket.push(currentUser);
             }
@@ -140,11 +138,9 @@ io.sockets.on('connection', (socket) => {
                             tableau.push(decoded.id);
                             checkDb.query(sql, tableau).then((result) => {
 
-                                console.log('result tous les messages unread de mes matchs', result);
                                 const sqlCondition2 = tab.map(el => 'from_user_id = ?').join(' OR ');
                                 const sql2 = 'SELECT count(unread) as allUnread FROM matcha.messages INNER JOIN matcha.reports WHERE (' + sqlCondition2 + ') AND matcha.messages.from_user_id = matcha.reports.reported_id AND matcha.reports.flag = 2 AND matcha.messages.to_user_id = ?';
                                 checkDb.query(sql2, tableau).then((result2) => {
-                                    console.log('resilt2 tous les reported id', result2);
                                     if (result1 && result2) {
                                         socket.broadcast.emit('users.new', {user: currentUser});
                                         socket.emit('allUnreadMsg', {countMsg: result[0].allUnread - result2[0].allUnread});
