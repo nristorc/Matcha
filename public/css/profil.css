@@ -28,3 +28,10 @@
         position: relative;
     }
 }
+
+@media screen and (max-height:740px)
+{
+    #issues {
+        position: relative;
+    }
+}
