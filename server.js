@@ -143,10 +143,14 @@ io.sockets.on('connection', (socket) => {
                                 const sqlCondition2 = tab.map(el => 'from_user_id = ?').join(' OR ');
                                 const sql2 = 'SELECT count(unread) as allUnread FROM matcha.messages INNER JOIN matcha.reports WHERE (' + sqlCondition2 + ') AND matcha.messages.from_user_id = matcha.reports.reported_id AND matcha.reports.flag = 2 AND matcha.messages.to_user_id = ?';
                                 checkDb.query(sql2, tableau).then((result2) => {
-                                    if (result1 && result2) {
+                                    if (parseInt(result[0].allUnread) - parseInt(result2[0].allUnread) > 0) {
                                         socket.broadcast.emit('users.new', {user: currentUser});
-                                        socket.emit('allUnreadMsg', {countMsg: result[0].allUnread - result2[0].allUnread});
-                                        socket.emit('allUnreadNotif', {countNotif: result1[0].allUnread});
+                                        socket.emit('allUnreadMsg', {countMsg: parseInt(result[0].allUnread) - parseInt(result2[0].allUnread)});
+                                        socket.emit('allUnreadNotif', {countNotif: parseInt(result1[0].allUnread)});
+                                    } else {
+                                        socket.broadcast.emit('users.new', {user: currentUser});
+                                        socket.emit('allUnreadMsg', {countMsg: 0});
+                                        socket.emit('allUnreadNotif', {countNotif: parseInt(result1[0].allUnread)});
                                     }
                                 })
                             }).catch((err) => {
@@ -155,7 +159,7 @@ io.sockets.on('connection', (socket) => {
                         } else {
                             socket.broadcast.emit('users.new', {user: currentUser});
                             socket.emit('allUnreadMsg', {countMsg: 0});
-                            socket.emit('allUnreadNotif', {countNotif: result1[0].allUnread});
+                            socket.emit('allUnreadNotif', {countNotif: parseInt(result1[0].allUnread)});
                         }
                     }).catch((err) => {
                         console.log('An error occured :' , err);
@@ -197,7 +201,6 @@ io.sockets.on('connection', (socket) => {
                             if (result) {
                                 var u = usersSocket.reduce((acc, elem) => {
                                     if (elem.id == info.toUser) {
-                                        console.log('elem', elem);
                                         acc.push(elem);
                                     }
                                     return acc;

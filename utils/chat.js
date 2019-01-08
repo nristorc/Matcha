@@ -109,7 +109,7 @@ router.route('/').get((request, response) => {
             response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
         });
     } catch (e) {
-        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+        request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accéder à cette page");
         return response.render('index');
     }
 })
@@ -134,7 +134,7 @@ router.route('/').get((request, response) => {
             }
 
         }catch (e) {
-            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accèder à cette page");
+            request.flash('warning', "Merci de vous inscrire ou de vous connecter à votre compte pour accéder à cette page");
             return response.render('index');
         }
     });
