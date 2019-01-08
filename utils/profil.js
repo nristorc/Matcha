@@ -58,22 +58,12 @@ router.route('/').get((request, response) => {
             algorithms: ['HS256']
         });
 
-        // response.cookie('token', 'tototototo');
-        // var ip = request.headers['x-forwarded-for'] ||
-        // request.connection.remoteAddress ||
-        // request.socket.remoteAddress ||
-        // (request.connection.socket ? request.connection.socket.remoteAddress : null);
-        // console.log("adresse IP: ", ip);
-
         publicIp.v4().then(ip => {
             checkDb.forceGeo(ip, decoded.id).then((geoloc) => {
                 console.log(geoloc);
             }).catch((err) => {
                 console.log(err);
             });
-
-
-            // http://api.ipstack.com/134.201.250.155 ? access_key = "31f49d56e09d0468b0ac0349dfdb75fe"
 
         });
 
@@ -269,12 +259,12 @@ router.route('/').get((request, response) => {
                 gender: request.body.gender,
                 birthdate: request.body.birthdate,
                 orientation: request.body.orientation,
-                description: request.body.description,
+                description: request.body.description.trim(),
             };
             await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format du genre");
             await validation.matchingRegex(data.birthdate, /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/, "Mauvais format de la date de naissance");
             await validation.matchingRegex(data.orientation, /^Heterosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format de l'orientation");
-            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de la description");
+            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?\n'"\-_]+$/, "Mauvais format de la description");
 
             if (validation.errors.length === 0) {
                 const sql = "UPDATE matcha.users SET `birth` = CASE WHEN ? = '' THEN NULL ELSE str_to_date(?, '%d/%m/%Y') END, `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
@@ -298,11 +288,11 @@ router.route('/').get((request, response) => {
             const data = {
                 gender: request.body.gender,
                 orientation: request.body.orientation,
-                description: request.body.description,
+                description: request.body.description.trim(),
             };
             await validation.matchingRegex(data.gender, /^Femme|Homme|Homme-Transgenre|Femme-Transgenre$/, "Mauvais format du genre");
             await validation.matchingRegex(data.orientation, /^Heterosexuel|Homosexuel|Bisexuel|Pansexuel$/, "Mauvais format de l'orientation");
-            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?'"\-_]+$/, "Mauvais format de la description");
+            await validation.matchingRegex(data.description, /^[a-zA-Z0-9 !.,:;?\n'"\-_]+$/, "Mauvais format de la description");
 
             if (validation.errors.length === 0) {
                 const sql = "UPDATE matcha.users SET `gender` = ?, orientation = ?, description = ? WHERE users.id = ?";
@@ -346,45 +336,59 @@ router.route('/').get((request, response) => {
 
         } else if (request.body.submit === 'deletePic') {
 
-            checkDb.checkProfilPic(decoded.id).then((result) => {
-                const imagePath = '/'+request.body.image.substring(22);
-                if (result && result.picture) {
-                    if (result.picture === imagePath) {
-                        checkDb.updateProfilPic('/public/img/avatarDefault.png', decoded.id).then((result) => {
-                            if (result) {
-                                checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
-                                    fs.unlink(request.body.image.substring(22), (err) => {
-                                        if (err) throw err;
-                                        // console.log('successfully deleted ' + imagePath);
-                                    });
-                                    response.json({
-                                        image: imagePath,
-                                        message: 'Votre photo a bien été supprimée',
-                                        flag: 'profil',
-                                        type: 'dark'
-                                    });
-                                }).catch((deleteRes) => {
-                                    response.json({errors: "Une erreur s'est produite: " + deleteRes, type: 'warning'});
-                                });
-                            }
-                        }).catch((result) => {
-                            response.json({errors: "Une erreur s'est produite: " + result, type: 'warning'});
-                        });
+            checkDb.getPhotos(decoded.id).then((result2) => {
+                if (result2 && result2 != '') {
+                    const imagePath = '/'+request.body.image.substring(22);
+                    // console.log('imagePath', imagePath);
+                    for (var i = 0; i < result2.length; i++) {
+                        if (result2[i].photo === imagePath) {
+                            checkDb.checkProfilPic(decoded.id).then((result) => {
+                                const imagePath = '/'+request.body.image.substring(22);
+                                if (result && result.picture) {
+                                    if (result.picture === imagePath) {
+                                        checkDb.updateProfilPic('/public/img/avatarDefault.png', decoded.id).then((result) => {
+                                            if (result) {
+                                                checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
+                                                    fs.unlink(request.body.image.substring(22), (err) => {
+                                                        if (err) throw err;
+                                                    });
+                                                    response.json({
+                                                        image: imagePath,
+                                                        message: 'Votre photo a bien été supprimée',
+                                                        flag: 'profil',
+                                                        type: 'dark'
+                                                    });
+                                                    return ;
+                                                }).catch((deleteRes) => {
+                                                    response.json({errors: "Une erreur s'est produite: " + deleteRes, type: 'warning'});
+                                                });
+                                            }
+                                        }).catch((result) => {
+                                            response.json({errors: "Une erreur s'est produite: " + result, type: 'warning'});
+                                        });
 
-                    } else {
-                        checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
-                            fs.unlink(request.body.image.substring(22), (err) => {
-                                if (err) throw err;
-                                // console.log('successfully deleted ' + imagePath);
+                                    } else {
+                                        checkDb.deletePhoto(decoded.id, imagePath).then((deleteRes) => {
+                                            fs.unlink(request.body.image.substring(22), (err) => {
+                                                if (err) throw err;
+                                            });
+                                            response.json({image: imagePath, message: 'Votre photo a bien été supprimée', type: 'dark'});
+                                            return ;
+                                        }).catch((deleteRes) => {
+                                            response.json({errors: "Une erreur s'est produite: " + deleteRes, type: 'warning'});
+                                        });
+                                    }
+                                }
+                            }).catch((result) => {
+                                response.json({errors: "Une erreur s'est produite: " + result, type: 'warning'});
                             });
-                            response.json({image: imagePath, message: 'Votre photo a bien été supprimée', type: 'dark'});
-                        }).catch((deleteRes) => {
-                            response.json({errors: "Une erreur s'est produite: " + deleteRes, type: 'warning'});
-                        });
+                        }
                     }
+                    // console.log('toto');
+                    // response.json({errors: "Aucune image correspondant à votre demande ne peut être supprimée", type: 'warning'});
                 }
-            }).catch((result) => {
-                response.json({errors: "Une erreur s'est produite: " + result, type: 'warning'});
+            }).catch((err) => {
+                console.log('catch', err)
             });
 
         } else if (request.body.submit === 'addTag') {

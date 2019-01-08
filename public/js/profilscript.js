@@ -75,6 +75,8 @@ function deleteTag(tag) {
 function deletePic(image) {
     const srcImg = image.previousElementSibling.children[0];
 
+    console.log(srcImg.src);
+
     var formData = {
         'image': srcImg.src,
         'submit': 'deletePic'
