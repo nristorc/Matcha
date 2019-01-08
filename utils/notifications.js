@@ -74,9 +74,7 @@ router.route('/').get(async (request, response) => {
                 }).catch((err) => {
                     console.log('error on update notifcations unread ', err);
                 })
-            } else {
-                console.log('pas de result')
-            }
+            } 
         }).catch((err) => {
             console.log('error on select notifcations unread ', err);
         })

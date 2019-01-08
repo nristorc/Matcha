@@ -1148,8 +1148,6 @@ class DatabaseRequest {
     async forceGeo(ip, user_id) {
         try {
             return new Promise((resolve, reject) => {
-				console.log(ip);
-
                 this.query("SELECT `changed_loc` FROM matcha.users WHERE `id` = ?", [user_id]).then((loc) => {
 					if (loc[0].changed_loc == "E"){
 					    ipstack(ip,"31f49d56e09d0468b0ac0349dfdb75fe",(err, response) => {

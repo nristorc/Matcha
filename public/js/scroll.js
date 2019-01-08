@@ -33,15 +33,15 @@ const   requestNextPage = () => {
         url: window.location.pathname + window.location.search,
         success: function(html) {
 			$('#container').append(html);
-			$('#loading').hide();
-            if (html == ""){
+            $('#loading').hide();
+            if (typeof html == typeof {}){
                 end = 1;
             }
         },
         error: function() {
             $('#loading').hide();
         },
-        complete: function(jqXHR, status){
+        complete: function(){
             $('#loading').hide();
         }
     });
