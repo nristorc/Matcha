@@ -122,6 +122,8 @@ io.sockets.on('connection', (socket) => {
             };
             let user = usersSocket.find(u => u.id === currentUser.id);
             if (user) {
+                // currentUser.socket = socket.id;
+                // usersSocket.push(currentUser);
                 user.count++;
             } else {
                 currentUser.socket = socket.id;
@@ -170,6 +172,8 @@ io.sockets.on('connection', (socket) => {
     /**
      * Nouveaux Messages Chat
      */
+
+
     socket.on('newMsg', (info) => {
         if (info.message !== '') {
             const checkBlock = 'SELECT reported_id FROM matcha.reports WHERE report_id = ? AND flag = 2';
@@ -193,12 +197,15 @@ io.sockets.on('connection', (socket) => {
                             if (result) {
                                 var u = usersSocket.reduce((acc, elem) => {
                                     if (elem.id == info.toUser) {
+                                        console.log('elem', elem);
                                         acc.push(elem);
                                     }
                                     return acc;
                                 }, []);
                                 socket.emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
                                 u.forEach(user => {
+                                    console.log('user', user);
+                                    console.log('connected', user.socket);
                                     io.sockets.connected[user.socket].emit('sendingMessage', {users: usersSocket, msg: info, date: new Date()});
                                 })
                             }
