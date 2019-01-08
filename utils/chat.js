@@ -52,13 +52,9 @@ router.route('/').get((request, response) => {
             algorithms: ['HS256']
         });
 
-        console.log('je rentre sur la page match')
         checkDb.getMatches(decoded.id).then((tab) => {
-            console.log('je rentre dans le THEN')
-            console.log('tab', tab);
             const tableau = Array.from(tab);
             if (tab != "") {
-                // console.log('je rentre dans tab');
                 const sqlCondition = tab.map(el => 'id = ?').join(' OR ');
 
                 const sql = 'SELECT `id`, `username`, `profil`, `online` FROM matcha.users WHERE (' + sqlCondition + ') AND `id` NOT IN (SELECT reported_id FROM matcha.reports WHERE flag = 2 AND report_id = ?);';
@@ -67,11 +63,9 @@ router.route('/').get((request, response) => {
 
                 checkDb.query(sql, tableau)
                     .then((res) => {
-                        // console.log('token', token);
                         push = res;
 
                         // Check user blocked
-
                         var msg = "SELECT count(unread) as unread, from_user_id FROM matcha.messages WHERE (";
                         if (push.length > 0) {
                             for (var i = 0; i < push.length; i++) {
@@ -107,7 +101,6 @@ router.route('/').get((request, response) => {
                     });
             }
             else {
-                // console.log('je rentre pas');
                 console.log('token', token);
                 response.render('pages/chatroom', {myMatchesMsg: 'Vous ne possédez aucun match', token});
             }
@@ -128,7 +121,6 @@ router.route('/').get((request, response) => {
             });
 
             if (request.body.submit === 'getMessages') {
-                console.log(request.body.userId);
                 checkDb.getMessages(decoded.id, request.body.userId, request.body.userId, decoded.id).then((result) => {
                     const sqlRead = 'UPDATE matcha.messages SET unread = null WHERE from_user_id = ? AND to_user_id = ?';
                     checkDb.query(sqlRead, [request.body.userId, decoded.id]).then((res) => {

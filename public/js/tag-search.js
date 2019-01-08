@@ -20,7 +20,6 @@ const	validTag = (tag) => {
 	if (tagDiv == null)
 		return
 	tagDiv.innerHTML = ""
-	console.log("tags valid", tags);
 }
 
 const validFormTag = () => {
@@ -93,7 +92,6 @@ $(function () {
                             small.innerText = server_response.error;
                             small.id = 'errorSearch';
                             small.setAttribute('style', 'color: red');
-                            console.log('small', document.getElementById('addTag'));
 
                             document.getElementById('addTag').insertAdjacentElement('afterend', small);
                             server_response.error = null;

@@ -116,7 +116,11 @@ router.post('/', async (request, response)=> {
         } else {
             registrationResponse.type = 'warning';
             registrationResponse.error = true;
-            registrationResponse.message = `Un ou plusieurs champs renseignés ont des erreurs dans leur format`;
+            var errors = [];
+            for (var i = 0; i < validation.errors.length; i++) {
+                errors.push(validation.errors[i].errorMsg);
+            }
+            registrationResponse.message = errors;
             request.flash(registrationResponse.type, registrationResponse.message);
             response.status(417).redirect('/');
             validation.errors = [];

@@ -151,7 +151,6 @@
         socket.on('onlineUser', (users) => {
             for (var e = 0; e < users.users.length; e++) {
                 if (parseInt(users.userOnline) === users.users[e].id) {
-                    console.log('userOnline');
 
                     const i = document.createElement('i');
                     i.setAttribute('class', 'fas fa-circle fa-xs');
@@ -170,11 +169,18 @@
     })
 
 
-function iLike(userId) {
+    function iLike(userId) {
         const formData = {
             'userId': userId,
             'submit': 'iLiked'
         }
+
+        var splitedURL = window.location.pathname.split("/")
+        var id = splitedURL.reduce((acc, val, i) => {
+            if (val == "user" && i < splitedURL.length - 1)
+                acc = splitedURL[i + 1]
+            return acc
+        }, "")
 
         $.ajax({
             type        : 'POST',
@@ -184,8 +190,7 @@ function iLike(userId) {
             encode        : true
         })
             .done(function(data) {
-                // console.log('data like: ', data);
-                if (data.flag === '1') {
+                if (data.flag === '1' && userId == id) {
                     $('.fa-thumbs-up').attr('class', 'fas fa-thumbs-up');
                     $('.fa-thumbs-up').attr('style', 'color: dodgerblue; font-size: xx-large; margin-left: 10px');
                     $('.fa-thumbs-up').attr('onclick', 'iUnlike(<%=user[0].id%>)');
@@ -199,7 +204,7 @@ function iLike(userId) {
                         $('span.badge.badge-light')[0].innerHTML = parseInt(pop) + 2 + '%';
                     }
                 }
-                if (data.getMatches) {
+                if (data.getMatches && userId == id) {
                     for (var i = 0; i < data.getMatches.length; i++) {
                         if (data.getMatches[i] === userId) {
                             $('#likeAndMatch').append('<span><i class="fas fa-heartbeat" style="color: red; font-size: xx-large; margin-left: 10px"></i></span>');
@@ -234,6 +239,13 @@ function iLike(userId) {
             'submit': 'iUnliked'
         }
 
+        var splitedURL = window.location.pathname.split("/")
+        var id = splitedURL.reduce((acc, val, i) => {
+            if (val == "user" && i < splitedURL.length - 1)
+                acc = splitedURL[i + 1]
+            return acc
+        }, "")
+
         $.ajax({
             type        : 'POST',
             url         : '/user/' + userId,
@@ -242,7 +254,7 @@ function iLike(userId) {
             encode        : true
         })
             .done(function(data) {
-                if (data.flag === '1') {
+                if (data.flag === '1' && userId == id) {
                     $('.fa-thumbs-up').attr('class', 'far fa-thumbs-up');
                     $('.fa-thumbs-up').attr('style', 'font-size: xx-large; margin-left: 10px');
                     $('.fa-thumbs-up').attr('onclick', 'iLike(<%=user[0].id%>)');
@@ -290,6 +302,12 @@ function iLike(userId) {
             'userId': userId,
             'submit': 'iReport'
         }
+        var splitedURL = window.location.pathname.split("/")
+        var id = splitedURL.reduce((acc, val, i) => {
+            if (val == "user" && i < splitedURL.length - 1)
+                acc = splitedURL[i + 1]
+                return acc
+        }, "")
         $.ajax({
             type		: 'POST',
             url         : '/user/' + userId,
@@ -298,7 +316,7 @@ function iLike(userId) {
             encode		: true
         })
             .done(function(data) {
-                if (data && data.flag === 'reported updated') {
+                if (data && data.flag === 'reported updated' && userId == id) {
                     $('#notFake').remove();
                     const fake = document.createElement('p');
                     fake.innerHTML = '<strong>It\'s a FAKE !</strong> <span><i class="fas fa-thumbs-down" style="font-size: x-large;"></i></span>';
@@ -321,6 +339,12 @@ function iLike(userId) {
             'userId': userId,
             'submit': 'iBlock'
         }
+        var splitedURL = window.location.pathname.split("/")
+        var id = splitedURL.reduce((acc, val, i) => {
+            if (val == "user" && i < splitedURL.length - 1)
+                acc = splitedURL[i + 1]
+            return acc
+        }, "")
         $.ajax({
             type		: 'POST',
             url         : '/user/' + userId,
@@ -330,7 +354,7 @@ function iLike(userId) {
         })
             .done(function(data) {
 
-                if (data && data.flag === 'blocked') {
+                if (data && data.flag === 'blocked' && userId == id) {
                     $('#notBlock').remove();
                     const block = document.createElement('p');
                     block.innerHTML = '<strong>Vous avez bloqué cet utilisateur...</strong> <span><i class="fas fa-angry" style="font-size: x-large;"></i></span>';
@@ -371,6 +395,12 @@ function iLike(userId) {
             'userId': userId,
             'submit': 'iUnblock'
         }
+        var splitedURL = window.location.pathname.split("/")
+        var id = splitedURL.reduce((acc, val, i) => {
+            if (val == "user" && i < splitedURL.length - 1)
+                acc = splitedURL[i + 1]
+            return acc
+        }, "")
         $.ajax({
             type		: 'POST',
             url         : '/user/' + userId,
@@ -379,7 +409,7 @@ function iLike(userId) {
             encode		: true
         })
             .done(function(data) {
-                if (data && data.flag === 'unblocked') {
+                if (data && data.flag === 'unblocked' && userId == id) {
                     $('#block').remove();
                     $('button.btn-link').remove();
                     const unblock = document.createElement('p');
@@ -396,7 +426,7 @@ function iLike(userId) {
                     }
                 }
 
-                if (data.getMatches) {
+                if (data.getMatches && userId == id) {
                     for (var i = 0; i < data.getMatches.length; i++) {
                         if (data.getMatches[i] === userId) {
                             if (data.messages) {

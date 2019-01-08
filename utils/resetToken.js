@@ -59,7 +59,6 @@ router.route('/:resetToken')
                 response.status(401).redirect('/');
             }
         }).catch((result) => {
-            // console.log('pb', result);
             if (result) {
                 resetResponse.error = true;
                 resetResponse.type = 'warning';
@@ -75,7 +74,6 @@ router.route('/:resetToken')
             }
         });
     }).post(async (request, response) => {
-    console.log('request post: ', request.body);
     const resetResponse = {};
     const data = {
         resetToken: request.body.resetToken,
