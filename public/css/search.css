@@ -194,8 +194,9 @@ a:hover {
 }
 
 .search-col {
-    padding: 30px;
-    margin: 30px;
+    padding: 40px;
+    max-width: 350px;
+    margin: auto;
 }
 
 .desc-search {

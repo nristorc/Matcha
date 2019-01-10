@@ -239,7 +239,12 @@ io.sockets.on('connection', (socket) => {
     });
 
     socket.on('okreadyUser', (userId) => {
-        socket.emit('onlineUser', {userOnline: userId, users: usersSocket});
+        getLastOnline = 'SELECT lastOnline FROM matcha.users WHERE id = ?';
+        checkDb.query(getLastOnline, [userId]).then((date) => {
+            socket.emit('onlineUser', {userOnline: userId, users: usersSocket, date: date[0].lastOnline});
+        }).catch((err) => {
+            console.log('error getting lastOnline date', err);
+        });
     });
 
     socket.on('okreadyChat', (userId) => {
