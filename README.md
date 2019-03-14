@@ -2,7 +2,7 @@
 
 **Projet réalisé dans le cadre de notre formation à l'école 42 - second projet de la branche Web**\
 **Objectifs: Micro-framework - Comptes utilisateur avancés - Web temps réel - Géolocalisation - Sécurité / Validation de données**\
-**Compétences: Security - Web - DB & Data **
+**Compétences: Security - Web - DB & Data**
 
 **Credit to: [acoulomb](https://github.com/acoulomb) - [nristorc](https://github.com/nristorc)**
 
